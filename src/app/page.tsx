@@ -18,7 +18,7 @@ export default function Home() {
   const [lang, setLang] = useState<Language>("en");
   const [keys, setKeys] = useState<ChallengeKey[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
-  const [activeTab, setActiveTab] = useState<FilterTab>("all");
+  const [activeTab, setActiveTab] = useState<FilterTab>("latest");
   const [isSubmitModalOpen, setIsSubmitModalOpen] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
 
@@ -276,8 +276,8 @@ export default function Home() {
         break;
       case "all":
       default:
-        // Default sort: verified & recent first
-        list.sort((a, b) => (b.upvotes - b.downvotes) - (a.upvotes - a.downvotes));
+        // Default ranking: strictly newest to oldest
+        list.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
         break;
     }
 

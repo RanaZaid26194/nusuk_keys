@@ -23,21 +23,21 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  title: "Nusuk Keys | Umrah Challenge Keys & Verification Portal",
-  description: "Discover and share active, verified Nusuk Umrah Challenge keys (NG-...). One-tap copy and instant deep-linking into the official Saudi Nusuk App.",
+  title: "Nusuk Keys | Challenge Keys Directory",
+  description: "Discover and share active Nusuk Challenge keys (NG-...). One-tap copy and instant deep-linking into the official Nusuk App.",
   keywords: ["Nusuk", "Nusuk App", "Umrah Challenge", "Nusuk Keys", "Saudi Arabia", "Hajj", "Umrah", "NG Code"],
   authors: [{ name: "Nusuk Keys" }],
   openGraph: {
-    title: "Nusuk Keys | Umrah Challenge Keys & Verification Portal",
-    description: "Browse verified Nusuk challenge keys, upvote working codes, and open directly in the Nusuk app.",
+    title: "Nusuk Keys | Challenge Keys Directory",
+    description: "Browse verified Nusuk challenge keys, check working status, and open directly in the Nusuk app.",
     type: "website",
     locale: "en_US",
     siteName: "Nusuk Keys",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Nusuk Keys | Umrah Challenge Keys",
-    description: "Verified Nusuk challenge keys for Umrah pilgrims.",
+    title: "Nusuk Keys | Challenge Keys Directory",
+    description: "Nusuk challenge keys directory for pilgrims.",
   },
 };
 

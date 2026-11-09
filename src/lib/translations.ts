@@ -1,9 +1,9 @@
 export const translations = {
   en: {
     siteTitle: "Nusuk Keys",
-    siteSubtitle: "Umrah Challenge Keys & Verification Portal",
-    heroHeading: "Discover & Share Nusuk Umrah Challenge Keys",
-    heroDescription: "Verified referral keys to unlock Umrah rewards and group challenges directly in the official Saudi Nusuk App.",
+    siteSubtitle: "Nusuk Challenge Keys Directory",
+    heroHeading: "Discover & Share Nusuk Challenge Keys",
+    heroDescription: "Nusuk challenge referral keys to unlock rewards and complete challenges directly in the official Nusuk App.",
     shareCodeBtn: "Share a Key",
     searchPlaceholder: "Search keys (e.g. NG-SBs...)",
     tabs: {
@@ -60,9 +60,9 @@ export const translations = {
   },
   ar: {
     siteTitle: "مفاتيح نسك",
-    siteSubtitle: "بوابة توثيق ومشاركة مفاتيح تحدي العمرة",
+    siteSubtitle: "دليل مفاتيح ورموز تحدي نسك",
     heroHeading: "شارك واستكشف مفاتيح تحدي تطبيق نسك",
-    heroDescription: "رموز ومفاتيح تحدي العمرة المعتمدة لتفعيل الجوائز وإتمام التحديات مباشرة في تطبيق نسك الرسمي.",
+    heroDescription: "رموز ومفاتيح تحدي نسك لتفعيل الجوائز وإتمام التحديات مباشرة في تطبيق نسك الرسمي.",
     shareCodeBtn: "مشاركة مفتاح جديد",
     searchPlaceholder: "ابحث عن مفتاح (مثال: NG-SBs...)",
     tabs: {
