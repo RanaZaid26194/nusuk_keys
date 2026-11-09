@@ -7,6 +7,7 @@ import { ChallengeKey, Language } from "@/lib/types";
 import { translations } from "@/lib/translations";
 import { calculateSuccessRate, formatTimeAgo, getNusukDeepLink } from "@/lib/utils";
 import { playHapticSound } from "@/lib/audio";
+import { copyToClipboard } from "@/lib/clipboard";
 
 interface KeyCardProps
 {
@@ -58,45 +59,6 @@ export const KeyCard: React.FC<KeyCardProps> = ({
   {
     if (spotlightRef.current)
       spotlightRef.current.style.opacity = "0";
-  };
-
-  const copyToClipboard = async (text: string): Promise<boolean> =>
-  {
-    try
-    {
-      if (typeof navigator !== "undefined" && navigator?.clipboard?.writeText)
-      {
-        await navigator.clipboard.writeText(text);
-        return true;
-      }
-    }
-    catch
-    {
-      // fallback to execCommand below
-    }
-
-    try
-    {
-      if (typeof document !== "undefined")
-      {
-        const textArea = document.createElement("textarea");
-        textArea.value = text;
-        textArea.style.position = "fixed";
-        textArea.style.opacity = "0";
-        document.body.appendChild(textArea);
-        textArea.focus();
-        textArea.select();
-        const success = document.execCommand("copy");
-        document.body.removeChild(textArea);
-        return success;
-      }
-    }
-    catch
-    {
-      // copy failed
-    }
-
-    return false;
   };
 
   const handleCopy = async (e: React.MouseEvent) =>

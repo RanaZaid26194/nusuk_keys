@@ -39,10 +39,10 @@ export function computeRevealTimeMs(
 ): { staggerMs: number; fadeMs: number; totalMs: number }
 {
   if (reducedMotion || wordCount <= 0)
-    return { staggerMs: 0, fadeMs: 150, totalMs: 150 };
-  const maxStaggerTotal = 0.40;
-  const stagger = Math.min(0.04, wordCount > 1 ? maxStaggerTotal / (wordCount - 1) : 0.04);
-  const fade = 0.15;
+    return { staggerMs: 0, fadeMs: 180, totalMs: 180 };
+  const maxStaggerTotal = 0.65;
+  const stagger = Math.min(0.055, wordCount > 1 ? maxStaggerTotal / (wordCount - 1) : 0.055);
+  const fade = 0.22;
   const total = (wordCount - 1) * stagger + fade;
   return {
     staggerMs: Math.round(stagger * 1000),
@@ -138,7 +138,7 @@ export const DailyAyah: React.FC<DailyAyahProps> = ({ lang, onOpenInfo, mockFrid
 
   const wordVariants =
   {
-    hidden: { opacity: 0, y: shouldReduceMotion ? 0 : 2 },
+    hidden: { opacity: 0, y: shouldReduceMotion ? 0 : 3 },
     visible:
     {
       opacity: 1,
