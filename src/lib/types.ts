@@ -10,7 +10,7 @@ export interface ChallengeKey {
   userVoted?: 'UP' | 'DOWN' | null;
 }
 
-export type FilterTab = 'all' | 'verified' | 'popular' | 'latest';
+export type FilterTab = 'all' | 'verified' | 'popular' | 'latest' | 'used';
 
 export type Language = 'en' | 'ar';
 

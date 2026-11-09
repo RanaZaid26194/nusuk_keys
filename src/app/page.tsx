@@ -10,6 +10,7 @@ import { InfoModal } from "@/components/InfoModal";
 import { Footer } from "@/components/Footer";
 import { supabase, isSupabaseConfigured, INITIAL_DEMO_KEYS } from "@/lib/supabase";
 import { calculateSuccessRate } from "@/lib/utils";
+import { loadUsedKeys, markUsed, unmarkUsed, clearUsedKeys, normalizeCode, STORAGE_KEY_USED } from "@/lib/usedKeys";
 
 const LOCAL_STORAGE_KEYS = "nusuk_keys_data_v1";
 const LOCAL_STORAGE_CACHE = "nusuk_keys_cache_v2";
@@ -53,6 +54,95 @@ export default function Home() {
   const [isSubmitModalOpen, setIsSubmitModalOpen] = useState(false);
   const [isInfoModalOpen, setIsInfoModalOpen] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
+
+  // local history for used keys
+  const [usedMap, setUsedMap] = useState<Record<string, number>>({});
+  const [usedSnapshot, setUsedSnapshot] = useState<Set<string>>(new Set());
+  const [shouldPulseUsedBadge, setShouldPulseUsedBadge] = useState(false);
+
+  // snapshot refresh and badge pulse
+  const refreshUsedSnapshot = useCallback(() =>
+  {
+    const currentMap = loadUsedKeys();
+    setUsedMap(currentMap);
+    const nextCodes = new Set(Object.keys(currentMap).map(c => normalizeCode(c)));
+
+    setUsedSnapshot((prevSnapshot) =>
+    {
+      let hasLeavingKey = false;
+      if (activeTab !== "used")
+      {
+        const currentCodes = Object.keys(currentMap);
+        for (let i = 0; i < currentCodes.length; i++)
+        {
+          const code = normalizeCode(currentCodes[i]);
+          if (!prevSnapshot.has(code))
+          {
+            hasLeavingKey = true;
+            break;
+          }
+        }
+      }
+
+      if (hasLeavingKey)
+      {
+        setShouldPulseUsedBadge(true);
+        setTimeout(() =>
+        {
+          setShouldPulseUsedBadge(false);
+        }, 800);
+      }
+
+      return nextCodes;
+    });
+  }, [activeTab]);
+
+  // load used keys after mount & attach tab sync listeners
+  useEffect(() =>
+  {
+    const initialMap = loadUsedKeys();
+    setUsedMap(initialMap);
+    setUsedSnapshot(new Set(Object.keys(initialMap).map(c => normalizeCode(c))));
+
+    const handleStorage = (e: StorageEvent) =>
+    {
+      if (e.key === STORAGE_KEY_USED)
+      {
+        const updatedMap = loadUsedKeys();
+        setUsedMap(updatedMap);
+        setUsedSnapshot(new Set(Object.keys(updatedMap).map(c => normalizeCode(c))));
+      }
+    };
+
+    const handleFocus = () =>
+    {
+      refreshUsedSnapshot();
+    };
+
+    const handleVisibility = () =>
+    {
+      if (document.visibilityState === "visible")
+        refreshUsedSnapshot();
+    };
+
+    window.addEventListener("storage", handleStorage);
+    window.addEventListener("focus", handleFocus);
+    document.addEventListener("visibilitychange", handleVisibility);
+
+    return () =>
+    {
+      window.removeEventListener("storage", handleStorage);
+      window.removeEventListener("focus", handleFocus);
+      document.removeEventListener("visibilitychange", handleVisibility);
+    };
+  }, [refreshUsedSnapshot]);
+
+  // handle tab change with snapshot refresh
+  const handleTabChange = (tab: FilterTab) =>
+  {
+    setActiveTab(tab);
+    refreshUsedSnapshot();
+  };
 
   // Initialize Language & Direction
   useEffect(() => {
@@ -315,6 +405,14 @@ export default function Home() {
     setKeys(updated);
     persistOfflineKeys(updated);
 
+    // mark as used
+    const targetKey = keys.find(k => k.id === keyId);
+    if (targetKey)
+    {
+      const nextUsed = markUsed(targetKey.code);
+      setUsedMap(nextUsed);
+    }
+
     // Sync to Supabase
     if (isSupabaseConfigured && supabase) {
       try {
@@ -347,6 +445,14 @@ export default function Home() {
     setKeys(updated);
     persistOfflineKeys(updated);
 
+    // mark as used
+    const targetKey = keys.find(k => k.id === keyId);
+    if (targetKey)
+    {
+      const nextUsed = markUsed(targetKey.code);
+      setUsedMap(nextUsed);
+    }
+
     if (isSupabaseConfigured && supabase) {
       try {
         const target = keys.find(k => k.id === keyId);
@@ -360,6 +466,35 @@ export default function Home() {
         console.error("Supabase copy count update error:", err);
       }
     }
+  };
+
+  // Open in Nusuk counts as used
+  const handleOpenNusuk = (code: string) =>
+  {
+    const nextUsed = markUsed(code);
+    setUsedMap(nextUsed);
+  };
+
+  // Mark as unused sends key back to main tabs immediately
+  const handleToggleUsed = (code: string) =>
+  {
+    const nextUsed = unmarkUsed(code);
+    setUsedMap(nextUsed);
+    const norm = normalizeCode(code);
+    setUsedSnapshot((prev) =>
+    {
+      const next = new Set(prev);
+      next.delete(norm);
+      return next;
+    });
+  };
+
+  // Clear all used keys history
+  const handleClearUsed = () =>
+  {
+    clearUsedKeys();
+    setUsedMap({});
+    setUsedSnapshot(new Set());
   };
 
   // Submit New Key with Strict Duplicate Rejection
@@ -485,17 +620,41 @@ export default function Home() {
   };
 
   // Filter & Search Logic
-  const filteredKeys = useMemo(() => {
+  const filteredKeys = useMemo(() =>
+  {
     let list = [...keys];
+    const hasSearch = searchQuery.trim().length > 0;
+    const q = searchQuery.toLowerCase().trim();
 
-    // Search query
-    if (searchQuery.trim()) {
-      const q = searchQuery.toLowerCase().trim();
-      list = list.filter(k => k.code.toLowerCase().includes(q));
+    if (activeTab === "used")
+    {
+      // Show all keys that are in usedMap
+      list = list.filter(k => Boolean(usedMap[normalizeCode(k.code)]));
+
+      if (hasSearch)
+        list = list.filter(k => k.code.toLowerCase().includes(q));
+
+      // Sort: most recently used first
+      list.sort((a, b) =>
+      {
+        const timeA = usedMap[normalizeCode(a.code)] || 0;
+        const timeB = usedMap[normalizeCode(b.code)] || 0;
+        return timeB - timeA;
+      });
+
+      return list;
     }
 
+    // In the 4 main tabs:
+    // If NO search query, filter out keys present in usedSnapshot
+    if (!hasSearch)
+      list = list.filter(k => !usedSnapshot.has(normalizeCode(k.code)));
+    else
+      list = list.filter(k => k.code.toLowerCase().includes(q));
+
     // Tabs
-    switch (activeTab) {
+    switch (activeTab)
+    {
       case "verified":
         list = list.filter(k => calculateSuccessRate(k.upvotes, k.downvotes) >= 70 && k.upvotes >= 2);
         break;
@@ -503,8 +662,6 @@ export default function Home() {
         list.sort((a, b) => b.copies_count - a.copies_count || b.upvotes - a.upvotes);
         break;
       case "latest":
-        list.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
-        break;
       case "all":
       default:
         // Default ranking: strictly newest to oldest
@@ -513,7 +670,18 @@ export default function Home() {
     }
 
     return list;
-  }, [keys, searchQuery, activeTab]);
+  }, [keys, searchQuery, activeTab, usedMap, usedSnapshot]);
+
+  // Derived counts for used keys
+  const usedCount = useMemo(() =>
+  {
+    return Object.keys(usedMap).length;
+  }, [usedMap]);
+
+  const hasUnvotedUsedKeys = useMemo(() =>
+  {
+    return keys.some(k => Boolean(usedMap[normalizeCode(k.code)]) && !k.userVoted);
+  }, [keys, usedMap]);
 
   // Exact Real-Time Statistics Calculation (Strict math, zero hallucination)
   const stats: Stats = useMemo(() => {
@@ -559,11 +727,18 @@ export default function Home() {
           lang={lang}
           searchQuery={searchQuery}
           activeTab={activeTab}
+          usedMap={usedMap}
+          usedCount={usedCount}
+          shouldPulseUsedBadge={shouldPulseUsedBadge}
+          hasUnvotedUsedKeys={hasUnvotedUsedKeys}
           onSearchChange={setSearchQuery}
-          onTabChange={setActiveTab}
+          onTabChange={handleTabChange}
           onVote={handleVote}
           onCopy={handleCopy}
           onOpenSubmit={() => setIsSubmitModalOpen(true)}
+          onOpenNusuk={handleOpenNusuk}
+          onToggleUsed={handleToggleUsed}
+          onClearUsed={handleClearUsed}
         />
       </main>
 

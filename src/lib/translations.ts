@@ -11,6 +11,7 @@ export const translations = {
       verified: "Verified Working",
       popular: "Most Used",
       latest: "Recently Added",
+      used: "Used by Me",
     },
     keyCard: {
       verified: "Verified Active",
@@ -29,6 +30,8 @@ export const translations = {
       showing: "Showing",
       of: "of",
       keys: "keys",
+      used: "Used",
+      markUnused: "Mark as unused",
     },
     stats: {
       totalKeys: "Active Keys",
@@ -70,6 +73,13 @@ export const translations = {
       description: "No challenge keys match your current search or filter. Be the first to share your key!",
       clearFilters: "Clear Search",
     },
+    usedHint: "Tried these? Let others know if they worked.",
+    emptyUsed: {
+      title: "No used keys yet",
+      description: "Keys you copy or try will show up here so you can vote on them.",
+    },
+    clearHistory: "Clear history",
+    confirmClear: "Clear all used keys?",
     footer: {
       disclaimer: "Independent open portal. Not officially affiliated with or endorsed by the Saudi Ministry of Hajj & Umrah or Nusuk platform.",
       quickCopy: "One-tap copy to Nusuk app",
@@ -87,6 +97,7 @@ export const translations = {
       verified: "مؤكد ويعمل",
       popular: "الأكثر استخداماً",
       latest: "أحدث المفاتيح",
+      used: "استخدمتُها",
     },
     keyCard: {
       verified: "يعمل ومؤكد",
@@ -105,6 +116,8 @@ export const translations = {
       showing: "يُعرض",
       of: "من",
       keys: "مفتاح",
+      used: "مُستخدم",
+      markUnused: "إلغاء الاستخدام",
     },
     stats: {
       totalKeys: "المفاتيح النشطة",
@@ -146,6 +159,13 @@ export const translations = {
       description: "لا توجد نتائج مطابقة لبحثك الحالي. كن أول من يشارك مفتاحه!",
       clearFilters: "إعادة تعيين البحث",
     },
+    usedHint: "هل جربت هذه المفاتيح؟ شاركنا برأيك لمعرفة ما إذا كانت تعمل.",
+    emptyUsed: {
+      title: "لا توجد مفاتيح مستخدمة بعد",
+      description: "المفاتيح التي تنسخها أو تجربها ستظهر هنا لتتمكن من تقييمها والتصويت عليها.",
+    },
+    clearHistory: "مسح السجل",
+    confirmClear: "هل تريد مسح جميع المفاتيح المستخدمة؟",
     footer: {
       disclaimer: "بوابة مفتوحة ومستقلة، غير تابعة أو معتمدة رسمياً من قبل وزارة الحج والعمرة أو منصة نسك.",
       quickCopy: "نسخ فوري برابط مباشر لتطبيق نسك",

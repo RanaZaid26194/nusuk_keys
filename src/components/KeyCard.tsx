@@ -2,7 +2,7 @@
 
 import React, { useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Copy, Check, ExternalLink, ThumbsUp, ThumbsDown, Clock, ShieldCheck, AlertCircle } from "lucide-react";
+import { Copy, Check, ExternalLink, ThumbsUp, ThumbsDown, Clock, ShieldCheck, AlertCircle, RotateCcw } from "lucide-react";
 import { ChallengeKey, Language } from "@/lib/types";
 import { translations } from "@/lib/translations";
 import { calculateSuccessRate, formatTimeAgo, getNusukDeepLink } from "@/lib/utils";
@@ -12,16 +12,22 @@ interface KeyCardProps {
   item: ChallengeKey;
   lang: Language;
   searchQuery?: string;
+  isUsed?: boolean;
   onVote: (id: string, type: 'UP' | 'DOWN') => void;
   onCopy: (id: string) => void;
+  onOpenNusuk?: (code: string) => void;
+  onToggleUsed?: (code: string) => void;
 }
 
 export const KeyCard: React.FC<KeyCardProps> = ({
   item,
   lang,
   searchQuery = "",
+  isUsed = false,
   onVote,
   onCopy,
+  onOpenNusuk,
+  onToggleUsed,
 }) => {
   const [copied, setCopied] = useState(false);
   const [mousePos, setMousePos] = useState<{ x: number; y: number } | null>(null);
@@ -115,25 +121,34 @@ export const KeyCard: React.FC<KeyCardProps> = ({
 
       {/* Header: Badge & Time */}
       <div className="relative z-10 flex items-center justify-between gap-2 mb-3.5">
-        {isExpired ? (
-          <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium bg-rose-500/10 text-rose-700 dark:text-rose-300 border border-rose-500/20">
-            <AlertCircle className="w-3.5 h-3.5 text-rose-500 dark:text-rose-400" />
-            <span className={isAr ? "font-arabic" : ""}>{t.keyCard.expired}</span>
-          </span>
-        ) : isVerified ? (
-          <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30">
-            <ShieldCheck className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
-            <span className={isAr ? "font-arabic" : ""}>{t.keyCard.verified} ({successRate}%)</span>
-          </span>
-        ) : (
-          <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-500/10 text-amber-800 dark:text-amber-300 border border-amber-500/20">
-            <Clock className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
-            <span className={isAr ? "font-arabic" : ""}>{t.keyCard.needsReview}</span>
-          </span>
-        )}
+        <div className="flex items-center gap-1.5 flex-wrap">
+          {isExpired ? (
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium bg-rose-500/10 text-rose-700 dark:text-rose-300 border border-rose-500/20">
+              <AlertCircle className="w-3.5 h-3.5 text-rose-500 dark:text-rose-400" />
+              <span className={isAr ? "font-arabic" : ""}>{t.keyCard.expired}</span>
+            </span>
+          ) : isVerified ? (
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30">
+              <ShieldCheck className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+              <span className={isAr ? "font-arabic" : ""}>{t.keyCard.verified} ({successRate}%)</span>
+            </span>
+          ) : (
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-500/10 text-amber-800 dark:text-amber-300 border border-amber-500/20">
+              <Clock className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
+              <span className={isAr ? "font-arabic" : ""}>{t.keyCard.needsReview}</span>
+            </span>
+          )}
+
+          {isUsed && (
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-semibold bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-700/80 shadow-xs">
+              <Check className="w-3 h-3 text-emerald-600 dark:text-emerald-400 stroke-[2.5]" />
+              <span className={isAr ? "font-arabic" : ""}>{t.keyCard.used}</span>
+            </span>
+          )}
+        </div>
 
         {/* Time Ago */}
-        <span className={`text-[11px] text-zinc-500 dark:text-zinc-500 flex items-center gap-1 ${isAr ? "font-arabic" : ""}`}>
+        <span className={`text-[11px] text-zinc-600 dark:text-zinc-400 flex items-center gap-1 flex-shrink-0 ${isAr ? "font-arabic" : ""}`}>
           <Clock className="w-3 h-3 opacity-60" />
           {formatTimeAgo(item.created_at, lang)}
         </span>
@@ -263,19 +278,45 @@ export const KeyCard: React.FC<KeyCardProps> = ({
           </motion.button>
         </div>
 
-        {/* Deep Link to Nusuk App */}
-        <motion.a
-          href={getNusukDeepLink(item.code)}
-          target="_blank"
-          rel="noopener noreferrer"
-          whileHover={{ x: isAr ? -3 : 3 }}
-          className="flex items-center gap-1 text-[11px] text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-200 transition-colors"
-          title={t.keyCard.openNusuk}
-          aria-label={t.keyCard.openNusuk}
-        >
-          <span className={isAr ? "font-arabic" : ""}>{t.keyCard.openNusuk}</span>
-          <ExternalLink className="w-3 h-3 opacity-70" />
-        </motion.a>
+        {/* Right side: Mark as unused & Deep link */}
+        <div className="flex items-center gap-2 sm:gap-3">
+          {isUsed && onToggleUsed && (
+            <motion.button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                playHapticSound('click');
+                onToggleUsed(item.code);
+              }}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              title={t.keyCard.markUnused}
+              aria-label={t.keyCard.markUnused}
+              className="flex items-center gap-1 text-[11px] text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-200 transition-colors"
+            >
+              <RotateCcw className="w-3 h-3 opacity-70" />
+              <span className={isAr ? "font-arabic" : ""}>{t.keyCard.markUnused}</span>
+            </motion.button>
+          )}
+
+          {/* Deep Link to Nusuk App */}
+          <motion.a
+            href={getNusukDeepLink(item.code)}
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={() => {
+              playHapticSound('click');
+              onOpenNusuk?.(item.code);
+            }}
+            whileHover={{ x: isAr ? -3 : 3 }}
+            className="flex items-center gap-1 text-[11px] text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-200 transition-colors"
+            title={t.keyCard.openNusuk}
+            aria-label={t.keyCard.openNusuk}
+          >
+            <span className={isAr ? "font-arabic" : ""}>{t.keyCard.openNusuk}</span>
+            <ExternalLink className="w-3 h-3 opacity-70" />
+          </motion.a>
+        </div>
       </div>
     </motion.div>
   );

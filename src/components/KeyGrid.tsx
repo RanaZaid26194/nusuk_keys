@@ -2,23 +2,31 @@
 
 import React, { useRef, useEffect, useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Search, X, Layers, ShieldCheck, Flame, Clock, Inbox, Command, ChevronDown } from "lucide-react";
+import { Search, X, Layers, ShieldCheck, Flame, Clock, Inbox, Command, ChevronDown, History, Trash2 } from "lucide-react";
 import { ChallengeKey, FilterTab, Language } from "@/lib/types";
 import { translations } from "@/lib/translations";
 import { KeyCard } from "./KeyCard";
 import { playHapticSound } from "@/lib/audio";
 
-interface KeyGridProps {
+interface KeyGridProps
+{
   items: ChallengeKey[];
   isLoading?: boolean;
   lang: Language;
   searchQuery: string;
   activeTab: FilterTab;
+  usedMap: Record<string, number>;
+  usedCount: number;
+  shouldPulseUsedBadge?: boolean;
+  hasUnvotedUsedKeys?: boolean;
   onSearchChange: (query: string) => void;
   onTabChange: (tab: FilterTab) => void;
   onVote: (id: string, type: 'UP' | 'DOWN') => void;
   onCopy: (id: string) => void;
   onOpenSubmit: () => void;
+  onOpenNusuk?: (code: string) => void;
+  onToggleUsed?: (code: string) => void;
+  onClearUsed?: () => void;
 }
 
 export const KeyGrid: React.FC<KeyGridProps> = ({
@@ -27,14 +35,22 @@ export const KeyGrid: React.FC<KeyGridProps> = ({
   lang,
   searchQuery,
   activeTab,
+  usedMap,
+  usedCount,
+  shouldPulseUsedBadge = false,
+  hasUnvotedUsedKeys = false,
   onSearchChange,
   onTabChange,
   onVote,
   onCopy,
   onOpenSubmit,
+  onOpenNusuk,
+  onToggleUsed,
+  onClearUsed,
 }) => {
   const searchInputRef = useRef<HTMLInputElement>(null);
   const [displayLimit, setDisplayLimit] = useState(60);
+  const [confirmingClear, setConfirmingClear] = useState(false);
   const t = translations[lang];
   const isAr = lang === "ar";
 
@@ -43,12 +59,20 @@ export const KeyGrid: React.FC<KeyGridProps> = ({
     verified: ShieldCheck,
     popular: Flame,
     latest: Clock,
+    used: History,
   };
 
   // Reset pagination when filter or search changes
-  useEffect(() => {
+  useEffect(() =>
+  {
     setDisplayLimit(60);
   }, [activeTab, searchQuery]);
+
+  // Reset clear confirmation when leaving tab
+  useEffect(() =>
+  {
+    setConfirmingClear(false);
+  }, [activeTab]);
 
   // Quick / or Ctrl+K focus shortcut
   useEffect(() => {
@@ -149,7 +173,8 @@ export const KeyGrid: React.FC<KeyGridProps> = ({
           aria-label={isAr ? "خيارات التصفية" : "Filter options"}
           className="flex items-center gap-1 p-1 rounded-full bg-zinc-100/90 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 overflow-x-auto no-scrollbar shadow-sm"
         >
-          {(["all", "verified", "popular", "latest"] as FilterTab[]).map((tab) => {
+          {(["all", "verified", "popular", "latest", "used"] as FilterTab[]).map((tab) =>
+          {
             const Icon = tabIcons[tab];
             const isActive = activeTab === tab;
 
@@ -175,13 +200,92 @@ export const KeyGrid: React.FC<KeyGridProps> = ({
                 )}
                 <span className="relative z-10 flex items-center gap-1.5">
                   <Icon className={`w-3.5 h-3.5 ${isActive ? "text-amber-500 dark:text-amber-400" : "text-zinc-400 dark:text-zinc-500"}`} />
-                  {t.tabs[tab]}
+                  <span>{t.tabs[tab]}</span>
+                  {tab === "used" && usedCount > 0 && (
+                    <motion.span
+                      animate={shouldPulseUsedBadge ? { scale: [1, 1.45, 1], transition: { duration: 0.6 } } : { scale: 1 }}
+                      className={`px-1.5 py-0.2 rounded-full text-[10px] font-mono font-bold leading-tight ${
+                        isActive
+                          ? "bg-amber-500/20 text-amber-900 dark:text-amber-200"
+                          : "bg-zinc-200 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300"
+                      }`}
+                    >
+                      {usedCount > 999 ? "999+" : usedCount}
+                    </motion.span>
+                  )}
                 </span>
               </motion.button>
             );
           })}
         </div>
       </motion.div>
+
+      {/* Used tab subheader: hint line & clear history action */}
+      {activeTab === "used" && usedCount > 0 && (
+        <motion.div
+          initial={{ opacity: 0, y: -6 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 mb-6 px-4 py-2.5 rounded-2xl bg-zinc-100/70 dark:bg-zinc-900/50 border border-zinc-200/70 dark:border-zinc-800/70 text-xs"
+        >
+          <div className="text-zinc-600 dark:text-zinc-400">
+            {hasUnvotedUsedKeys && (
+              <span className={isAr ? "font-arabic" : ""}>
+                {t.usedHint}
+              </span>
+            )}
+          </div>
+
+          {onClearUsed && (
+            <div className="flex items-center gap-2 self-end sm:self-auto">
+              {confirmingClear ? (
+                <div className="flex items-center gap-2">
+                  <span className={`text-[11px] text-rose-600 dark:text-rose-400 font-medium ${isAr ? "font-arabic" : ""}`}>
+                    {t.confirmClear}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() =>
+                    {
+                      playHapticSound('click');
+                      onClearUsed();
+                      setConfirmingClear(false);
+                    }}
+                    className="px-2 py-0.5 rounded-md bg-rose-600 hover:bg-rose-500 text-white text-[11px] font-semibold transition-colors"
+                  >
+                    {isAr ? "تأكيد" : "Yes, clear"}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() =>
+                    {
+                      playHapticSound('click');
+                      setConfirmingClear(false);
+                    }}
+                    className="px-2 py-0.5 rounded-md bg-zinc-200 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 text-[11px] font-medium transition-colors"
+                  >
+                    {isAr ? "إلغاء" : "Cancel"}
+                  </button>
+                </div>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() =>
+                  {
+                    playHapticSound('click');
+                    setConfirmingClear(true);
+                  }}
+                  className={`flex items-center gap-1 text-[11px] text-zinc-500 hover:text-rose-600 dark:text-zinc-400 dark:hover:text-rose-400 transition-colors ${
+                    isAr ? "font-arabic" : ""
+                  }`}
+                >
+                  <Trash2 className="w-3 h-3" />
+                  <span>{t.clearHistory}</span>
+                </button>
+              )}
+            </div>
+          )}
+        </motion.div>
+      )}
 
       {/* Grid of Cards with Staggered Cascading Reveal */}
       {items.length > 0 ? (
@@ -206,8 +310,11 @@ export const KeyGrid: React.FC<KeyGridProps> = ({
                     item={item}
                     lang={lang}
                     searchQuery={searchQuery}
+                    isUsed={Boolean(usedMap[item.code.toUpperCase().trim()])}
                     onVote={onVote}
                     onCopy={onCopy}
+                    onOpenNusuk={onOpenNusuk}
+                    onToggleUsed={onToggleUsed}
                   />
                 </motion.div>
               ))}
@@ -265,8 +372,25 @@ export const KeyGrid: React.FC<KeyGridProps> = ({
             </div>
           ))}
         </div>
+      ) : activeTab === "used" ? (
+        /* Empty State for Used tab */
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="text-center py-16 px-4 rounded-3xl bg-white/80 dark:bg-zinc-900/60 border border-dashed border-zinc-200 dark:border-zinc-800 max-w-lg mx-auto shadow-xs"
+        >
+          <div className="w-12 h-12 rounded-2xl bg-zinc-100 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400 flex items-center justify-center mx-auto mb-4 border border-zinc-200 dark:border-zinc-700/60">
+            <History className="w-6 h-6" />
+          </div>
+          <h3 className={`text-base sm:text-lg font-bold text-zinc-900 dark:text-white mb-1.5 ${isAr ? "font-arabic" : ""}`}>
+            {t.emptyUsed.title}
+          </h3>
+          <p className={`text-xs sm:text-sm text-zinc-600 dark:text-zinc-400 max-w-sm mx-auto ${isAr ? "font-arabic" : ""}`}>
+            {t.emptyUsed.description}
+          </p>
+        </motion.div>
       ) : (
-        /* Empty State */
+        /* Empty State for other tabs */
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
