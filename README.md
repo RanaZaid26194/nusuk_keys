@@ -28,7 +28,7 @@ A high-performance, modern progressive web application designed to help pilgrims
   - **Stage 1 (<100ms)**: Renders the first 500 challenge keys instantly upon load.
   - **Stage 2 (Background Sync)**: Fetches up to 1,000 keys silently.
   - **Stage 3 (Background Sync)**: Expands the list to 1,500 keys.
-  - **Stage 4 (Parallel Streaming)**: Hydrates the full catalog of **5,996+ keys** without ever locking the UI thread.
+  - **Stage 4 (Parallel Streaming)**: Hydrates the full catalog of **7,000+ keys** without ever locking the UI thread.
 - **💾 Zero-Latency Local Caching (SWR)**: Utilizes `localStorage` with versioned cache busting (`nusuk_keys_cache_v2`). Return visits render in **0ms** from local storage while syncing fresh changes in the background.
 - **🎨 Modern Minimalist Glassmorphic Design**:
   - Dark zinc glassmorphic surfaces (`bg-zinc-900/60`, `backdrop-blur-xl`).
