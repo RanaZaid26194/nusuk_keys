@@ -139,31 +139,32 @@ export const Hero: React.FC<HeroProps> = ({
               <ArrowIcon className="w-4 h-4 transition-transform duration-200 group-hover:translate-x-1 rtl:group-hover:-translate-x-1" />
             </motion.button>
 
-            {/* Apple-style single circle (i) button with theme-matched tooltip */}
-            <Tooltip
-              content={t.hook.title}
-              position="bottom"
-              align="end"
-              dotColor="emerald"
-              containerClassName="absolute -top-0.5 right-0 rtl:left-0 rtl:right-auto sm:-top-1.5 sm:-right-2 sm:rtl:-left-2 sm:rtl:right-auto z-10"
-            >
-              <motion.button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleOpenInfo();
-                }}
-                whileHover={{ scale: 1.15 }}
-                whileTap={{ scale: 0.9 }}
-                transition={{ duration: 0.16, ease: "easeOut" }}
-                aria-label={t.hook.infoButtonAria}
-                className="w-[22px] h-[22px] sm:w-6 sm:h-6 rounded-full bg-emerald-950 hover:bg-emerald-900 text-emerald-200 hover:text-white border border-emerald-400/50 shadow-md flex items-center justify-center transition-colors"
+            {/* Apple-style single circle (i) button overlapping the top-right corner */}
+            <div className="absolute -top-1 -right-1 sm:-top-1.5 sm:-right-2 rtl:-left-1 rtl:right-auto sm:rtl:-left-2 sm:rtl:right-auto z-20">
+              <Tooltip
+                content={t.hook.title}
+                position="bottom"
+                align="end"
+                dotColor="emerald"
               >
-                <svg className="w-3 h-3 sm:w-3.5 sm:h-3.5" viewBox="0 0 12 12" fill="currentColor">
-                  <circle cx="6" cy="2.5" r="1.1" />
-                  <path d="M5 5h1.6v4.2H7.6v.8H4.4v-.8h1.2V5.8H5V5z" />
-                </svg>
-              </motion.button>
-            </Tooltip>
+                <motion.button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleOpenInfo();
+                  }}
+                  whileHover={{ scale: 1.15 }}
+                  whileTap={{ scale: 0.9 }}
+                  transition={{ duration: 0.16, ease: "easeOut" }}
+                  aria-label={t.hook.infoButtonAria}
+                  className="w-[22px] h-[22px] sm:w-6 sm:h-6 rounded-full bg-emerald-950 hover:bg-emerald-900 text-emerald-200 hover:text-white border border-emerald-400/50 shadow-md flex items-center justify-center transition-colors cursor-pointer"
+                >
+                  <svg className="w-3 h-3 sm:w-3.5 sm:h-3.5" viewBox="0 0 12 12" fill="currentColor">
+                    <circle cx="6" cy="2.5" r="1.1" />
+                    <path d="M5 5h1.6v4.2H7.6v.8H4.4v-.8h1.2V5.8H5V5z" />
+                  </svg>
+                </motion.button>
+              </Tooltip>
+            </div>
           </div>
         </motion.div>
 
