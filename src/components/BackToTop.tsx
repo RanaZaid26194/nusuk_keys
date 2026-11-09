@@ -42,27 +42,32 @@ export const BackToTop: React.FC<BackToTopProps> = ({ lang = "en" }) =>
   return (
     <AnimatePresence>
       {visible && (
-        <Tooltip
-          content={label}
-          position="top"
-          dotColor="emerald"
-          containerClassName="fixed bottom-20 sm:bottom-8 right-4 rtl:right-auto rtl:left-4 z-40"
+        <motion.div
+          initial={{ opacity: 0, y: 16, scale: 0.85 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          exit={{ opacity: 0, y: 16, scale: 0.85 }}
+          transition={{ duration: 0.2, ease: "easeOut" }}
+          className="fixed bottom-20 sm:bottom-8 right-4 sm:right-8 rtl:right-auto rtl:left-4 sm:rtl:left-8 z-40 pb-[env(safe-area-inset-bottom)]"
         >
-          <motion.button
-            type="button"
-            onClick={scrollToTop}
-            initial={{ opacity: 0, y: 16, scale: 0.85 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 16, scale: 0.85 }}
-            whileHover={{ scale: 1.1, y: -2 }}
-            whileTap={{ scale: 0.92 }}
-            transition={{ duration: 0.2, ease: "easeOut" }}
-            aria-label={label}
-            className="p-3 rounded-full bg-white/90 dark:bg-zinc-900/90 text-zinc-700 dark:text-zinc-200 hover:text-emerald-600 dark:hover:text-emerald-400 border border-zinc-200/90 dark:border-zinc-700/80 shadow-lg shadow-black/10 dark:shadow-black/40 backdrop-blur-md transition-colors"
+          <Tooltip
+            content={label}
+            position="top"
+            align={lang === "ar" ? "start" : "end"}
+            dotColor="emerald"
           >
-            <ArrowUp className="w-4 h-4 stroke-[2.5]" />
-          </motion.button>
-        </Tooltip>
+            <motion.button
+              type="button"
+              onClick={scrollToTop}
+              whileHover={{ scale: 1.1, y: -2 }}
+              whileTap={{ scale: 0.92 }}
+              transition={{ duration: 0.16, ease: "easeOut" }}
+              aria-label={label}
+              className="p-3 rounded-full bg-white/95 dark:bg-zinc-900/95 text-zinc-700 dark:text-zinc-200 hover:text-emerald-600 dark:hover:text-emerald-400 border border-zinc-200 dark:border-zinc-700/80 shadow-lg shadow-black/10 dark:shadow-black/50 backdrop-blur-md transition-colors flex items-center justify-center cursor-pointer"
+            >
+              <ArrowUp className="w-5 h-5 stroke-[2.5]" />
+            </motion.button>
+          </Tooltip>
+        </motion.div>
       )}
     </AnimatePresence>
   );

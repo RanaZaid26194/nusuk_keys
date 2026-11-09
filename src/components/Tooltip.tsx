@@ -84,8 +84,11 @@ export const Tooltip: React.FC<TooltipProps> = ({
     }
   }
 
+  const hasCustomPos = containerClassName.includes("fixed") || containerClassName.includes("absolute");
+  const posClass = hasCustomPos ? "" : "relative";
+
   return (
-    <div className={`relative group/tooltip inline-flex ${containerClassName}`}>
+    <div className={`${posClass} group/tooltip inline-flex ${containerClassName}`}>
       {children}
 
       <div
