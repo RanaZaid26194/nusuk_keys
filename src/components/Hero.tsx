@@ -41,7 +41,7 @@ export const Hero: React.FC<HeroProps> = ({
   return (
     <section className="relative pt-10 pb-12 sm:pt-14 sm:pb-16 border-b border-zinc-200/80 dark:border-zinc-800/80 bg-zinc-50 dark:bg-[#09090b] transition-colors overflow-hidden">
       {/* Background Ambient Radial Light */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[700px] h-[300px] bg-emerald-500/5 blur-[120px] pointer-events-none -z-10" />
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[700px] h-[300px] bg-emerald-500/10 dark:bg-emerald-500/5 blur-[120px] pointer-events-none -z-10" />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
         {/* Minimal Animated Badge */}
@@ -61,11 +61,11 @@ export const Hero: React.FC<HeroProps> = ({
         >
           {isAr ? (
             <>
-              استكشف وشارك <span className="text-zinc-700 dark:text-zinc-100">مفاتيح تحدي نسك</span>
+              استكشف وشارك <span className="text-zinc-900 dark:text-zinc-100">مفاتيح تحدي نسك</span>
             </>
           ) : (
             <>
-              Discover & Share <span className="text-zinc-700 dark:text-zinc-100">Nusuk Challenge Keys</span>
+              Discover & Share <span className="text-zinc-900 dark:text-zinc-100">Nusuk Challenge Keys</span>
             </>
           )}
         </h1>
@@ -92,7 +92,7 @@ export const Hero: React.FC<HeroProps> = ({
               whileHover={{ scale: 1.03 }}
               whileTap={{ scale: 0.96 }}
               aria-label={t.shareCodeBtn}
-              className="flex items-center gap-2.5 px-7 sm:px-9 py-3 rounded-full bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-sm sm:text-base shadow-lg shadow-emerald-950/60 transition-all"
+              className="flex items-center gap-2.5 px-7 sm:px-9 py-3 rounded-full bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-sm sm:text-base shadow-lg shadow-emerald-600/25 dark:shadow-emerald-950/60 transition-all"
             >
               <KeyRound className="w-4 h-4 sm:w-5 sm:h-5" />
               <span className={isAr ? "font-arabic text-base sm:text-lg" : ""}>{t.shareCodeBtn}</span>

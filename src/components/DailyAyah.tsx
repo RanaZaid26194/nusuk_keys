@@ -175,7 +175,7 @@ export const DailyAyah: React.FC<DailyAyahProps> = ({ lang, onOpenInfo, mockFrid
 
       {/* 4. Eight-pointed star geometric pattern (Rub el Hizb) with soft radial mask */}
       <div
-        className="absolute inset-0 pointer-events-none opacity-[0.035] -z-0"
+        className="absolute inset-0 pointer-events-none opacity-[0.06] dark:opacity-[0.035] -z-0"
         style={{
           backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48' viewBox='0 0 48 48' fill='none' stroke='%23d4af37' stroke-width='0.75'%3E%3Crect x='15' y='15' width='18' height='18'/%3E%3Crect x='15' y='15' width='18' height='18' transform='rotate(45 24 24)'/%3E%3Ccircle cx='24' cy='24' r='2' fill='%23d4af37'/%3E%3Cpath d='M0 24h48M24 0v48' stroke='%23d4af37' stroke-dasharray='2 3' stroke-width='0.5'/%3E%3C/svg%3E")`,
           backgroundRepeat: "repeat",
@@ -275,7 +275,7 @@ export const DailyAyah: React.FC<DailyAyahProps> = ({ lang, onOpenInfo, mockFrid
                     style={{ textAlign: "center" }}
                     className="text-[11px] sm:text-xs text-zinc-600 dark:text-zinc-400 text-center !text-center transition-colors mx-auto"
                   >
-                    “{ayah.english}” — [Surah {ayah.surahNameEn} ({ayah.surah}:{ayah.numberInSurah})]
+                    “{ayah.english.replace(/["“”]+$/, "").trim()}” — [Surah {ayah.surahNameEn} ({ayah.surah}:{ayah.numberInSurah})]
                   </div>
                   <div
                     style={{ textAlign: "center" }}

@@ -178,7 +178,7 @@ export const KeyCard: React.FC<KeyCardProps> = ({
           aria-label={t.keyCard.copyKey}
           className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold transition-all shadow-xs ${
             copied
-              ? "bg-emerald-600 text-white shadow-emerald-950/60"
+              ? "bg-emerald-600 text-white shadow-emerald-600/25 dark:shadow-emerald-950/60"
               : "bg-white hover:bg-zinc-100 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-200 border border-zinc-200 dark:border-zinc-700/80"
           }`}
         >
