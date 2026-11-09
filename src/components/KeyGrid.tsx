@@ -59,10 +59,30 @@ export const KeyGrid: React.FC<KeyGridProps> = ({
     onTabChange(tab);
   };
 
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    show: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.05,
+      },
+    },
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 15 },
+    show: { opacity: 1, y: 0, transition: { duration: 0.35, ease: "easeOut" } },
+  };
+
   return (
     <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-24">
       {/* Controls Container: Search & Tabs */}
-      <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4 mb-8">
+      <motion.div
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4, delay: 0.2 }}
+        className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4 mb-8"
+      >
         {/* Animated Search Bar with Keyboard Hint */}
         <div className="relative flex-1 max-w-md group">
           <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-zinc-500 group-focus-within:text-zinc-300 transition-colors">
@@ -106,16 +126,18 @@ export const KeyGrid: React.FC<KeyGridProps> = ({
           </div>
         </div>
 
-        {/* Sliding Filter Tabs (Clean Segmented Control) */}
+        {/* Sliding Filter Tabs (Clean Segmented Control with spring slider) */}
         <div className="flex items-center gap-1 p-1 rounded-xl bg-zinc-900 border border-zinc-800 overflow-x-auto no-scrollbar shadow-sm">
           {(["all", "verified", "popular", "latest"] as FilterTab[]).map((tab) => {
             const Icon = tabIcons[tab];
             const isActive = activeTab === tab;
 
             return (
-              <button
+              <motion.button
                 key={tab}
                 onClick={() => handleTabClick(tab)}
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.96 }}
                 className={`relative flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs sm:text-sm font-medium whitespace-nowrap transition-colors select-none ${
                   isActive ? "text-white" : "text-zinc-400 hover:text-zinc-200"
                 } ${isAr ? "font-arabic" : ""}`}
@@ -124,35 +146,45 @@ export const KeyGrid: React.FC<KeyGridProps> = ({
                   <motion.div
                     layoutId="activeFilterTab"
                     className="absolute inset-0 bg-zinc-800 rounded-lg border border-zinc-700/60 shadow-sm"
-                    transition={{ type: "spring", stiffness: 450, damping: 35 }}
+                    transition={{ type: "spring", stiffness: 500, damping: 32 }}
                   />
                 )}
                 <span className="relative z-10 flex items-center gap-1.5">
                   <Icon className={`w-3.5 h-3.5 ${isActive ? "text-amber-400" : "text-zinc-500"}`} />
                   {t.tabs[tab]}
                 </span>
-              </button>
+              </motion.button>
             );
           })}
         </div>
-      </div>
+      </motion.div>
 
-      {/* Grid of Cards */}
+      {/* Grid of Cards with Staggered Cascading Reveal */}
       {items.length > 0 ? (
         <motion.div
           layout
+          variants={containerVariants}
+          initial="hidden"
+          animate="show"
           className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-5"
         >
           <AnimatePresence mode="popLayout">
             {items.map((item) => (
-              <KeyCard
+              <motion.div
                 key={item.id}
-                item={item}
-                lang={lang}
-                searchQuery={searchQuery}
-                onVote={onVote}
-                onCopy={onCopy}
-              />
+                layout
+                variants={itemVariants}
+                exit={{ opacity: 0, scale: 0.9 }}
+                transition={{ duration: 0.25 }}
+              >
+                <KeyCard
+                  item={item}
+                  lang={lang}
+                  searchQuery={searchQuery}
+                  onVote={onVote}
+                  onCopy={onCopy}
+                />
+              </motion.div>
             ))}
           </AnimatePresence>
         </motion.div>
@@ -175,19 +207,23 @@ export const KeyGrid: React.FC<KeyGridProps> = ({
 
           <div className="flex flex-wrap items-center justify-center gap-2.5">
             {searchQuery && (
-              <button
+              <motion.button
                 onClick={() => onSearchChange("")}
+                whileHover={{ scale: 1.04 }}
+                whileTap={{ scale: 0.96 }}
                 className="px-4 py-2 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-xs sm:text-sm text-white font-medium transition-colors"
               >
                 {t.empty.clearFilters}
-              </button>
+              </motion.button>
             )}
-            <button
+            <motion.button
               onClick={onOpenSubmit}
+              whileHover={{ scale: 1.04 }}
+              whileTap={{ scale: 0.96 }}
               className="px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-xs sm:text-sm text-white font-semibold shadow-sm transition-colors"
             >
               {t.shareCodeBtn}
-            </button>
+            </motion.button>
           </div>
         </motion.div>
       )}

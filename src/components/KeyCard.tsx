@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Copy, Check, ExternalLink, ThumbsUp, ThumbsDown, Clock, ShieldCheck, AlertCircle } from "lucide-react";
 import { ChallengeKey, Language } from "@/lib/types";
@@ -24,6 +24,8 @@ export const KeyCard: React.FC<KeyCardProps> = ({
   onCopy,
 }) => {
   const [copied, setCopied] = useState(false);
+  const [mousePos, setMousePos] = useState<{ x: number; y: number } | null>(null);
+  const cardRef = useRef<HTMLDivElement>(null);
 
   const t = translations[lang];
   const isAr = lang === "ar";
@@ -32,12 +34,25 @@ export const KeyCard: React.FC<KeyCardProps> = ({
   const isVerified = successRate >= 75 && item.upvotes >= 2;
   const isExpired = item.downvotes > item.upvotes + 3;
 
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!cardRef.current) return;
+    const rect = cardRef.current.getBoundingClientRect();
+    setMousePos({
+      x: e.clientX - rect.left,
+      y: e.clientY - rect.top,
+    });
+  };
+
+  const handleMouseLeave = () => {
+    setMousePos(null);
+  };
+
   const handleCopy = (e: React.MouseEvent) => {
     e.stopPropagation();
     navigator.clipboard.writeText(item.code);
     setCopied(true);
     onCopy(item.id);
-    playHapticSound('click');
+    playHapticSound('success');
 
     setTimeout(() => {
       setCopied(false);
@@ -67,22 +82,39 @@ export const KeyCard: React.FC<KeyCardProps> = ({
     return (
       <span>
         {before}
-        <span className="bg-amber-500/20 text-amber-200 px-0.5 rounded font-bold">{match}</span>
+        <span className="bg-amber-500/25 text-amber-200 px-1 py-0.5 rounded font-black">{match}</span>
         {after}
       </span>
     );
   };
 
   return (
-    <div
-      className={`rounded-2xl bg-zinc-900/70 p-5 border transition-all shadow-sm ${
-        isVerified
-          ? "border-zinc-800/80 hover:border-zinc-700"
-          : "border-zinc-800/60 hover:border-zinc-700"
+    <motion.div
+      ref={cardRef}
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
+      whileHover={{ y: -4 }}
+      transition={{ duration: 0.25, ease: "easeOut" }}
+      className={`relative rounded-2xl bg-zinc-900/70 p-5 border transition-all duration-300 overflow-hidden shadow-sm ${
+        copied
+          ? "border-emerald-500/80 ring-1 ring-emerald-500/40 shadow-[0_0_24px_rgba(16,185,129,0.18)]"
+          : isVerified
+          ? "border-zinc-800/80 hover:border-zinc-700 hover:shadow-lg hover:shadow-black/40"
+          : "border-zinc-800/60 hover:border-zinc-700 hover:shadow-lg hover:shadow-black/40"
       }`}
     >
+      {/* Interactive Cursor Spotlight Glow */}
+      {mousePos && (
+        <div
+          className="pointer-events-none absolute -inset-px rounded-2xl opacity-100 transition-opacity duration-300"
+          style={{
+            background: `radial-gradient(350px circle at ${mousePos.x}px ${mousePos.y}px, rgba(16, 185, 129, 0.09), transparent 80%)`,
+          }}
+        />
+      )}
+
       {/* Header: Badge & Time */}
-      <div className="flex items-center justify-between gap-2 mb-3.5">
+      <div className="relative z-10 flex items-center justify-between gap-2 mb-3.5">
         {isExpired ? (
           <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium bg-rose-500/10 text-rose-300 border border-rose-500/20">
             <AlertCircle className="w-3.5 h-3.5 text-rose-400" />
@@ -107,44 +139,62 @@ export const KeyCard: React.FC<KeyCardProps> = ({
         </span>
       </div>
 
-      {/* Main Key Box (Click to copy) */}
-      <div
+      {/* Main Key Box (Click to copy with spring bounce) */}
+      <motion.div
         onClick={handleCopy}
-        className="flex items-center justify-between p-3.5 rounded-xl bg-zinc-950 border border-zinc-800/80 hover:border-zinc-700 transition-colors cursor-pointer select-none mb-3.5 shadow-inner"
+        whileHover={{ scale: 1.01 }}
+        whileTap={{ scale: 0.98 }}
+        className="relative z-10 flex items-center justify-between p-3.5 rounded-xl bg-zinc-950 border border-zinc-800/80 hover:border-zinc-700 transition-colors cursor-pointer select-none mb-3.5 shadow-inner group"
         title={t.keyCard.copyKey}
       >
-        <div className="font-mono text-base sm:text-lg font-bold tracking-widest text-zinc-100 truncate">
+        <div className="font-mono text-base sm:text-lg font-bold tracking-widest text-zinc-100 group-hover:text-white transition-colors truncate">
           {renderHighlightedCode()}
         </div>
 
-        {/* Copy Button */}
-        <button
+        {/* Tactile Copy Button */}
+        <motion.button
           onClick={handleCopy}
+          whileHover={{ scale: 1.06 }}
+          whileTap={{ scale: 0.92 }}
           title={t.keyCard.copyKey}
-          className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all shadow-sm ${
             copied
-              ? "bg-emerald-600 text-white"
+              ? "bg-emerald-600 text-white shadow-emerald-900/50"
               : "bg-zinc-800 hover:bg-zinc-700 text-zinc-200 border border-zinc-700/60"
           }`}
         >
           <AnimatePresence mode="wait" initial={false}>
             {copied ? (
-              <span key="check" className="flex items-center gap-1 text-white">
+              <motion.span
+                key="check"
+                initial={{ scale: 0.7, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.7, opacity: 0 }}
+                transition={{ type: "spring", stiffness: 500, damping: 25 }}
+                className="flex items-center gap-1 text-white"
+              >
                 <Check className="w-3.5 h-3.5 stroke-[2.5]" />
                 <span className={isAr ? "font-arabic" : ""}>{t.keyCard.copied}</span>
-              </span>
+              </motion.span>
             ) : (
-              <span key="copy" className="flex items-center gap-1">
+              <motion.span
+                key="copy"
+                initial={{ scale: 0.7, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.7, opacity: 0 }}
+                transition={{ type: "spring", stiffness: 500, damping: 25 }}
+                className="flex items-center gap-1"
+              >
                 <Copy className="w-3.5 h-3.5" />
                 <span className={isAr ? "font-arabic" : ""}>{t.keyCard.copyKey}</span>
-              </span>
+              </motion.span>
             )}
           </AnimatePresence>
-        </button>
-      </div>
+        </motion.button>
+      </motion.div>
 
-      {/* Trust & Usage Bar */}
-      <div className="space-y-1.5 mb-4">
+      {/* Trust & Usage Progress Bar */}
+      <div className="relative z-10 space-y-1.5 mb-4">
         <div className="flex justify-between items-center text-xs text-zinc-400">
           <span className={isAr ? "font-arabic" : ""}>
             <span className="font-mono text-zinc-300 font-medium">{item.copies_count}</span> {t.keyCard.copiedTimes}
@@ -154,8 +204,10 @@ export const KeyCard: React.FC<KeyCardProps> = ({
           </span>
         </div>
         <div className="w-full h-1 bg-zinc-800 rounded-full overflow-hidden">
-          <div
-            style={{ width: `${successRate}%` }}
+          <motion.div
+            initial={{ width: 0 }}
+            animate={{ width: `${successRate}%` }}
+            transition={{ duration: 0.8, ease: "easeOut" }}
             className={`h-full rounded-full ${
               successRate >= 75 ? "bg-emerald-500" : successRate >= 45 ? "bg-amber-500" : "bg-rose-500"
             }`}
@@ -164,11 +216,13 @@ export const KeyCard: React.FC<KeyCardProps> = ({
       </div>
 
       {/* Footer Actions: Vote & Deep Link */}
-      <div className="flex items-center justify-between gap-2 pt-3 border-t border-zinc-800/80">
-        {/* Voting */}
+      <div className="relative z-10 flex items-center justify-between gap-2 pt-3 border-t border-zinc-800/80">
+        {/* Voting Buttons with Spring Bounces */}
         <div className="flex items-center gap-1.5">
-          <button
+          <motion.button
             onClick={() => handleVoteClick('UP')}
+            whileHover={{ scale: 1.08 }}
+            whileTap={{ scale: 0.90 }}
             disabled={item.userVoted === 'UP'}
             className={`flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium transition-colors ${
               item.userVoted === 'UP'
@@ -176,12 +230,19 @@ export const KeyCard: React.FC<KeyCardProps> = ({
                 : "bg-zinc-800/70 hover:bg-zinc-800 text-zinc-300 border border-zinc-700/60"
             }`}
           >
-            <ThumbsUp className={`w-3.5 h-3.5 ${item.userVoted === 'UP' ? 'fill-emerald-400 text-emerald-400' : ''}`} />
+            <motion.div
+              animate={item.userVoted === 'UP' ? { scale: [1, 1.4, 1] } : {}}
+              transition={{ duration: 0.3 }}
+            >
+              <ThumbsUp className={`w-3.5 h-3.5 ${item.userVoted === 'UP' ? 'fill-emerald-400 text-emerald-400' : ''}`} />
+            </motion.div>
             <span className="font-mono">{item.upvotes}</span>
-          </button>
+          </motion.button>
 
-          <button
+          <motion.button
             onClick={() => handleVoteClick('DOWN')}
+            whileHover={{ scale: 1.08 }}
+            whileTap={{ scale: 0.90 }}
             disabled={item.userVoted === 'DOWN'}
             className={`flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium transition-colors ${
               item.userVoted === 'DOWN'
@@ -189,23 +250,29 @@ export const KeyCard: React.FC<KeyCardProps> = ({
                 : "bg-zinc-800/70 hover:bg-zinc-800 text-zinc-400 border border-zinc-700/60"
             }`}
           >
-            <ThumbsDown className={`w-3.5 h-3.5 ${item.userVoted === 'DOWN' ? 'fill-rose-400 text-rose-400' : ''}`} />
+            <motion.div
+              animate={item.userVoted === 'DOWN' ? { scale: [1, 1.4, 1] } : {}}
+              transition={{ duration: 0.3 }}
+            >
+              <ThumbsDown className={`w-3.5 h-3.5 ${item.userVoted === 'DOWN' ? 'fill-rose-400 text-rose-400' : ''}`} />
+            </motion.div>
             <span className="font-mono">{item.downvotes}</span>
-          </button>
+          </motion.button>
         </div>
 
         {/* Deep Link to Nusuk App */}
-        <a
+        <motion.a
           href={getNusukDeepLink(item.code)}
           target="_blank"
           rel="noopener noreferrer"
+          whileHover={{ x: isAr ? -3 : 3 }}
           className="flex items-center gap-1 text-[11px] text-zinc-400 hover:text-zinc-200 transition-colors"
           title={t.keyCard.openNusuk}
         >
           <span className={isAr ? "font-arabic" : ""}>{t.keyCard.openNusuk}</span>
           <ExternalLink className="w-3 h-3 opacity-70" />
-        </a>
+        </motion.a>
       </div>
-    </div>
+    </motion.div>
   );
 };

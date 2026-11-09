@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import { KeyRound, Plus, Info } from "lucide-react";
 import { Language } from "@/lib/types";
 import { translations } from "@/lib/translations";
+import { playHapticSound } from "@/lib/audio";
 
 interface HeaderProps {
   lang: Language;
@@ -21,11 +22,30 @@ export const Header: React.FC<HeaderProps> = ({
 }) => {
   const t = translations[lang];
 
+  const handleLang = (newLang: Language) => {
+    playHapticSound('click');
+    onLanguageChange(newLang);
+  };
+
+  const handleOpenSubmit = () => {
+    playHapticSound('click');
+    onOpenSubmit();
+  };
+
+  const handleOpenInfo = () => {
+    playHapticSound('click');
+    onOpenInfo();
+  };
+
   return (
     <header className="sticky top-0 z-40 w-full bg-zinc-950/80 backdrop-blur-md border-b border-zinc-800/80">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 sm:h-18 flex items-center justify-between">
         {/* Brand / Logo */}
-        <div className="flex items-center gap-3 select-none">
+        <motion.div
+          initial={{ opacity: 0, x: -10 }}
+          animate={{ opacity: 1, x: 0 }}
+          className="flex items-center gap-3 select-none"
+        >
           <div className="flex items-center justify-center w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-zinc-900 border border-zinc-800 text-emerald-400 shadow-sm">
             <KeyRound className="w-4 h-4 sm:w-5 sm:h-5" />
           </div>
@@ -40,14 +60,18 @@ export const Header: React.FC<HeaderProps> = ({
               {t.siteSubtitle}
             </p>
           </div>
-        </div>
+        </motion.div>
 
         {/* Action Controls */}
-        <div className="flex items-center gap-2 sm:gap-3">
+        <motion.div
+          initial={{ opacity: 0, x: 10 }}
+          animate={{ opacity: 1, x: 0 }}
+          className="flex items-center gap-2 sm:gap-3"
+        >
           {/* Language Switcher */}
-          <div className="flex items-center p-1 rounded-xl bg-zinc-900 border border-zinc-800">
+          <div className="flex items-center p-1 rounded-xl bg-zinc-900 border border-zinc-800 shadow-sm">
             <button
-              onClick={() => onLanguageChange("en")}
+              onClick={() => handleLang("en")}
               className={`relative px-2.5 py-1 text-xs font-medium rounded-lg transition-colors ${
                 lang === "en" ? "text-white" : "text-zinc-400 hover:text-zinc-200"
               }`}
@@ -63,7 +87,7 @@ export const Header: React.FC<HeaderProps> = ({
             </button>
 
             <button
-              onClick={() => onLanguageChange("ar")}
+              onClick={() => handleLang("ar")}
               className={`relative px-2.5 py-1 text-xs font-medium rounded-lg transition-colors font-arabic ${
                 lang === "ar" ? "text-white" : "text-zinc-400 hover:text-zinc-200"
               }`}
@@ -81,25 +105,29 @@ export const Header: React.FC<HeaderProps> = ({
 
           {/* Share Your Key CTA Group */}
           <div className="flex items-center gap-1.5">
-            <button
-              onClick={onOpenSubmit}
-              className="flex items-center gap-1.5 px-3.5 sm:px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-medium text-xs sm:text-sm transition-all shadow-sm"
+            <motion.button
+              onClick={handleOpenSubmit}
+              whileHover={{ scale: 1.04 }}
+              whileTap={{ scale: 0.95 }}
+              className="flex items-center gap-1.5 px-3.5 sm:px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-medium text-xs sm:text-sm transition-colors shadow-sm"
             >
               <Plus className="w-4 h-4 stroke-[2.5]" />
               <span className={lang === 'ar' ? 'font-arabic text-sm' : ''}>{t.shareCodeBtn}</span>
-            </button>
+            </motion.button>
 
             {/* Noble Motivation (i) Info Button */}
-            <button
-              onClick={onOpenInfo}
+            <motion.button
+              onClick={handleOpenInfo}
+              whileHover={{ scale: 1.08, rotate: 6 }}
+              whileTap={{ scale: 0.92 }}
               aria-label={t.hook.infoButtonAria}
               title={t.hook.infoButtonAria}
-              className="p-2 sm:p-2.5 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-zinc-400 hover:text-amber-300 border border-zinc-800 transition-colors"
+              className="p-2 sm:p-2.5 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-zinc-400 hover:text-amber-300 border border-zinc-800 transition-colors shadow-sm"
             >
               <Info className="w-4 h-4" />
-            </button>
+            </motion.button>
           </div>
-        </div>
+        </motion.div>
       </div>
     </header>
   );
