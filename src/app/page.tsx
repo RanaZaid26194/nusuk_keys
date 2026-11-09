@@ -46,8 +46,9 @@ export default function Home()
   const [shouldPulseUsedBadge, setShouldPulseUsedBadge] = useState(false);
 
   // snapshot refresh and badge pulse
-  const refreshUsedSnapshot = useCallback(() =>
+  const refreshUsedSnapshot = useCallback((targetTab?: FilterTab) =>
   {
+    const currentTab = targetTab || activeTab;
     const currentMap = loadUsedKeys();
     setUsedMap(currentMap);
     const nextCodes = new Set(Object.keys(currentMap).map(c => normalizeCode(c)));
@@ -55,7 +56,7 @@ export default function Home()
     setUsedSnapshot((prevSnapshot) =>
     {
       let hasLeavingKey = false;
-      if (activeTab !== "used")
+      if (currentTab !== "used")
       {
         const currentCodes = Object.keys(currentMap);
         for (let i = 0; i < currentCodes.length; i++)
@@ -130,7 +131,7 @@ export default function Home()
       setSortBy("copies");
     else if (tab === "latest")
       setSortBy("newest");
-    refreshUsedSnapshot();
+    refreshUsedSnapshot(tab);
   };
 
   // Post-mount hydration sync: restores local cache & saved language safely without SSR mismatch
@@ -419,15 +420,20 @@ export default function Home()
     userVotes[keyId] = type;
     localStorage.setItem(LOCAL_STORAGE_VOTES, JSON.stringify(userVotes));
 
+    const targetKey = keys.find(k => k.id === keyId);
+    if (targetKey?.code)
+    {
+      const nextUsed = markUsed(targetKey.code);
+      setUsedMap(nextUsed);
+    }
+
     // Optimistic UI update
-    let targetCode = "";
     setKeys((prevKeys) =>
     {
       const updated = prevKeys.map((k) =>
       {
         if (k.id === keyId)
         {
-          targetCode = k.code;
           const newUpvotes = type === 'UP' ? k.upvotes + 1 : k.upvotes;
           const newDownvotes = type === 'DOWN' ? k.downvotes + 1 : k.downvotes;
           return {
@@ -442,13 +448,6 @@ export default function Home()
       persistOfflineKeys(updated);
       return updated;
     });
-
-    // mark as used
-    if (targetCode)
-    {
-      const nextUsed = markUsed(targetCode);
-      setUsedMap(nextUsed);
-    }
 
     // Atomic server-side vote casting
     if (isSupabaseConfigured && supabase)
@@ -473,14 +472,8 @@ export default function Home()
   // Copy Count Increment with Soft Anti-Spam
   const handleCopy = useCallback(async (keyId: string) =>
   {
-    let targetCode = "";
-    setKeys((prevKeys) =>
-    {
-      const targetKey = prevKeys.find(k => k.id === keyId);
-      if (targetKey)
-        targetCode = targetKey.code;
-      return prevKeys;
-    });
+    const targetKey = keys.find(k => k.id === keyId);
+    const targetCode = targetKey?.code || "";
 
     // Always mark as used in local history
     if (targetCode)

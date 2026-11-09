@@ -394,189 +394,172 @@ export const KeyGrid: React.FC<KeyGridProps> = ({
             </motion.div>
           )}
 
-          {/* Skeleton Shimmer Sweep vs Real Cards Crossfade */}
-          <AnimatePresence mode="wait">
-            {isLoading ? (
-              <motion.div
-                key="skeleton-grid"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.18, ease: "easeInOut" }}
-                className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-5"
-              >
-                {Array.from({ length: 8 }).map((_, idx) => (
-                  <div
-                    key={idx}
-                    className="relative p-5 rounded-2xl bg-white/80 dark:bg-zinc-900/60 border border-zinc-300/80 dark:border-zinc-800/80 flex flex-col justify-between h-44 overflow-hidden shadow-xs dark:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.04)]"
-                  >
-                    {/* Shimmer light sweep */}
-                    <div className="absolute inset-0 -translate-x-full animate-shimmer bg-gradient-to-r from-transparent via-zinc-200/50 dark:via-zinc-700/25 to-transparent pointer-events-none" />
-
-                    {/* Top row: badge + time shimmer */}
-                    <div className="flex items-center justify-between">
-                      <div className="h-5 w-24 bg-zinc-200/80 dark:bg-zinc-800/80 rounded-full" />
-                      <div className="h-4 w-12 bg-zinc-200/80 dark:bg-zinc-800/60 rounded" />
-                    </div>
-
-                    {/* Middle row: code display box shimmer */}
-                    <div className="my-3 py-3 px-3.5 rounded-xl bg-zinc-100 dark:bg-zinc-950/80 border border-zinc-200 dark:border-zinc-800/60 flex items-center justify-between">
-                      <div className="h-5 w-28 bg-zinc-200/80 dark:bg-zinc-800 rounded" />
-                      <div className="h-6 w-14 bg-zinc-200/80 dark:bg-zinc-800/80 rounded-lg" />
-                    </div>
-
-                    {/* Bottom row: votes & stats shimmer */}
-                    <div className="flex items-center justify-between pt-2 border-t border-zinc-200/70 dark:border-zinc-800/50">
-                      <div className="h-4 w-20 bg-zinc-200/80 dark:bg-zinc-800/70 rounded" />
-                      <div className="flex gap-1.5">
-                        <div className="h-6 w-10 bg-zinc-200/80 dark:bg-zinc-800 rounded-lg" />
-                        <div className="h-6 w-10 bg-zinc-200/80 dark:bg-zinc-800 rounded-lg" />
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </motion.div>
-            ) : items.length > 0 ? (
-              <motion.div
-                key="cards-grid"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.18, ease: "easeInOut" }}
-              >
-                <motion.div
-                  layout
-                  className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-5"
+          {/* Grid Content / Skeletons / Empty States */}
+          {isLoading ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-5">
+              {Array.from({ length: 8 }).map((_, idx) => (
+                <div
+                  key={idx}
+                  className="relative p-5 rounded-2xl bg-white/80 dark:bg-zinc-900/60 border border-zinc-300/80 dark:border-zinc-800/80 flex flex-col justify-between h-44 overflow-hidden shadow-xs dark:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.04)]"
                 >
-                  <AnimatePresence mode="popLayout">
-                    {visibleItems.map((item, idx) => (
-                      <motion.div
-                        key={item.id}
-                        layout
-                        initial={{ opacity: 0, y: 16 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true, margin: "-40px" }}
-                        transition={{ duration: 0.28, ease: "easeOut", delay: idx < 8 ? (idx % 4) * 0.03 : 0 }}
-                        exit={{ opacity: 0, scale: 0.9 }}
-                      >
-                        <KeyCard
-                          item={item}
-                          lang={lang}
-                          searchQuery={searchQuery}
-                          isUsed={Boolean(usedMap[item.code.toUpperCase().trim()])}
-                          onVote={onVote}
-                          onCopy={onCopy}
-                          onOpenNusuk={onOpenNusuk}
-                          onToggleUsed={onToggleUsed}
-                        />
-                      </motion.div>
-                    ))}
-                  </AnimatePresence>
-                </motion.div>
+                  {/* Shimmer light sweep */}
+                  <div className="absolute inset-0 -translate-x-full animate-shimmer bg-gradient-to-r from-transparent via-zinc-200/50 dark:via-zinc-700/25 to-transparent pointer-events-none" />
 
-                {/* Apple-style Progressive Pagination ("Show More") */}
-                {items.length > displayLimit && (
-                  <div className="flex flex-col items-center justify-center mt-12 gap-2">
-                    <motion.button
-                      onClick={handleLoadMore}
-                      whileHover={{ scale: 1.03, y: -1 }}
-                      whileTap={{ scale: 0.96 }}
-                      transition={{ duration: 0.16, ease: "easeOut" }}
-                      aria-label={isAr ? "عرض المزيد من المفاتيح" : "Show more keys"}
-                      className="group flex items-center gap-2 px-6 py-2.5 rounded-full bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700/80 hover:bg-zinc-50 dark:hover:bg-zinc-800 text-xs sm:text-sm font-semibold text-zinc-800 dark:text-zinc-200 shadow-sm hover:shadow transition-colors duration-150"
-                    >
-                      <span>
-                        {isAr
-                          ? `عرض المزيد (يُعرض ${visibleItems.length.toLocaleString()} من ${items.length.toLocaleString()} مفتاح)`
-                          : `Show More (${visibleItems.length.toLocaleString()} of ${items.length.toLocaleString()} keys)`}
-                      </span>
-                      <ChevronDown className="w-4 h-4 text-zinc-400 dark:text-zinc-400 group-hover:translate-y-0.5 transition-transform duration-200" />
-                    </motion.button>
+                  {/* Top row: badge + time shimmer */}
+                  <div className="flex items-center justify-between">
+                    <div className="h-5 w-24 bg-zinc-200/80 dark:bg-zinc-800/80 rounded-full" />
+                    <div className="h-4 w-12 bg-zinc-200/80 dark:bg-zinc-800/60 rounded" />
                   </div>
-                )}
-              </motion.div>
-            ) : activeTab === "used" ? (
-              /* Enhanced Empty State for Used tab with custom illustration */
-              <motion.div
-                key="empty-used"
-                initial={{ opacity: 0, y: 16 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: 16 }}
-                transition={{ duration: 0.2 }}
-                className="text-center py-16 px-6 rounded-3xl bg-white/80 dark:bg-zinc-900/60 border border-dashed border-zinc-200 dark:border-zinc-800 max-w-lg mx-auto shadow-xs"
-              >
-                {/* Pilgrimage History Illustration */}
-                <div className="relative w-20 h-20 mx-auto mb-5 flex items-center justify-center">
-                  <div className="absolute inset-0 rounded-2xl bg-amber-500/10 dark:bg-amber-500/5 rotate-6 border border-amber-500/20" />
-                  <div className="relative w-16 h-16 rounded-2xl bg-white dark:bg-zinc-800 shadow-md flex items-center justify-center text-amber-500 dark:text-amber-400 border border-zinc-200 dark:border-zinc-700">
-                    <History className="w-8 h-8" />
+
+                  {/* Middle row: code display box shimmer */}
+                  <div className="my-3 py-3 px-3.5 rounded-xl bg-zinc-100 dark:bg-zinc-950/80 border border-zinc-200 dark:border-zinc-800/60 flex items-center justify-between">
+                    <div className="h-5 w-28 bg-zinc-200/80 dark:bg-zinc-800 rounded" />
+                    <div className="h-6 w-14 bg-zinc-200/80 dark:bg-zinc-800/80 rounded-lg" />
+                  </div>
+
+                  {/* Bottom row: votes & stats shimmer */}
+                  <div className="flex items-center justify-between pt-2 border-t border-zinc-200/70 dark:border-zinc-800/50">
+                    <div className="h-4 w-20 bg-zinc-200/80 dark:bg-zinc-800/70 rounded" />
+                    <div className="flex gap-1.5">
+                      <div className="h-6 w-10 bg-zinc-200 dark:bg-zinc-800 rounded-lg" />
+                      <div className="h-6 w-10 bg-zinc-200 dark:bg-zinc-800 rounded-lg" />
+                    </div>
                   </div>
                 </div>
-
-                <h3 className={`text-base sm:text-lg font-bold text-zinc-900 dark:text-white mb-2 ${isAr ? "font-arabic" : ""}`}>
-                  {t.emptyUsed.title}
-                </h3>
-                <p className={`text-xs sm:text-sm text-zinc-600 dark:text-zinc-400 max-w-sm mx-auto mb-6 leading-relaxed ${isAr ? "font-arabic" : ""}`}>
-                  {isAr
-                    ? "انسخ أي رمز أو استخدمه وسيظهر هنا تلقائياً لتتبع مفاتيحك أثناء التسجيل."
-                    : "Copy a key and it shows up here. Keep track of what you've tested during registration."}
-                </p>
-
-                <motion.button
-                  type="button"
-                  onClick={() => handleTabClick("latest")}
-                  whileHover={{ scale: 1.04 }}
-                  whileTap={{ scale: 0.96 }}
-                  className="px-5 py-2.5 rounded-full bg-emerald-600 hover:bg-emerald-500 text-xs sm:text-sm text-white font-semibold shadow-sm transition-colors"
-                >
-                  {isAr ? "استعراض المفاتيح الجديدة" : "Browse fresh keys"}
-                </motion.button>
-              </motion.div>
-            ) : (
-              /* Empty State for Search or other tabs */
-              <motion.div
-                key="empty-general"
-                initial={{ opacity: 0, y: 16 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: 16 }}
-                transition={{ duration: 0.2 }}
-                className="text-center py-16 px-4 rounded-3xl bg-white/80 dark:bg-zinc-900/60 border border-dashed border-zinc-200 dark:border-zinc-800 max-w-lg mx-auto shadow-xs"
-              >
-                <div className="w-14 h-14 rounded-2xl bg-zinc-100 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400 flex items-center justify-center mx-auto mb-4 border border-zinc-200 dark:border-zinc-700/60 shadow-xs">
-                  <Inbox className="w-7 h-7" />
-                </div>
-                <h3 className={`text-base sm:text-lg font-bold text-zinc-900 dark:text-white mb-1.5 ${isAr ? "font-arabic" : ""}`}>
-                  {t.empty.title}
-                </h3>
-                <p className={`text-xs sm:text-sm text-zinc-600 dark:text-zinc-400 mb-6 ${isAr ? "font-arabic" : ""}`}>
-                  {t.empty.description}
-                </p>
-
-                <div className="flex flex-wrap items-center justify-center gap-2.5">
-                  {searchQuery && (
-                    <motion.button
-                      onClick={() => onSearchChange("")}
-                      whileHover={{ scale: 1.04 }}
-                      whileTap={{ scale: 0.96 }}
-                      aria-label={t.empty.clearFilters}
-                      className="px-4 py-2 rounded-full bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-xs sm:text-sm text-zinc-800 dark:text-white font-medium transition-colors"
+              ))}
+            </div>
+          ) : items.length > 0 ? (
+            <div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-5">
+                <AnimatePresence mode="popLayout">
+                  {visibleItems.map((item, idx) => (
+                    <motion.div
+                      key={item.id}
+                      layout="position"
+                      initial={{ opacity: 0, y: 12 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, scale: 0.9 }}
+                      transition={{
+                        duration: 0.22,
+                        ease: "easeOut",
+                        delay: idx < 12 ? (idx % 4) * 0.025 : 0
+                      }}
                     >
-                      {t.empty.clearFilters}
-                    </motion.button>
-                  )}
+                      <KeyCard
+                        item={item}
+                        lang={lang}
+                        searchQuery={searchQuery}
+                        isUsed={Boolean(usedMap[item.code.toUpperCase().trim()])}
+                        onVote={onVote}
+                        onCopy={onCopy}
+                        onOpenNusuk={onOpenNusuk}
+                        onToggleUsed={onToggleUsed}
+                      />
+                    </motion.div>
+                  ))}
+                </AnimatePresence>
+              </div>
+
+              {/* Apple-style Progressive Pagination ("Show More") */}
+              {items.length > displayLimit && (
+                <div className="flex flex-col items-center justify-center mt-12 gap-2">
                   <motion.button
-                    onClick={onOpenSubmit}
-                    whileHover={{ scale: 1.04 }}
+                    onClick={handleLoadMore}
+                    whileHover={{ scale: 1.03, y: -1 }}
                     whileTap={{ scale: 0.96 }}
-                    aria-label={t.shareCodeBtn}
-                    className="px-5 py-2 rounded-full bg-emerald-600 hover:bg-emerald-500 text-xs sm:text-sm text-white font-semibold shadow-sm transition-colors"
+                    transition={{ duration: 0.16, ease: "easeOut" }}
+                    aria-label={isAr ? "عرض المزيد من المفاتيح" : "Show more keys"}
+                    className="group flex items-center gap-2 px-6 py-2.5 rounded-full bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700/80 hover:bg-zinc-50 dark:hover:bg-zinc-800 text-xs sm:text-sm font-semibold text-zinc-800 dark:text-zinc-200 shadow-sm hover:shadow transition-colors duration-150"
                   >
-                    {t.shareCodeBtn}
+                    <span>
+                      {isAr
+                        ? `عرض المزيد (يُعرض ${visibleItems.length.toLocaleString()} من ${items.length.toLocaleString()} مفتاح)`
+                        : `Show More (${visibleItems.length.toLocaleString()} of ${items.length.toLocaleString()} keys)`}
+                    </span>
+                    <ChevronDown className="w-4 h-4 text-zinc-400 dark:text-zinc-400 group-hover:translate-y-0.5 transition-transform duration-200" />
                   </motion.button>
                 </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
+              )}
+            </div>
+          ) : activeTab === "used" ? (
+            /* Enhanced Empty State for Used tab with custom illustration */
+            <motion.div
+              key="empty-used"
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.2 }}
+              className="text-center py-16 px-6 rounded-3xl bg-white/80 dark:bg-zinc-900/60 border border-dashed border-zinc-200 dark:border-zinc-800 max-w-lg mx-auto shadow-xs"
+            >
+              {/* Pilgrimage History Illustration */}
+              <div className="relative w-20 h-20 mx-auto mb-5 flex items-center justify-center">
+                <div className="absolute inset-0 rounded-2xl bg-amber-500/10 dark:bg-amber-500/5 rotate-6 border border-amber-500/20" />
+                <div className="relative w-16 h-16 rounded-2xl bg-white dark:bg-zinc-800 shadow-md flex items-center justify-center text-amber-500 dark:text-amber-400 border border-zinc-200 dark:border-zinc-700">
+                  <History className="w-8 h-8" />
+                </div>
+              </div>
+
+              <h3 className={`text-base sm:text-lg font-bold text-zinc-900 dark:text-white mb-2 ${isAr ? "font-arabic" : ""}`}>
+                {t.emptyUsed.title}
+              </h3>
+              <p className={`text-xs sm:text-sm text-zinc-600 dark:text-zinc-400 max-w-sm mx-auto mb-6 leading-relaxed ${isAr ? "font-arabic" : ""}`}>
+                {isAr
+                  ? "انسخ أي رمز أو استخدمه وسيظهر هنا تلقائياً لتتبع مفاتيحك أثناء التسجيل."
+                  : "Copy a key and it shows up here. Keep track of what you've tested during registration."}
+              </p>
+
+              <motion.button
+                type="button"
+                onClick={() => handleTabClick("all")}
+                whileHover={{ scale: 1.04 }}
+                whileTap={{ scale: 0.96 }}
+                className="px-5 py-2.5 rounded-full bg-emerald-600 hover:bg-emerald-500 text-xs sm:text-sm text-white font-semibold shadow-sm transition-colors"
+              >
+                {isAr ? "استعراض جميع المفاتيح" : "Browse all keys"}
+              </motion.button>
+            </motion.div>
+          ) : (
+            /* Empty State for Search or other tabs */
+            <motion.div
+              key="empty-general"
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.2 }}
+              className="text-center py-16 px-4 rounded-3xl bg-white/80 dark:bg-zinc-900/60 border border-dashed border-zinc-200 dark:border-zinc-800 max-w-lg mx-auto shadow-xs"
+            >
+              <div className="w-14 h-14 rounded-2xl bg-zinc-100 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400 flex items-center justify-center mx-auto mb-4 border border-zinc-200 dark:border-zinc-700/60 shadow-xs">
+                <Inbox className="w-7 h-7" />
+              </div>
+              <h3 className={`text-base sm:text-lg font-bold text-zinc-900 dark:text-white mb-1.5 ${isAr ? "font-arabic" : ""}`}>
+                {t.empty.title}
+              </h3>
+              <p className={`text-xs sm:text-sm text-zinc-600 dark:text-zinc-400 mb-6 ${isAr ? "font-arabic" : ""}`}>
+                {t.empty.description}
+              </p>
+
+              <div className="flex flex-wrap items-center justify-center gap-2.5">
+                {searchQuery && (
+                  <motion.button
+                    onClick={() => onSearchChange("")}
+                    whileHover={{ scale: 1.04 }}
+                    whileTap={{ scale: 0.96 }}
+                    aria-label={t.empty.clearFilters}
+                    className="px-4 py-2 rounded-full bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-xs sm:text-sm text-zinc-800 dark:text-white font-medium transition-colors"
+                  >
+                    {t.empty.clearFilters}
+                  </motion.button>
+                )}
+                <motion.button
+                  onClick={onOpenSubmit}
+                  whileHover={{ scale: 1.04 }}
+                  whileTap={{ scale: 0.96 }}
+                  aria-label={t.shareCodeBtn}
+                  className="px-5 py-2 rounded-full bg-emerald-600 hover:bg-emerald-500 text-xs sm:text-sm text-white font-semibold shadow-sm transition-colors"
+                >
+                  {t.shareCodeBtn}
+                </motion.button>
+              </div>
+            </motion.div>
+          )}
         </motion.div>
       </AnimatePresence>
     </section>
