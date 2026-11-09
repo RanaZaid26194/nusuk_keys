@@ -8,6 +8,7 @@ import { translations } from "@/lib/translations";
 import { NumberCounter } from "./NumberCounter";
 import { playHapticSound } from "@/lib/audio";
 import { DailyAyah } from "./DailyAyah";
+import { useCanHover } from "@/lib/useCanHover";
 
 interface HeroProps {
   lang: Language;
@@ -26,6 +27,29 @@ export const Hero: React.FC<HeroProps> = ({
 }) => {
   const t = translations[lang];
   const isAr = lang === "ar";
+
+  const canHover = useCanHover();
+  const buttonRef = React.useRef<HTMLButtonElement>(null);
+  const [magneticOffset, setMagneticOffset] = React.useState({ x: 0, y: 0 });
+
+  // subtle magnetic tracking on desktop only (max 6px)
+  const handleButtonMouseMove = (e: React.MouseEvent<HTMLButtonElement>) =>
+  {
+    if (!canHover || !buttonRef.current)
+      return;
+
+    const rect = buttonRef.current.getBoundingClientRect();
+    const centerX = rect.left + rect.width / 2;
+    const centerY = rect.top + rect.height / 2;
+    const deltaX = Math.max(-6, Math.min(6, (e.clientX - centerX) * 0.15));
+    const deltaY = Math.max(-6, Math.min(6, (e.clientY - centerY) * 0.15));
+    setMagneticOffset({ x: deltaX, y: deltaY });
+  };
+
+  const handleButtonMouseLeave = () =>
+  {
+    setMagneticOffset({ x: 0, y: 0 });
+  };
 
   // stat card entrance variants so delay stays isolated to page load
   const statCardVariants = {
@@ -98,10 +122,14 @@ export const Hero: React.FC<HeroProps> = ({
         >
           <div className="relative inline-flex items-center">
             <motion.button
+              ref={buttonRef}
               onClick={handleOpenSubmit}
-              whileHover={{ scale: 1.025, y: -1 }}
+              onMouseMove={handleButtonMouseMove}
+              onMouseLeave={handleButtonMouseLeave}
+              animate={{ x: magneticOffset.x, y: magneticOffset.y }}
+              whileHover={canHover ? { scale: 1.025 } : undefined}
               whileTap={{ scale: 0.96 }}
-              transition={{ duration: 0.16, ease: "easeOut" }}
+              transition={{ type: "spring", stiffness: 350, damping: 25 }}
               aria-label={t.shareCodeBtn}
               className="group flex items-center gap-2.5 px-7 sm:px-9 py-3 rounded-full bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-sm sm:text-base shadow-lg shadow-emerald-600/25 dark:shadow-emerald-950/60 transition-colors duration-150"
             >

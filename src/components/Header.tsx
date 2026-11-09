@@ -49,8 +49,8 @@ export const Header: React.FC<HeaderProps> = ({
   };
 
   return (
-    <header className={`sticky top-0 z-40 w-full bg-white/80 dark:bg-zinc-950/80 backdrop-blur-md border-b transition-all duration-200 ${scrolled ? 'border-zinc-200/90 dark:border-zinc-800/90 shadow-sm shadow-zinc-950/5 dark:shadow-black/25' : 'border-zinc-200/50 dark:border-zinc-800/50'}`}>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 sm:h-[72px] flex items-center justify-between">
+    <header className={`sticky top-0 z-40 w-full transition-all duration-300 ${scrolled ? 'bg-white/95 dark:bg-zinc-950/90 backdrop-blur-xl border-b border-zinc-200/90 dark:border-zinc-800/90 shadow-sm shadow-zinc-950/5 dark:shadow-black/30' : 'bg-white/80 dark:bg-zinc-950/80 backdrop-blur-md border-b border-zinc-200/50 dark:border-zinc-800/50'}`}>
+      <div className={`max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between transition-all duration-300 ${scrolled ? 'h-14 sm:h-[56px]' : 'h-16 sm:h-[72px]'}`}>
         {/* Brand / Logo */}
         <motion.div
           initial={{ opacity: 0, x: -10 }}

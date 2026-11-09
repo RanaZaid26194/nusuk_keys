@@ -35,6 +35,7 @@ export const KeyCard: React.FC<KeyCardProps> = ({
 {
   const [copied, setCopied] = useState(false);
   const [copyFailed, setCopyFailed] = useState(false);
+  const [openingNusuk, setOpeningNusuk] = useState(false);
   const cardRef = useRef<HTMLDivElement>(null);
   const spotlightRef = useRef<HTMLDivElement>(null);
   const canHover = useCanHover();
@@ -46,7 +47,7 @@ export const KeyCard: React.FC<KeyCardProps> = ({
   const isVerified = successRate >= 75 && item.upvotes >= 2;
   const isExpired = item.downvotes > item.upvotes + 3;
 
-  // zero-react-rerender spotlight tracking
+  // zero-react-rerender spotlight tracking and subtle 3D tilt (max 2deg)
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) =>
   {
     if (!cardRef.current || !spotlightRef.current)
@@ -56,12 +57,21 @@ export const KeyCard: React.FC<KeyCardProps> = ({
     const y = e.clientY - rect.top;
     spotlightRef.current.style.opacity = "1";
     spotlightRef.current.style.background = `radial-gradient(350px circle at ${x}px ${y}px, var(--spotlight-glow, rgba(16, 185, 129, 0.08)), transparent 80%)`;
+
+    // subtle 3D tilt (max 2 degrees, desktop only)
+    const centerX = rect.width / 2;
+    const centerY = rect.height / 2;
+    const rotateX = Math.max(-2, Math.min(2, ((y - centerY) / centerY) * -2));
+    const rotateY = Math.max(-2, Math.min(2, ((x - centerX) / centerX) * 2));
+    cardRef.current.style.transform = `perspective(900px) rotateX(${rotateX.toFixed(2)}deg) rotateY(${rotateY.toFixed(2)}deg)`;
   };
 
   const handleMouseLeave = () =>
   {
     if (spotlightRef.current)
       spotlightRef.current.style.opacity = "0";
+    if (cardRef.current)
+      cardRef.current.style.transform = "perspective(900px) rotateX(0deg) rotateY(0deg)";
   };
 
   const handleCopy = async (e: React.MouseEvent) =>
@@ -117,7 +127,14 @@ export const KeyCard: React.FC<KeyCardProps> = ({
     return (
       <span>
         {before}
-        <span className="bg-amber-400/30 text-amber-900 dark:text-amber-200 px-1 py-0.5 rounded font-black">{match}</span>
+        <motion.span
+          initial={{ backgroundColor: "rgba(251, 191, 36, 0)" }}
+          animate={{ backgroundColor: "rgba(251, 191, 36, 0.3)" }}
+          transition={{ duration: 0.15, ease: "easeOut" }}
+          className="text-amber-900 dark:text-amber-200 px-1 py-0.5 rounded font-black inline-block"
+        >
+          {match}
+        </motion.span>
         {after}
       </span>
     );
@@ -183,12 +200,12 @@ export const KeyCard: React.FC<KeyCardProps> = ({
         </span>
       </div>
 
-      {/* Main Key Box (Click to copy with spring bounce) */}
+      {/* Main Key Box (Click to copy with tactile press & flourish) */}
       <motion.div
         onClick={handleCopy}
         whileHover={{ scale: 1.01 }}
-        whileTap={{ scale: 0.98 }}
-        className={`relative z-10 flex items-center justify-between p-3 sm:p-3.5 rounded-xl border transition-colors duration-150 cursor-pointer select-none mb-3.5 shadow-xs group ${
+        whileTap={{ y: 1, scale: 0.995 }}
+        className={`relative z-10 flex items-center justify-between p-3 sm:p-3.5 rounded-xl border transition-all duration-150 cursor-pointer select-none mb-3.5 shadow-xs active:shadow-[inset_0_2px_4px_rgba(0,0,0,0.08)] dark:active:shadow-[inset_0_2px_4px_rgba(0,0,0,0.3)] overflow-hidden group ${
           copied
             ? "bg-emerald-500/10 dark:bg-emerald-500/15 border-emerald-500/60 ring-1 ring-emerald-500/30"
             : copyFailed
@@ -197,9 +214,23 @@ export const KeyCard: React.FC<KeyCardProps> = ({
         }`}
         title={copyFailed ? (t.keyCard.copyFailed || (isAr ? "اضغط مطولاً للنسخ" : "Press & hold to copy")) : t.keyCard.copyKey}
       >
-        <div className="font-mono text-sm sm:text-base md:text-lg font-bold tracking-wider sm:tracking-widest text-zinc-900 dark:text-zinc-100 group-hover:text-emerald-700 dark:group-hover:text-emerald-300 transition-colors truncate">
+        {/* Shimmer sweep flourish across key box on copy */}
+        {copied && (
+          <motion.div
+            initial={{ x: "-100%" }}
+            animate={{ x: "200%" }}
+            transition={{ duration: 0.55, ease: "easeInOut" }}
+            className="pointer-events-none absolute inset-0 bg-gradient-to-r from-transparent via-emerald-400/20 to-transparent skew-x-12 z-0"
+          />
+        )}
+
+        <motion.div
+          animate={copied ? { letterSpacing: ["0.08em", "0.14em", "0.08em"] } : {}}
+          transition={{ duration: 0.16, ease: "easeOut" }}
+          className="relative z-10 font-mono text-sm sm:text-base md:text-lg font-bold tracking-wider sm:tracking-widest text-zinc-900 dark:text-zinc-100 group-hover:text-emerald-700 dark:group-hover:text-emerald-300 transition-colors truncate"
+        >
           {renderHighlightedCode()}
-        </div>
+        </motion.div>
 
         {/* Tactile Copy Button (Small Apple-style pill with 'Copy' and icon) */}
         <motion.button
@@ -258,7 +289,7 @@ export const KeyCard: React.FC<KeyCardProps> = ({
         </motion.button>
       </motion.div>
 
-      {/* Trust & Usage Progress Bar */}
+      {/* Trust & Usage Progress Bar with smooth color transitions */}
       <div className="relative z-10 space-y-1.5 mb-4">
         <div className="flex justify-between items-center text-xs text-zinc-600 dark:text-zinc-400">
           <span className={isAr ? "font-arabic" : ""}>
@@ -273,7 +304,7 @@ export const KeyCard: React.FC<KeyCardProps> = ({
             initial={{ width: 0 }}
             animate={{ width: `${successRate}%` }}
             transition={{ duration: 0.8, ease: "easeOut" }}
-            className={`h-full rounded-full ${
+            className={`h-full rounded-full transition-colors duration-500 ${
               successRate >= 75 ? "bg-emerald-500" : successRate >= 45 ? "bg-amber-500" : "bg-rose-500"
             }`}
           />
@@ -282,7 +313,7 @@ export const KeyCard: React.FC<KeyCardProps> = ({
 
       {/* Footer Actions: Vote & Deep Link */}
       <div className="relative z-10 flex items-center justify-between gap-2 pt-3 border-t border-zinc-200/80 dark:border-zinc-800/80">
-        {/* Voting Buttons with Apple-style rounded-full pills */}
+        {/* Voting Buttons with Flip Counter Roll & Personality Thumbs */}
         <div className="flex items-center gap-1.5">
           <motion.button
             onClick={() => handleVoteClick('UP')}
@@ -297,12 +328,25 @@ export const KeyCard: React.FC<KeyCardProps> = ({
             }`}
           >
             <motion.div
-              animate={item.userVoted === 'UP' ? { scale: [1, 1.4, 1] } : {}}
-              transition={{ duration: 0.3 }}
+              animate={item.userVoted === 'UP' ? { rotate: [0, -15, 6, 0], scale: [1, 1.25, 1] } : {}}
+              transition={{ duration: 0.35, ease: "backOut" }}
             >
               <ThumbsUp className={`w-3.5 h-3.5 ${item.userVoted === 'UP' ? 'fill-emerald-600 text-emerald-600 dark:fill-emerald-400 dark:text-emerald-400' : ''}`} />
             </motion.div>
-            <span className="font-mono">{item.upvotes}</span>
+            <span className="font-mono inline-block overflow-hidden relative h-[18px] min-w-[12px] text-center leading-[18px]">
+              <AnimatePresence mode="popLayout" initial={false}>
+                <motion.span
+                  key={item.upvotes}
+                  initial={{ y: 12, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  exit={{ y: -12, opacity: 0 }}
+                  transition={{ duration: 0.18, ease: "easeOut" }}
+                  className="inline-block"
+                >
+                  {item.upvotes}
+                </motion.span>
+              </AnimatePresence>
+            </span>
           </motion.button>
 
           <motion.button
@@ -318,12 +362,25 @@ export const KeyCard: React.FC<KeyCardProps> = ({
             }`}
           >
             <motion.div
-              animate={item.userVoted === 'DOWN' ? { scale: [1, 1.4, 1] } : {}}
-              transition={{ duration: 0.3 }}
+              animate={item.userVoted === 'DOWN' ? { rotate: [0, 15, -4, 0], y: [0, 3, 0], scale: [1, 1.2, 1] } : {}}
+              transition={{ duration: 0.35, ease: "easeOut" }}
             >
               <ThumbsDown className={`w-3.5 h-3.5 ${item.userVoted === 'DOWN' ? 'fill-rose-600 text-rose-600 dark:fill-rose-400 dark:text-rose-400' : ''}`} />
             </motion.div>
-            <span className="font-mono">{item.downvotes}</span>
+            <span className="font-mono inline-block overflow-hidden relative h-[18px] min-w-[12px] text-center leading-[18px]">
+              <AnimatePresence mode="popLayout" initial={false}>
+                <motion.span
+                  key={item.downvotes}
+                  initial={{ y: 12, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  exit={{ y: -12, opacity: 0 }}
+                  transition={{ duration: 0.18, ease: "easeOut" }}
+                  className="inline-block"
+                >
+                  {item.downvotes}
+                </motion.span>
+              </AnimatePresence>
+            </span>
           </motion.button>
         </div>
 
@@ -348,13 +405,17 @@ export const KeyCard: React.FC<KeyCardProps> = ({
             </motion.button>
           )}
 
-          {/* Deep Link to Nusuk App */}
+          {/* Deep Link to Nusuk App with loading ring indicator */}
           <motion.a
             href={getNusukDeepLink(item.code)}
             target="_blank"
             rel="noopener noreferrer"
             onClick={() => {
               playHapticSound('click');
+              setOpeningNusuk(true);
+              setTimeout(() => {
+                setOpeningNusuk(false);
+              }, 2000);
               onOpenNusuk?.(item.code);
             }}
             whileHover={{ x: isAr ? -3 : 3 }}
@@ -363,7 +424,11 @@ export const KeyCard: React.FC<KeyCardProps> = ({
             aria-label={t.keyCard.openNusuk}
           >
             <span className={isAr ? "font-arabic" : ""}>{t.keyCard.openNusuk}</span>
-            <ExternalLink className="w-3 h-3 opacity-70 group-hover/link:opacity-100 group-hover/link:translate-x-0.5 group-hover/link:-translate-y-0.5 transition-all duration-200" />
+            {openingNusuk ? (
+              <span className="w-3 h-3 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin inline-block" />
+            ) : (
+              <ExternalLink className="w-3 h-3 opacity-70 group-hover/link:opacity-100 group-hover/link:translate-x-0.5 group-hover/link:-translate-y-0.5 transition-all duration-200" />
+            )}
           </motion.a>
         </div>
       </div>

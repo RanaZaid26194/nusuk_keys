@@ -34,6 +34,7 @@ export default function Home()
   const [isSubmitModalOpen, setIsSubmitModalOpen] = useState(false);
   const [isInfoModalOpen, setIsInfoModalOpen] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
+  const [isLanguageFlipping, setIsLanguageFlipping] = useState(false);
 
   // local history for used keys
   const [usedMap, setUsedMap] = useState<Record<string, number>>({});
@@ -158,11 +159,25 @@ export default function Home()
     }
   }, []);
 
-  const handleLanguageChange = (newLang: Language) => {
-    setLang(newLang);
-    localStorage.setItem(LOCAL_STORAGE_LANG, newLang);
-    document.documentElement.setAttribute("dir", newLang === "ar" ? "rtl" : "ltr");
-    document.documentElement.setAttribute("lang", newLang);
+  // 150ms content fade before applying direction to prevent layout mirroring flash
+  const handleLanguageChange = (newLang: Language) =>
+  {
+    if (newLang === lang)
+      return;
+
+    setIsLanguageFlipping(true);
+    setTimeout(() =>
+    {
+      setLang(newLang);
+      localStorage.setItem(LOCAL_STORAGE_LANG, newLang);
+      document.documentElement.setAttribute("dir", newLang === "ar" ? "rtl" : "ltr");
+      document.documentElement.setAttribute("lang", newLang);
+
+      setTimeout(() =>
+      {
+        setIsLanguageFlipping(false);
+      }, 50);
+    }, 150);
   };
 
   // Load user votes map from localStorage
@@ -781,8 +796,8 @@ export default function Home()
           onOpenInfo={() => setIsInfoModalOpen(true)}
         />
 
-        {/* Main Content Area */}
-        <main className="flex-1">
+        {/* Main Content Area with smooth 150ms language crossfade */}
+        <main className={`flex-1 transition-opacity duration-150 ease-out ${isLanguageFlipping ? "opacity-0" : "opacity-100"}`}>
           <Hero
             lang={lang}
             stats={stats}

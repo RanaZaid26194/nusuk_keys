@@ -228,9 +228,29 @@ export const SubmitModal: React.FC<SubmitModalProps> = ({
 
             {isSuccess ? (
               <div className="text-center py-6">
-                <div className="w-12 h-12 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30 flex items-center justify-center mx-auto mb-3">
-                  <CheckCircle2 className="w-6 h-6" />
-                </div>
+                <motion.div
+                  initial={{ scale: 0.8, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  transition={{ type: "spring", stiffness: 350, damping: 22 }}
+                  className="w-14 h-14 rounded-full bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30 flex items-center justify-center mx-auto mb-3 shadow-xs"
+                >
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    className="w-7 h-7"
+                    stroke="currentColor"
+                    strokeWidth={2.8}
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <motion.path
+                      d="M4.5 12.75l6 6 9-13.5"
+                      initial={{ pathLength: 0 }}
+                      animate={{ pathLength: 1 }}
+                      transition={{ duration: 0.45, ease: "easeOut", delay: 0.1 }}
+                    />
+                  </svg>
+                </motion.div>
                 <h3 id="submit-modal-title" className={`text-lg sm:text-xl font-bold text-zinc-900 dark:text-white mb-1.5 ${isAr ? "font-arabic" : ""}`}>
                   {t.modal.successTitle}
                 </h3>
