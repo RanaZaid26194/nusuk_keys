@@ -12,12 +12,42 @@ import { supabase, isSupabaseConfigured, INITIAL_DEMO_KEYS } from "@/lib/supabas
 import { calculateSuccessRate } from "@/lib/utils";
 
 const LOCAL_STORAGE_KEYS = "nusuk_keys_data_v1";
+const LOCAL_STORAGE_CACHE = "nusuk_keys_cache_v2";
 const LOCAL_STORAGE_VOTES = "nusuk_user_votes_v1";
 const LOCAL_STORAGE_LANG = "nusuk_keys_lang_v1";
 
 export default function Home() {
   const [lang, setLang] = useState<Language>("en");
-  const [keys, setKeys] = useState<ChallengeKey[]>([]);
+  
+  // Instant Initial State via Local Cache (0ms on repeat visits)
+  const [keys, setKeys] = useState<ChallengeKey[]>(() => {
+    if (typeof window !== "undefined") {
+      try {
+        const cached = localStorage.getItem(LOCAL_STORAGE_CACHE);
+        if (cached) {
+          const parsed = JSON.parse(cached);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            return parsed;
+          }
+        }
+      } catch {}
+    }
+    return [];
+  });
+
+  const [isLoading, setIsLoading] = useState<boolean>(() => {
+    if (typeof window !== "undefined") {
+      try {
+        const cached = localStorage.getItem(LOCAL_STORAGE_CACHE);
+        if (cached) {
+          const parsed = JSON.parse(cached);
+          if (Array.isArray(parsed) && parsed.length > 0) return false;
+        }
+      } catch {}
+    }
+    return true;
+  });
+
   const [searchQuery, setSearchQuery] = useState("");
   const [activeTab, setActiveTab] = useState<FilterTab>("latest");
   const [isSubmitModalOpen, setIsSubmitModalOpen] = useState(false);
@@ -52,7 +82,7 @@ export default function Home() {
     }
   }, []);
 
-  // Fetch initial keys with multi-page batching (to fetch all 6,000+ keys beyond 1,000 PostgREST limit)
+  // Fetch initial keys with 2-stage progressive hydration
   const loadKeys = useCallback(async () => {
     const userVotes = getUserVotes();
 
@@ -60,7 +90,7 @@ export default function Home() {
       try {
         const BATCH_SIZE = 1000;
 
-        // 1. Fetch first batch with exact count from Postgres
+        // 1. Fetch first batch with exact count from Postgres (~150-250ms)
         const { data: firstBatch, count, error } = await supabase
           .from("challenge_keys")
           .select("*", { count: "exact" })
@@ -70,11 +100,32 @@ export default function Home() {
 
         if (error) {
           console.error("Supabase loadKeys error:", error);
-        } else if (firstBatch) {
+        } else if (firstBatch && firstBatch.length > 0) {
           const totalCount = count || firstBatch.length;
-          let combinedData: any[] = [...firstBatch];
 
-          // 2. If there are more than 1,000 keys (e.g. ~6,000 keys), fetch all remaining batches in parallel
+          // ⭐ STAGE 1: Instantly render the first 1,000 keys in ~200ms!
+          const firstBatchMapped: ChallengeKey[] = firstBatch.map((d: any) => ({
+            ...d,
+            userVoted: userVotes[d.id] || null,
+          }));
+
+          setKeys((prev) => {
+            // Keep full dataset if we already had all keys loaded previously
+            if (prev.length > firstBatchMapped.length) {
+              const existingIds = new Set(firstBatchMapped.map(k => k.id));
+              const remainingOld = prev.filter(k => !existingIds.has(k.id));
+              return [...firstBatchMapped, ...remainingOld];
+            }
+            return firstBatchMapped;
+          });
+          setIsLoading(false);
+
+          // Save Stage 1 to cache immediately
+          try {
+            localStorage.setItem(LOCAL_STORAGE_CACHE, JSON.stringify(firstBatchMapped));
+          } catch {}
+
+          // ⭐ STAGE 2: If there are more than 1,000 keys, fetch remaining batches in the background
           if (totalCount > BATCH_SIZE) {
             const batchPromises = [];
             for (let from = BATCH_SIZE; from < totalCount; from += BATCH_SIZE) {
@@ -90,18 +141,25 @@ export default function Home() {
             }
 
             const results = await Promise.all(batchPromises);
+            let combinedData: any[] = [...firstBatch];
             for (const res of results) {
               if (res.data && res.data.length > 0) {
                 combinedData = combinedData.concat(res.data);
               }
             }
-          }
 
-          const mapped: ChallengeKey[] = combinedData.map((d: any) => ({
-            ...d,
-            userVoted: userVotes[d.id] || null,
-          }));
-          setKeys(mapped);
+            const allMapped: ChallengeKey[] = combinedData.map((d: any) => ({
+              ...d,
+              userVoted: userVotes[d.id] || null,
+            }));
+
+            setKeys(allMapped);
+            try {
+              localStorage.setItem(LOCAL_STORAGE_CACHE, JSON.stringify(allMapped));
+            } catch {
+              // If quota exceeded for 6,000 keys, firstBatchMapped is already preserved
+            }
+          }
           return;
         }
       } catch (err) {
@@ -111,10 +169,11 @@ export default function Home() {
 
     // Local / Offline fallback
     try {
-      const saved = localStorage.getItem(LOCAL_STORAGE_KEYS);
+      const saved = localStorage.getItem(LOCAL_STORAGE_CACHE) || localStorage.getItem(LOCAL_STORAGE_KEYS);
       if (saved) {
         const parsed: ChallengeKey[] = JSON.parse(saved);
         setKeys(parsed.map(k => ({ ...k, userVoted: userVotes[k.id] || null })));
+        setIsLoading(false);
         return;
       }
     } catch {
@@ -123,6 +182,7 @@ export default function Home() {
 
     // Default seed
     setKeys(INITIAL_DEMO_KEYS.map(k => ({ ...k, userVoted: userVotes[k.id] || null })));
+    setIsLoading(false);
   }, [getUserVotes]);
 
   useEffect(() => {
@@ -403,8 +463,6 @@ export default function Home() {
     };
   }, [keys]);
 
-  if (!isMounted) return null;
-
   return (
     <div className="flex flex-col min-h-screen bg-[#09090b] text-zinc-100 selection:bg-emerald-500/20 selection:text-emerald-200">
       {/* Top Navbar */}
@@ -427,6 +485,7 @@ export default function Home() {
 
         <KeyGrid
           items={filteredKeys}
+          isLoading={isLoading}
           lang={lang}
           searchQuery={searchQuery}
           activeTab={activeTab}

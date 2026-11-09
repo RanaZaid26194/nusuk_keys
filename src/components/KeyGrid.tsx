@@ -10,6 +10,7 @@ import { playHapticSound } from "@/lib/audio";
 
 interface KeyGridProps {
   items: ChallengeKey[];
+  isLoading?: boolean;
   lang: Language;
   searchQuery: string;
   activeTab: FilterTab;
@@ -22,6 +23,7 @@ interface KeyGridProps {
 
 export const KeyGrid: React.FC<KeyGridProps> = ({
   items,
+  isLoading = false,
   lang,
   searchQuery,
   activeTab,
@@ -224,6 +226,37 @@ export const KeyGrid: React.FC<KeyGridProps> = ({
             </div>
           )}
         </>
+      ) : isLoading ? (
+        /* Apple-Grade Glass Skeleton Shimmer Grid */
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-5">
+          {Array.from({ length: 8 }).map((_, idx) => (
+            <div
+              key={idx}
+              className="relative p-5 rounded-2xl bg-zinc-900/60 border border-zinc-800/80 flex flex-col justify-between h-44 overflow-hidden animate-pulse"
+            >
+              {/* Top row: badge + time shimmer */}
+              <div className="flex items-center justify-between">
+                <div className="h-5 w-24 bg-zinc-800/80 rounded-full" />
+                <div className="h-4 w-12 bg-zinc-800/60 rounded" />
+              </div>
+
+              {/* Middle row: code display box shimmer */}
+              <div className="my-3 py-3 px-3.5 rounded-xl bg-zinc-950/80 border border-zinc-800/60 flex items-center justify-between">
+                <div className="h-5 w-28 bg-zinc-800 rounded" />
+                <div className="h-6 w-14 bg-zinc-800/80 rounded-lg" />
+              </div>
+
+              {/* Bottom row: votes & stats shimmer */}
+              <div className="flex items-center justify-between pt-2 border-t border-zinc-800/50">
+                <div className="h-4 w-20 bg-zinc-800/70 rounded" />
+                <div className="flex gap-1.5">
+                  <div className="h-6 w-10 bg-zinc-800 rounded-lg" />
+                  <div className="h-6 w-10 bg-zinc-800 rounded-lg" />
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
       ) : (
         /* Empty State */
         <motion.div
