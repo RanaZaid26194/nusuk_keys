@@ -12,6 +12,7 @@ interface DailyAyahProps
 {
   lang: Language;
   onOpenInfo: () => void;
+  mockFriday?: boolean;
 }
 
 // helper to calculate exact word stagger and total reveal time in ms
@@ -33,9 +34,10 @@ export function computeRevealTimeMs(
   };
 }
 
-export const DailyAyah: React.FC<DailyAyahProps> = ({ lang, onOpenInfo }) =>
+export const DailyAyah: React.FC<DailyAyahProps> = ({ lang, onOpenInfo, mockFriday = false }) =>
 {
   const [ayah, setAyah] = useState<DailyAyahData | null>(null);
+  const [isFriday, setIsFriday] = useState<boolean>(false);
   const shouldReduceMotion = useReducedMotion();
   const t = translations[lang];
   const isAr = lang === "ar";
@@ -62,6 +64,11 @@ export const DailyAyah: React.FC<DailyAyahProps> = ({ lang, onOpenInfo }) =>
   {
     let activeDayKey = getDayKey();
     let isMounted = true;
+
+    // gate friday check strictly after mount to prevent hydration mismatch
+    const now = new Date();
+    const isMockUrl = typeof window !== "undefined" && window.location.search.includes("friday=true");
+    setIsFriday(mockFriday || isMockUrl || now.getDay() === 5);
 
     const syncAyah = async () =>
     {
@@ -91,7 +98,7 @@ export const DailyAyah: React.FC<DailyAyahProps> = ({ lang, onOpenInfo }) =>
       isMounted = false;
       document.removeEventListener("visibilitychange", handleVisibility);
     };
-  }, []);
+  }, [mockFriday]);
 
   // split into whole words so arabic cursive ligatures never break
   const arabicWords = ayah ? ayah.arabic.trim().split(/\s+/) : [];
@@ -123,6 +130,15 @@ export const DailyAyah: React.FC<DailyAyahProps> = ({ lang, onOpenInfo }) =>
     }
   };
 
+  // friday badge label or daily ayah label
+  const labelText = isFriday
+    ? isAr
+      ? "جمعة مباركة"
+      : "Jumu'ah Mubarak"
+    : isAr
+      ? "آية اليوم"
+      : "Ayah of the Day";
+
   return (
     <motion.div
       role="button"
@@ -135,44 +151,69 @@ export const DailyAyah: React.FC<DailyAyahProps> = ({ lang, onOpenInfo }) =>
       onKeyDown={handleKeyDown}
       whileHover={{ y: -2 }}
       whileTap={{ scale: 0.98 }}
-      className="mt-6 flex flex-col items-center justify-center px-6 py-4 rounded-2xl bg-zinc-900/80 hover:bg-zinc-900 border border-amber-500/25 hover:border-amber-500/40 cursor-pointer transition-all max-w-xl mx-auto shadow-sm group text-center min-h-[176px]"
+      className={`mt-6 relative overflow-hidden flex flex-col items-center justify-center px-6 py-4 rounded-2xl bg-zinc-900/80 hover:bg-zinc-900 border ${
+        isFriday
+          ? "border-gold-accent/35 hover:border-gold-accent/50 shadow-[0_0_20px_rgba(212,175,55,0.06)]"
+          : "border-gold-accent/20 hover:border-gold-accent/35"
+      } cursor-pointer transition-all max-w-xl mx-auto shadow-sm group text-center min-h-[176px]`}
     >
-      <div className="w-8 h-8 rounded-full bg-amber-500/10 border border-amber-500/20 flex items-center justify-center flex-shrink-0 group-hover:scale-105 transition-transform mb-1.5">
-        <HeartHandshake className="w-4 h-4 text-amber-400" />
+      {/* 3. Soft gold ambient radial glow at the top */}
+      <div
+        className="absolute inset-x-0 top-0 h-28 pointer-events-none -z-0"
+        style={{
+          background:
+            "radial-gradient(50% 100% at 50% 0%, rgba(212, 175, 55, 0.08) 0%, rgba(212, 175, 55, 0.02) 50%, transparent 100%)"
+        }}
+      />
+
+      {/* 4. Eight-pointed star geometric pattern (Rub el Hizb) with soft radial mask */}
+      <div
+        className="absolute inset-0 pointer-events-none opacity-[0.035] -z-0"
+        style={{
+          backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48' viewBox='0 0 48 48' fill='none' stroke='%23d4af37' stroke-width='0.75'%3E%3Crect x='15' y='15' width='18' height='18'/%3E%3Crect x='15' y='15' width='18' height='18' transform='rotate(45 24 24)'/%3E%3Ccircle cx='24' cy='24' r='2' fill='%23d4af37'/%3E%3Cpath d='M0 24h48M24 0v48' stroke='%23d4af37' stroke-dasharray='2 3' stroke-width='0.5'/%3E%3C/svg%3E")`,
+          backgroundRepeat: "repeat",
+          maskImage: "radial-gradient(ellipse at center, rgba(0,0,0,1) 30%, rgba(0,0,0,0) 80%)",
+          WebkitMaskImage: "radial-gradient(ellipse at center, rgba(0,0,0,1) 30%, rgba(0,0,0,0) 80%)"
+        }}
+      />
+
+      {/* Scripture Header Icon Circle */}
+      <div className="relative z-10 w-8 h-8 rounded-full bg-gold-accent/10 border border-gold-accent/20 flex items-center justify-center flex-shrink-0 group-hover:scale-105 transition-transform mb-1.5">
+        <HeartHandshake className="w-4 h-4 text-gold-accent" />
       </div>
 
-      <div className="text-center w-full overflow-visible">
+      <div className="relative z-10 text-center w-full overflow-visible">
         <AnimatePresence mode="wait">
           {ayah && (
             <motion.div
-              key={`${ayah.surah}:${ayah.numberInSurah}-${lang}`}
+              key={`${ayah.surah}:${ayah.numberInSurah}-${lang}-${isFriday ? 'fri' : 'reg'}`}
               initial={{ opacity: 0, y: shouldReduceMotion ? 0 : 3 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: shouldReduceMotion ? 0 : -3 }}
               transition={{ duration: shouldReduceMotion ? 0.15 : 0.22, ease: "easeInOut" }}
               className="w-full"
             >
-              {/* 1. Small uppercase label above the ayah */}
+              {/* 1 & 6. Label above the ayah with Friday conditional */}
               <div className="flex items-center justify-center gap-1.5 mb-1">
                 <span
                   className={
                     isAr
-                      ? "font-arabic text-xs text-amber-400/90 font-medium tracking-normal select-none"
-                      : "text-[10px] uppercase tracking-widest text-amber-400/90 font-semibold font-mono select-none"
+                      ? "font-arabic text-xs text-gold-accent/90 font-medium tracking-normal select-none"
+                      : "text-[10px] uppercase tracking-widest text-gold-accent/90 font-semibold font-mono select-none"
                   }
                 >
-                  {isAr ? "آية اليوم" : "Ayah of the Day"}
+                  {labelText}
                 </span>
               </div>
 
-              {/* 2. Arabic ayah: whole word stagger with ligatures preserved, lang='ar' */}
+              {/* 1 & 2. Arabic ayah: gold-200, Amiri font, whole word stagger, lang='ar' */}
               <motion.div
                 dir="rtl"
                 lang="ar"
                 variants={containerVariants}
                 initial="hidden"
                 animate="visible"
-                className="font-arabic font-normal text-amber-200 text-base sm:text-lg leading-[2.2] py-1 px-2 text-center group-hover:text-amber-100 transition-colors overflow-visible select-text"
+                className="font-arabic font-normal text-gold-200 text-base sm:text-lg leading-[2.2] py-1 px-2 text-center group-hover:text-gold-100 transition-colors overflow-visible select-text"
               >
                 «{arabicWords.map((word, idx) => (
                   <React.Fragment key={idx}>
@@ -184,16 +225,18 @@ export const DailyAyah: React.FC<DailyAyahProps> = ({ lang, onOpenInfo }) =>
                 ))}»
               </motion.div>
 
-              {/* 4. Hairline divider with tiny amber diamond (EN mode only) */}
+              {/* 5. Ayah End Marker ۝ (U+06DD) in dim gold as divider (EN mode only) */}
               {!isAr && (
-                <div className="flex items-center justify-center gap-2.5 my-2 max-w-[200px] mx-auto opacity-75">
-                  <div className="flex-1 h-[1px] bg-gradient-to-r from-transparent via-amber-500/25 to-amber-500/40" />
-                  <div className="w-1.5 h-1.5 rotate-45 bg-amber-400/80 shadow-[0_0_6px_rgba(251,191,36,0.4)] flex-shrink-0" />
-                  <div className="flex-1 h-[1px] bg-gradient-to-l from-transparent via-amber-500/25 to-amber-500/40" />
+                <div className="flex items-center justify-center gap-2.5 my-1.5 max-w-[200px] mx-auto opacity-70 select-none">
+                  <div className="flex-1 h-[1px] bg-gradient-to-r from-transparent via-gold-accent/20 to-gold-accent/35" />
+                  <span className="font-arabic text-gold-accent/80 text-sm leading-none" aria-hidden="true">
+                    &#x06DD;
+                  </span>
+                  <div className="flex-1 h-[1px] bg-gradient-to-l from-transparent via-gold-accent/20 to-gold-accent/35" />
                 </div>
               )}
 
-              {/* English translation and reference */}
+              {/* 2. English translation and reference in muted zinc */}
               {!isAr && (
                 <>
                   <div className="text-[11px] sm:text-xs text-zinc-400 text-center">
@@ -205,11 +248,11 @@ export const DailyAyah: React.FC<DailyAyahProps> = ({ lang, onOpenInfo }) =>
                 </>
               )}
 
-              {/* In Arabic mode: Arabic reference only, zero English text */}
+              {/* 2. In Arabic mode: Arabic reference only, in muted zinc */}
               {isAr && (
                 <div
                   dir="rtl"
-                  className="text-[11px] sm:text-xs text-amber-400/80 font-arabic mt-1 text-center"
+                  className="text-[11px] sm:text-xs text-zinc-400 font-arabic mt-1 text-center"
                 >
                   [{ayah.surahNameAr} ({ayah.numberInSurah})]
                 </div>
