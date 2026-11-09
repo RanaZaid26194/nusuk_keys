@@ -118,11 +118,12 @@ export const Hero: React.FC<HeroProps> = ({
               whileTap={{ scale: 0.9 }}
               aria-label={t.hook.infoButtonAria}
               title={t.hook.infoButtonAria}
-              className="absolute -top-1 -right-1 sm:-top-1.5 sm:-right-1.5 w-5 h-5 sm:w-5.5 sm:h-5.5 rounded-full bg-zinc-950/90 hover:bg-black text-zinc-300 hover:text-white border border-white/25 shadow-md flex items-center justify-center transition-colors z-10"
+              className="absolute -top-1.5 -right-2 rtl:-left-2 rtl:right-auto w-5.5 h-5.5 sm:w-6 sm:h-6 rounded-full bg-emerald-950 hover:bg-emerald-900 text-emerald-200 hover:text-white border border-emerald-400/50 shadow-md flex items-center justify-center transition-colors z-10"
             >
-              <span className="font-serif text-xs sm:text-sm font-bold italic leading-none select-none">
-                i
-              </span>
+              <svg className="w-3 h-3 sm:w-3.5 sm:h-3.5" viewBox="0 0 12 12" fill="currentColor">
+                <circle cx="6" cy="2.5" r="1.1" />
+                <path d="M5 5h1.6v4.2H7.6v.8H4.4v-.8h1.2V5.8H5V5z" />
+              </svg>
             </motion.button>
           </div>
         </motion.div>

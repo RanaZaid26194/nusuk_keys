@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32">
+  <defs>
+    <linearGradient id="goldKey" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fde68a"/>
+      <stop offset="50%" stop-color="#f59e0b"/>
+      <stop offset="100%" stop-color="#d97706"/>
+    </linearGradient>
+    <radialGradient id="emeraldRim" cx="50%" cy="50%" r="50%">
+      <stop offset="70%" stop-color="#09090b"/>
+      <stop offset="100%" stop-color="#047857"/>
+    </radialGradient>
+  </defs>
+  <!-- Background squircle -->
+  <rect width="32" height="32" rx="8" fill="url(#emeraldRim)"/>
+  <rect x="0.75" y="0.75" width="30.5" height="30.5" rx="7.25" fill="none" stroke="#10b981" stroke-width="1.5" stroke-opacity="0.6"/>
+  
+  <!-- Modern Geometric Challenge Key Icon -->
+  <g transform="translate(6, 6)" fill="none" stroke="url(#goldKey)" stroke-linecap="round" stroke-linejoin="round">
+    <!-- Key Head -->
+    <circle cx="6" cy="6" r="4.5" stroke-width="2.2"/>
+    <circle cx="6" cy="6" r="1.8" fill="url(#goldKey)"/>
+    <!-- Key Stem -->
+    <path d="M9.2 9.2 L17.5 17.5" stroke-width="2.2"/>
+    <!-- Key Teeth -->
+    <path d="M14.5 14.5 L17 12" stroke-width="2"/>
+    <path d="M12.5 16.5 L15 14" stroke-width="2"/>
+    <path d="M16 16 L18 18" stroke-width="2"/>
+  </g>
+</svg>
