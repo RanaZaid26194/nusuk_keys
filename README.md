@@ -1,54 +1,88 @@
+<div align="center">
+
 # 🕋 Nusuk Keys (مفاتيح نسك)
 
-A community-driven, ultra-fast web application to share, discover, and verify **Nusuk Umrah Challenge Keys** (`NG-...`), optimized for seamless deployment on **Vercel** with **Supabase**.
+**The Community-Powered Directory for Nusuk Umrah Challenge Keys**
+
+[![Live Deployment](https://img.shields.io/badge/Production-keys--nusuk.vercel.app-10b981?style=for-the-badge&logo=vercel&logoColor=white)](https://keys-nusuk.vercel.app)
+[![Next.js](https://img.shields.io/badge/Next.js%2014-black?style=for-the-badge&logo=next.js&logoColor=white)](https://nextjs.org)
+[![React](https://img.shields.io/badge/React%2018-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)](https://react.dev)
+[![TypeScript](https://img.shields.io/badge/TypeScript%205-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind%20CSS-38B2AC?style=for-the-badge&logo=tailwind_css&logoColor=white)](https://tailwindcss.com)
+[![Supabase](https://img.shields.io/badge/Supabase-3ECF8E?style=for-the-badge&logo=supabase&logoColor=white)](https://supabase.com)
+[![License: MIT](https://img.shields.io/badge/License-MIT-amber.svg?style=for-the-badge)](LICENSE)
+
+<br />
+
+An ultra-responsive, Apple-inspired progressive web application designed to help pilgrims worldwide discover, verify, and share referral keys (`NG-...`) for challenges in the official **Nusuk (نسك)** mobile app. Built with Next.js 14, Supabase, Tailwind CSS, and Framer Motion.
+
+[Explore Live App](https://keys-nusuk.vercel.app) · [View Architecture](ARCHITECTURE.md) · [Security Model](SECURITY.md) · [Report Issue](https://github.com/RanaZaid26194/nusuk_keys/issues)
+
+</div>
 
 ---
 
-## ✨ Features & Micro-Animations
+## ⚡ Highlights & Key Capabilities
 
-- **⚡ Native Responsiveness**: Crafted for every screen dimension — compact touch experience on mobile, clean multi-column layouts on tablets, desktops, and ultra-wide screens.
-- **🎨 Islamic Modern Aesthetic**: Deep emerald green (`#064e3b`), warm gold accents (`#d4af37`), glassmorphism cards, and subtle geometric patterns.
-- **✨ Micro-Animations**:
-  - **Morphing Copy Button**: Icon smoothly transitions from `Copy` to `Check` with celebratory particle burst and green glow.
-  - **Spring Physics Voting**: Interactive "Works 👍" & "Expired ❌" buttons with bounce counters and local duplication prevention.
-  - **Sliding Filter Tabs**: Smooth Framer Motion layout pill that slides between *All*, *Verified*, *Most Used*, and *Recent*.
-  - **Interactive Search**: Dynamic search with live filter and animated clear button.
-  - **Live Preview Submission**: As users type `NG-...`, a live preview card animates in real-time with automatic uppercase formatting.
-- **🌐 Bilingual by Design**: Instant switcher between **English (LTR)** and **العربية (RTL)** with native font support (Amiri & Inter).
-- **🚀 One-Tap Nusuk Deep Link**: Direct redirect button opening `https://services.nusuk.sa/app?p=27&id={CODE}`.
-- **🔄 Realtime Synchronization**: Live updates when new keys are added using Supabase WebSockets.
-
----
-
-## 🛠️ Quick Start
-
-### 1. Install Dependencies
-```bash
-npm install
-```
-
-### 2. Configure Environment (`.env.local`)
-Create or edit `.env.local`:
-```env
-NEXT_PUBLIC_SUPABASE_URL=https://dttwxygghtdxokcebwta.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key_here
-NEXT_PUBLIC_SITE_URL=http://localhost:3000
-```
-
-> [!NOTE]
-> Even if you run without Supabase keys, the app automatically runs in interactive offline/demo mode with persistent local storage.
-
-### 3. Run Locally
-```bash
-npm run dev
-```
-Open [http://localhost:3000](http://localhost:3000) in your browser.
+- **⚡ 4-Stage Progressive Hydration Pipeline**:
+  - **Stage 1 (<100ms)**: Renders the first 500 challenge keys instantly upon load.
+  - **Stage 2 (Background Sync)**: Fetches up to 1,000 keys silently.
+  - **Stage 3 (Background Sync)**: Expands the list to 1,500 keys.
+  - **Stage 4 (Parallel Streaming)**: Hydrates the full catalog of **5,996+ keys** without ever locking the UI thread.
+- **💾 Zero-Latency Local Caching (SWR)**: Utilizes `localStorage` with versioned cache busting (`nusuk_keys_cache_v2`). Return visits render in **0ms** from local storage while syncing fresh changes in the background.
+- **🍎 Apple Design Language**:
+  - Dark zinc glassmorphic surfaces (`bg-zinc-900/60`, `backdrop-blur-xl`).
+  - Native iOS-style squircles and rounded corner micro-badges.
+  - Fluid spring physics powered by `framer-motion` (stiffness: 400, damping: 30).
+  - Web Audio API haptic synthesizers generating zero-latency mechanical clicks and soft chime tones on user interactions.
+- **🕌 Native Bi-directional RTL & Sacred Calligraphy**:
+  - Instant one-tap switcher between **English (LTR)** and **العربية (RTL)** with mirrored layouts.
+  - Handcrafted **Nasta'liq** calligraphy style typography for Quranic Ayahs (*Surah Al-Ma'idah 5:2*) and Hadith (*Sahih Muslim 2699*), rendered with vertical breathing room.
+- **🛡️ Multi-Tier Security & Anti-Abuse**:
+  - Client & database level Regex sanitization: `^NG-[A-Za-z0-9_-]+$`.
+  - Token-bucket client-side rate limiting (prevents rapid submission spam).
+  - Real-time duplicate key detection against Supabase Postgres with animated shake alerts.
+  - Postgres Row-Level Security (RLS) guaranteeing tamper-proof public read/insert permissions.
+- **📱 PWA & Mobile Installability**:
+  - Fully compliant Progressive Web App with `manifest.json`, high-resolution iOS touch icons, and Android standalone display mode.
+- **🔍 SEO & LLM Ready**:
+  - Dynamic `sitemap.xml`, `robots.txt`, and crawler-friendly `llms.txt`.
+  - Rich 1200×630 OpenGraph and Twitter cards for social sharing.
+  - Integrated Vercel Web Analytics and Speed Insights for real-time Core Web Vitals monitoring.
 
 ---
 
-## 🗄️ Supabase SQL Schema
+## 🏗️ Architecture Overview
 
-Paste this SQL into your **Supabase Dashboard ➔ SQL Editor**:
+```mermaid
+graph TD
+    User([Pilgrim / User]) -->|Visits App| Edge[Vercel Global Edge Network]
+    Edge -->|SSR HTML + CSS| Browser[Client Browser]
+    
+    subgraph Browser Storage
+        Browser -->|Read Cache| LS[(LocalStorage SWR Cache)]
+        LS -->|0ms Instant Paint| UI[Apple Glassmorphic UI]
+    end
+
+    subgraph 4-Stage Hydration Pipeline
+        Browser -->|Stage 1: Range 0-499| PostgREST[Supabase PostgREST API]
+        PostgREST -->|Stage 2: Range 500-999| PostgREST
+        PostgREST -->|Stage 3: Range 1000-1499| PostgREST
+        PostgREST -->|Stage 4: Range 1500-End| PostgREST
+        PostgREST -->|Postgres DB Pool| DB[(Supabase PostgreSQL 15)]
+    end
+
+    PostgREST -->|Stream Batches| Browser
+    Browser -->|Update Cache & State| UI
+```
+
+For an exhaustive explanation of the data flow, state management, and audio synthesis, see [ARCHITECTURE.md](ARCHITECTURE.md).
+
+---
+
+## 🗄️ Database Schema & RLS Policies
+
+Run this in your **Supabase SQL Editor** to initialize the table, indexes, and Row Level Security policies:
 
 ```sql
 -- 1. Create table for challenge keys
@@ -63,40 +97,139 @@ CREATE TABLE IF NOT EXISTS challenge_keys (
     last_verified_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
--- 2. Create index for fast query sorting
+-- 2. Create optimized compound indexes for sorting and filtering
 CREATE INDEX IF NOT EXISTS idx_challenge_keys_active 
 ON challenge_keys (is_active, upvotes DESC, created_at DESC);
 
--- 3. Enable Public Read & Insert Access (Row Level Security)
+CREATE INDEX IF NOT EXISTS idx_challenge_keys_code 
+ON challenge_keys (code);
+
+-- 3. Enable Row Level Security (RLS)
 ALTER TABLE challenge_keys ENABLE ROW LEVEL SECURITY;
 
+-- 4. RLS Policies
+-- Allow anyone to read active keys
 CREATE POLICY "Allow public read active keys" 
-ON challenge_keys FOR SELECT USING (is_active = true);
+ON challenge_keys FOR SELECT 
+USING (is_active = true);
 
+-- Allow anyone to submit a new key conforming to the NG format
 CREATE POLICY "Allow public submit new keys" 
-ON challenge_keys FOR INSERT WITH CHECK (code ~ '^NG-[A-Za-z0-9_-]+$');
+ON challenge_keys FOR INSERT 
+WITH CHECK (code ~ '^NG-[A-Za-z0-9_-]+$');
 
+-- Allow community voting and copy count incrementing
 CREATE POLICY "Allow voting updates" 
-ON challenge_keys FOR UPDATE USING (true);
+ON challenge_keys FOR UPDATE 
+USING (true);
 
--- 4. Enable Realtime updates
+-- 5. Enable Realtime Publications
 ALTER PUBLICATION supabase_realtime ADD TABLE challenge_keys;
 ```
 
 ---
 
-## 🚀 Deploy to Vercel
+## 🚀 Quick Start & Local Setup
 
-1. Push this folder to a GitHub repository:
-   ```bash
-   git init
-   git add .
-   git commit -m "Initial commit of Nusuk Keys"
-   git remote add origin https://github.com/YOUR_USERNAME/nusuk-keys.git
-   git push -u origin main
-   ```
-2. Import the project in [Vercel](https://vercel.com/new).
-3. Add the two environment variables:
-   - `NEXT_PUBLIC_SUPABASE_URL`
-   - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
-4. Click **Deploy**!
+### Prerequisites
+- Node.js 18.17+ or Node.js 20+
+- npm or pnpm or bun
+
+### 1. Clone the Repository
+```bash
+git clone https://github.com/RanaZaid26194/nusuk_keys.git
+cd nusuk_keys
+```
+
+### 2. Install Dependencies
+```bash
+npm install
+```
+
+### 3. Setup Environment Variables
+Create a `.env.local` file in the root directory:
+```env
+NEXT_PUBLIC_SUPABASE_URL=https://dttwxygghtdxokcebwta.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key_here
+NEXT_PUBLIC_SITE_URL=http://localhost:3000
+```
+
+> [!NOTE]
+> If run without Supabase credentials, the application automatically falls back to an interactive local demo state with client storage persistence.
+
+### 4. Start Development Server
+```bash
+npm run dev
+```
+
+Visit [http://localhost:3000](http://localhost:3000) to view the application.
+
+### 5. Build for Production
+```bash
+npm run build
+npm start
+```
+
+---
+
+## 📂 Project Structure
+
+```
+nusuk_keys/
+├── public/                       # Static assets & verification files
+│   ├── favicon.ico               # 32x32 multi-size favicon
+│   ├── icon.svg                  # Scalable vector icon
+│   ├── apple-icon.png            # 180x180 iOS home screen icon
+│   ├── og-image.png              # 1200x630 high-res OpenGraph card
+│   ├── twitter-image.png         # 1200x630 Twitter card
+│   ├── robots.txt                # Search engine crawler policies
+│   ├── llms.txt                  # Context-optimized crawler file for AI agents
+│   └── googlea2294fd447f1f41b.html # Google Search Console ownership verification
+├── src/
+│   ├── app/
+│   │   ├── layout.tsx            # Global layout, fonts, meta tags & Vercel analytics
+│   │   ├── page.tsx              # Core app container, 4-stage hydration pipeline
+│   │   ├── globals.css           # Tailwind custom utilities, Nasta'liq font rules
+│   │   ├── manifest.ts           # PWA manifest generator
+│   │   ├── robots.ts             # Dynamic robots.txt generator
+│   │   └── sitemap.ts            # Dynamic XML sitemap generator
+│   ├── components/
+│   │   ├── Header.tsx            # Apple glass header, language switch, CTA
+│   │   ├── Hero.tsx              # Value proposition, live statistics, sacred banner
+│   │   ├── KeyGrid.tsx           # Search, filters, Apple glass shimmer & card grid
+│   │   ├── KeyCard.tsx           # Interactive key card, copy action, up/down voting
+│   │   ├── SubmitModal.tsx       # Share key dialog with live validation & haptics
+│   │   ├── InfoModal.tsx         # "Why Share?" modal with Nastaliq sacred quotes
+│   │   ├── NumberCounter.tsx     # Animated rolling counter for key totals
+│   │   └── Footer.tsx            # Sadaqah Jariyah footer & navigation links
+│   └── lib/
+│       ├── audio.ts              # Web Audio API procedural sound synthesizer
+│       ├── security.ts           # Code sanitization, validation & rate limiting
+│       ├── supabase.ts           # Supabase client instantiation
+│       ├── translations.ts       # Bilingual English & Arabic dictionaries
+│       ├── types.ts              # TypeScript interfaces & database schemas
+│       └── utils.ts              # Utility helpers
+├── ARCHITECTURE.md               # Technical architecture & hydration benchmark docs
+├── CONTRIBUTING.md               # Contribution and coding standards
+├── SECURITY.md                   # Security model & RLS threat boundaries
+├── CHANGELOG.md                  # Release notes & version changelog
+└── LICENSE                       # MIT License
+```
+
+---
+
+## 🌍 Open-Source & Sadaqah Jariyah
+
+This project was built with the singular intention of serving the global Umrah & Hajj community. Earning rewards and completing challenges in the Nusuk app should be accessible, seamless, and completely free of spam or ads.
+
+> «وَتَعَاوَنُوا عَلَى الْبِرِّ وَالتَّقْوَىٰ»  
+> *“And cooperate in righteousness and piety...”* — [Surah Al-Ma'idah 5:2]
+
+> «وَاللَّهُ فِي عَوْنِ الْعَبْدِ مَا كَانَ الْعَبْدُ فِي عَوْنِ أَخِيهِ»  
+> *“Allah helps His servant as long as the servant is helping his brother.”* — [Sahih Muslim 2699]
+
+---
+
+## 📄 License
+
+Distributed under the **MIT License**. See [`LICENSE`](LICENSE) for more information.
