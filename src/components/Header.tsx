@@ -27,7 +27,7 @@ const HeaderComponent: React.FC<HeaderProps> = ({
 
   React.useEffect(() => {
     const handleScroll = () => {
-      setScrolled(window.scrollY > 12);
+      setScrolled(window.scrollY > 15);
     };
     handleScroll();
     window.addEventListener("scroll", handleScroll, { passive: true });
@@ -50,7 +50,7 @@ const HeaderComponent: React.FC<HeaderProps> = ({
   };
 
   return (
-    <header className={`sticky top-0 z-40 w-full transition-all duration-300 ${scrolled ? 'bg-white/95 dark:bg-zinc-950/90 backdrop-blur-xl border-b border-zinc-200/90 dark:border-zinc-800/90 shadow-sm shadow-zinc-950/5 dark:shadow-black/30' : 'bg-white/80 dark:bg-zinc-950/80 backdrop-blur-md border-b border-zinc-200/50 dark:border-zinc-800/50'}`}>
+    <header className={`sticky top-0 z-40 w-full transition-all duration-300 ${scrolled ? 'bg-white/95 dark:bg-zinc-950/95 backdrop-blur-xl border-b border-zinc-200/90 dark:border-zinc-800/90 shadow-sm shadow-zinc-950/5 dark:shadow-black/40' : 'bg-white/80 dark:bg-zinc-950/80 backdrop-blur-md border-b border-zinc-200/40 dark:border-zinc-800/40'}`}>
       <div className={`max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between transition-all duration-300 ${scrolled ? 'h-14 sm:h-[56px]' : 'h-16 sm:h-[72px]'}`}>
         {/* Brand / Logo */}
         <motion.div
@@ -61,18 +61,20 @@ const HeaderComponent: React.FC<HeaderProps> = ({
           <motion.div
             whileHover={{ rotate: 14, scale: 1.08 }}
             transition={{ duration: 0.16, ease: "easeOut" }}
-            className="flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-emerald-600 dark:text-emerald-400 shadow-sm transition-colors cursor-pointer"
+            className={`flex items-center justify-center rounded-xl bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-emerald-600 dark:text-emerald-400 shadow-sm transition-all duration-300 cursor-pointer ${
+              scrolled ? "w-7 h-7 sm:w-8 sm:h-8" : "w-8 h-8 sm:w-10 sm:h-10"
+            }`}
           >
-            <KeyRound className="w-4 h-4 sm:w-5 sm:h-5" />
+            <KeyRound className={`transition-all duration-300 ${scrolled ? "w-3.5 h-3.5 sm:w-4 sm:h-4" : "w-4 h-4 sm:w-5 sm:h-5"}`} />
           </motion.div>
 
           <div>
             <div className="flex items-center gap-2">
-              <span className={`text-sm sm:text-lg font-bold tracking-tight text-zinc-900 dark:text-white whitespace-nowrap ${lang === 'ar' ? 'font-arabic text-base sm:text-xl' : ''}`}>
+              <span className={`font-bold tracking-tight text-zinc-900 dark:text-white whitespace-nowrap transition-all duration-300 ${scrolled ? "text-xs sm:text-base" : "text-sm sm:text-lg"} ${lang === 'ar' ? (scrolled ? 'font-arabic text-sm sm:text-lg' : 'font-arabic text-base sm:text-xl') : ''}`}>
                 {t.siteTitle}
               </span>
             </div>
-            <p className="text-[11px] text-zinc-500 dark:text-zinc-400 hidden sm:block whitespace-nowrap">
+            <p className={`text-[11px] text-zinc-500 dark:text-zinc-400 hidden sm:block whitespace-nowrap transition-all duration-300 ${scrolled ? 'opacity-0 max-h-0 -translate-y-1 overflow-hidden pointer-events-none' : 'opacity-100 max-h-4 translate-y-0'}`}>
               {t.siteSubtitle}
             </p>
           </div>

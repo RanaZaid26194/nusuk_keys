@@ -55,7 +55,9 @@ const KeyGridComponent: React.FC<KeyGridProps> = ({
 }) => {
   const searchInputRef = useRef<HTMLInputElement>(null);
   const sortRef = useRef<HTMLDivElement>(null);
+  const tabContainerRef = useRef<HTMLDivElement>(null);
   const tabRefs = useRef<Record<string, HTMLButtonElement | null>>({});
+  const isMountedRef = useRef(false);
   const [displayLimit, setDisplayLimit] = useState(24);
   const [confirmingClear, setConfirmingClear] = useState(false);
   const [isSortOpen, setIsSortOpen] = useState(false);
@@ -76,10 +78,29 @@ const KeyGridComponent: React.FC<KeyGridProps> = ({
     setDisplayLimit(24);
   }, [activeTab, searchQuery]);
 
-  // Ensure active tab is scrolled into view on mobile
-  useEffect(() =>
-  {
-    tabRefs.current[activeTab]?.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "nearest" });
+  // Smoothly scroll only the horizontal tab container without scrolling the window
+  const scrollTabIntoContainer = (tab: FilterTab) => {
+    const container = tabContainerRef.current;
+    const tabEl = tabRefs.current[tab];
+    if (!container || !tabEl) return;
+
+    const containerRect = container.getBoundingClientRect();
+    const tabRect = tabEl.getBoundingClientRect();
+
+    if (tabRect.left < containerRect.left) {
+      container.scrollBy({ left: tabRect.left - containerRect.left - 16, behavior: "smooth" });
+    } else if (tabRect.right > containerRect.right) {
+      container.scrollBy({ left: tabRect.right - containerRect.right + 16, behavior: "smooth" });
+    }
+  };
+
+  // Scroll active tab in container only after initial mount
+  useEffect(() => {
+    if (!isMountedRef.current) {
+      isMountedRef.current = true;
+      return;
+    }
+    scrollTabIntoContainer(activeTab);
   }, [activeTab]);
 
   // Reset clear confirmation when leaving tab
@@ -128,12 +149,8 @@ const KeyGridComponent: React.FC<KeyGridProps> = ({
   const handleTabClick = (tab: FilterTab) => {
     playHapticSound('click');
     onTabChange(tab);
-    tabRefs.current[tab]?.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+    scrollTabIntoContainer(tab);
   };
-
-  useEffect(() => {
-    tabRefs.current[activeTab]?.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
-  }, [activeTab]);
 
   const handleLoadMore = () =>
   {
@@ -238,6 +255,7 @@ const KeyGridComponent: React.FC<KeyGridProps> = ({
           <div className="flex items-center gap-2 w-full lg:w-auto">
             {/* Sliding Filter Tabs (Clean Apple-style Segmented Control) */}
             <div
+              ref={tabContainerRef}
               role="tablist"
               aria-label={isAr ? "خيارات التصفية" : "Filter options"}
               className="flex-1 min-w-0 flex items-center gap-1 p-1 rounded-full bg-zinc-100/90 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 overflow-x-auto no-scrollbar shadow-sm touch-pan-x"
