@@ -37,6 +37,7 @@ export const SubmitModal: React.FC<SubmitModalProps> = ({
   const isComplete = bodyCount === KEY_BODY_LENGTH && isValidKey(code);
   const previousFocusRef = useRef<HTMLElement | null>(null);
   const modalRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   // Live rate limit countdown interval
   useEffect(() =>
@@ -68,6 +69,14 @@ export const SubmitModal: React.FC<SubmitModalProps> = ({
       setCode(KEY_PREFIX);
       setErrorMessage(null);
       setIsSuccess(false);
+
+      if (typeof window !== "undefined" && window.innerWidth >= 768)
+      {
+        const timer = setTimeout(() => {
+          inputRef.current?.focus();
+        }, 50);
+        return () => clearTimeout(timer);
+      }
     }
     else if (previousFocusRef.current)
     {
@@ -270,25 +279,26 @@ export const SubmitModal: React.FC<SubmitModalProps> = ({
     <AnimatePresence>
       {isOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
-          {/* Backdrop */}
+          {/* Backdrop (crisp on mobile, blurred on desktop) */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={onClose}
-            className="fixed inset-0 bg-black/60 dark:bg-black/80 backdrop-blur-sm"
+            className="fixed inset-0 bg-black/65 dark:bg-black/80 sm:backdrop-blur-sm"
           />
 
-          {/* Dialog Container */}
+          {/* Dialog Container (lightweight GPU entrance) */}
           <motion.div
             ref={modalRef}
             role="dialog"
             aria-modal="true"
             aria-labelledby="submit-modal-title"
-            initial={{ opacity: 0, scale: 0.94, y: 12 }}
+            initial={{ opacity: 0, scale: 0.95, y: 8 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.94, y: 12 }}
-            transition={{ type: "spring", stiffness: 400, damping: 30 }}
+            exit={{ opacity: 0, scale: 0.95, y: 8 }}
+            transition={{ duration: 0.16, ease: [0.16, 1, 0.3, 1] }}
+            style={{ willChange: "transform, opacity" }}
             className="relative w-full max-w-lg max-h-[calc(100dvh-2rem)] overflow-y-auto overscroll-contain my-auto rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 p-4 sm:p-7 shadow-2xl z-10 transition-colors"
           >
             {/* Close Button - positioned on left in RTL, right in LTR to avoid header overlap */}
@@ -395,6 +405,7 @@ export const SubmitModal: React.FC<SubmitModalProps> = ({
                     </div>
                   </div>
                   <input
+                    ref={inputRef}
                     id="submit-key-input"
                     type="text"
                     inputMode="text"
@@ -408,7 +419,6 @@ export const SubmitModal: React.FC<SubmitModalProps> = ({
                     onChange={handleInputChange}
                     onPaste={handlePaste}
                     placeholder={t.modal.placeholder}
-                    autoFocus
                     className={`w-full px-3.5 py-3 rounded-xl bg-zinc-50 dark:bg-zinc-950 font-mono text-base font-bold tracking-widest text-left focus:outline-none shadow-xs transition-colors ${
                       errorMessage
                         ? "border-2 border-rose-500 text-rose-600 dark:text-rose-200 focus:border-rose-400 focus:ring-1 focus:ring-rose-400"

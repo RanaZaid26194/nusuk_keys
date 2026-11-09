@@ -93,7 +93,7 @@ export const Tooltip: React.FC<TooltipProps> = ({
 
       <div
         role="tooltip"
-        className={`absolute ${positionClasses} ${alignClasses} z-50 pointer-events-none opacity-0 invisible ${transitionOrigin} group-hover/tooltip:opacity-100 group-hover/tooltip:visible group-focus-within/tooltip:opacity-100 group-focus-within/tooltip:visible transition-all duration-150 ease-out select-none ${className}`}
+        className={`hidden sm:block absolute ${positionClasses} ${alignClasses} z-50 pointer-events-none opacity-0 invisible ${transitionOrigin} group-hover/tooltip:opacity-100 group-hover/tooltip:visible group-focus-within/tooltip:opacity-100 group-focus-within/tooltip:visible transition-all duration-150 ease-out select-none ${className}`}
       >
         {/* Caret pointing toward target */}
         <div className={`absolute ${caretClasses} ${caretAlignClasses} w-2 h-2 bg-zinc-900 border-zinc-700/80 rotate-45 pointer-events-none`} />

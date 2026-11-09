@@ -17,6 +17,7 @@ import { calculateSuccessRate } from "@/lib/utils";
 import { loadUsedKeys, markUsed, unmarkUsed, clearUsedKeys, normalizeCode, STORAGE_KEY_USED } from "@/lib/usedKeys";
 import { isValidKey, normalizeNumerals } from "@/lib/keyFormat";
 import { translations } from "@/lib/translations";
+import { playHapticSound } from "@/lib/audio";
 
 const LOCAL_STORAGE_KEYS = "nusuk_keys_data_v1";
 const LOCAL_STORAGE_CACHE = "nusuk_keys_cache_v2";
@@ -975,7 +976,10 @@ export default function Home()
         <div className="fixed bottom-5 right-4 rtl:right-auto rtl:left-4 z-40 sm:hidden pb-[env(safe-area-inset-bottom)]">
           <motion.button
             type="button"
-            onClick={handleOpenSubmitModal}
+            onClick={() => {
+              playHapticSound('click');
+              handleOpenSubmitModal();
+            }}
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             className="flex items-center gap-2 px-4 py-3 rounded-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-sm shadow-xl shadow-emerald-950/30 border border-emerald-400/30 backdrop-blur-md transition-colors"

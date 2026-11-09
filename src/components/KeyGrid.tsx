@@ -128,7 +128,12 @@ export const KeyGrid: React.FC<KeyGridProps> = ({
   const handleTabClick = (tab: FilterTab) => {
     playHapticSound('click');
     onTabChange(tab);
+    tabRefs.current[tab]?.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
   };
+
+  useEffect(() => {
+    tabRefs.current[activeTab]?.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+  }, [activeTab]);
 
   const handleLoadMore = () =>
   {
@@ -229,13 +234,13 @@ export const KeyGrid: React.FC<KeyGridProps> = ({
             </AnimatePresence>
           </div>
 
-          {/* Right side: Filter Tabs & Sort Dropdown */}
-          <div className="flex flex-wrap sm:flex-nowrap items-center gap-2">
+          {/* Right side: Filter Tabs & Sort Dropdown (Side-by-side on mobile, no 3rd row wrapping) */}
+          <div className="flex items-center gap-2 w-full lg:w-auto">
             {/* Sliding Filter Tabs (Clean Apple-style Segmented Control) */}
             <div
               role="tablist"
               aria-label={isAr ? "خيارات التصفية" : "Filter options"}
-              className="flex items-center gap-1 p-1 rounded-full bg-zinc-100/90 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 overflow-x-auto no-scrollbar shadow-sm max-w-full touch-pan-x"
+              className="flex-1 min-w-0 flex items-center gap-1 p-1 rounded-full bg-zinc-100/90 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 overflow-x-auto no-scrollbar shadow-sm touch-pan-x"
             >
               {(["all", "verified", "popular", "latest", "used"] as FilterTab[]).map((tab) =>
               {
@@ -290,7 +295,7 @@ export const KeyGrid: React.FC<KeyGridProps> = ({
 
             {/* Sort Dropdown Control with theme tooltip */}
             {onSortChange && (
-              <div className="relative" ref={sortRef}>
+              <div className="relative flex-shrink-0" ref={sortRef}>
                 <Tooltip
                   content={isSortOpen ? null : (isAr ? "تغيير ترتيب المفاتيح" : "Change sorting order")}
                   position="bottom"
@@ -303,10 +308,10 @@ export const KeyGrid: React.FC<KeyGridProps> = ({
                     aria-label={`${t.sort.label}: ${t.sort[sortBy]}`}
                     className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700 text-xs sm:text-sm font-medium text-zinc-700 dark:text-zinc-300 shadow-sm transition-all"
                   >
-                    <ArrowUpDown className="w-3.5 h-3.5 text-zinc-400 dark:text-zinc-500" />
+                    <ArrowUpDown className="w-3.5 h-3.5 text-zinc-400 dark:text-zinc-500 flex-shrink-0" />
                     <span className="hidden sm:inline text-zinc-500 dark:text-zinc-400">{t.sort.label}:</span>
-                    <span className="font-semibold text-zinc-900 dark:text-zinc-100">{t.sort[sortBy]}</span>
-                    <ChevronDown className={`w-3.5 h-3.5 text-zinc-400 transition-transform duration-200 ${isSortOpen ? "rotate-180" : ""}`} />
+                    <span className="font-semibold text-zinc-900 dark:text-zinc-100 whitespace-nowrap">{t.sort[sortBy]}</span>
+                    <ChevronDown className={`w-3.5 h-3.5 text-zinc-400 flex-shrink-0 transition-transform duration-200 ${isSortOpen ? "rotate-180" : ""}`} />
                   </button>
                 </Tooltip>
 
@@ -317,7 +322,7 @@ export const KeyGrid: React.FC<KeyGridProps> = ({
                       animate={{ opacity: 1, scale: 1, y: 0 }}
                       exit={{ opacity: 0, scale: 0.95, y: -4 }}
                       transition={{ duration: 0.15, ease: "easeOut" }}
-                      className={`absolute ${isAr ? "left-0" : "right-0"} mt-1.5 w-44 rounded-2xl bg-white/95 dark:bg-zinc-900/95 border border-zinc-200 dark:border-zinc-800 shadow-xl backdrop-blur-xl p-1 z-40`}
+                      className={`absolute ${isAr ? "left-0" : "right-0"} mt-1.5 w-44 max-w-[calc(100vw-2rem)] rounded-2xl bg-white/95 dark:bg-zinc-900/95 border border-zinc-200 dark:border-zinc-800 shadow-xl backdrop-blur-xl p-1 z-40`}
                     >
                       {(["newest", "copies", "rating"] as SortOption[]).map((option) => (
                         <button
