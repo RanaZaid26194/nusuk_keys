@@ -114,10 +114,11 @@ export const SubmitModal: React.FC<SubmitModalProps> = ({
             exit={{ opacity: 0, scale: 0.96 }}
             className="relative w-full max-w-lg rounded-2xl bg-zinc-900 border border-zinc-800 p-6 sm:p-7 shadow-2xl z-10"
           >
-            {/* Close Button */}
+            {/* Close Button - positioned on left in RTL, right in LTR to avoid header overlap */}
             <button
               onClick={onClose}
-              className="absolute top-5 right-5 p-1.5 rounded-lg text-zinc-400 hover:text-white hover:bg-zinc-800 transition-colors"
+              aria-label={t.hook.close}
+              className={`absolute top-5 ${isAr ? "left-5" : "right-5"} p-1.5 rounded-lg text-zinc-400 hover:text-white hover:bg-zinc-800 transition-colors z-20`}
             >
               <X className="w-4 h-4" />
             </button>
@@ -150,32 +151,35 @@ export const SubmitModal: React.FC<SubmitModalProps> = ({
                   </div>
                 </div>
 
-                {/* Noble Spiritual Hook Reminder Card with ample vertical room */}
-                <div className="p-4 rounded-2xl bg-zinc-950 border border-amber-500/25 mb-4 flex items-start gap-3 shadow-inner">
-                  <HeartHandshake className="w-4 h-4 text-amber-400 flex-shrink-0 mt-2" />
-                  <div className="text-xs text-zinc-300 leading-relaxed w-full overflow-visible">
-                    <div dir="rtl" className="font-nastaliq font-bold text-amber-200 block text-base sm:text-lg leading-[2.8] py-2 px-1 text-center overflow-visible">
+                {/* Noble Spiritual Hook Reminder Card - Centered Symmetric Layout */}
+                <div className="p-4 sm:p-5 rounded-2xl bg-zinc-950 border border-amber-500/25 mb-4 flex flex-col items-center justify-center text-center shadow-inner">
+                  <div className="w-7 h-7 rounded-full bg-amber-500/10 border border-amber-500/20 flex items-center justify-center mb-1.5">
+                    <HeartHandshake className="w-3.5 h-3.5 text-amber-400" />
+                  </div>
+                  <div className="w-full text-center overflow-visible">
+                    <div dir="rtl" className="font-nastaliq font-bold text-amber-200 block text-base sm:text-lg leading-[2.8] py-1.5 px-1 text-center overflow-visible">
                       «{t.hook.hadithArabic}»
                     </div>
-                    <span className="text-[11px] text-zinc-400 block text-center mt-1">
+                    <span className={`text-[11px] sm:text-xs text-zinc-400 block text-center mt-1.5 leading-relaxed ${isAr ? "font-arabic" : ""}`}>
                       {t.hook.rewardMessage}
                     </span>
                   </div>
                 </div>
 
-                {/* Input Field */}
+                {/* Input Field (always LTR for alphanumeric code entry) */}
                 <div className="mb-4">
                   <label className={`block text-xs font-medium text-zinc-300 mb-1.5 ${isAr ? "font-arabic" : ""}`}>
                     {t.modal.inputLabel}
                   </label>
                   <input
                     type="text"
+                    dir="ltr"
                     value={code}
                     onChange={handleInputChange}
                     placeholder={t.modal.placeholder}
                     maxLength={24}
                     autoFocus
-                    className={`w-full px-3.5 py-3 rounded-xl bg-zinc-950 font-mono text-base font-bold tracking-widest focus:outline-none shadow-inner transition-colors ${
+                    className={`w-full px-3.5 py-3 rounded-xl bg-zinc-950 font-mono text-base font-bold tracking-widest text-left focus:outline-none shadow-inner transition-colors ${
                       errorMessage
                         ? "border-2 border-rose-500 text-rose-200 focus:border-rose-400 focus:ring-1 focus:ring-rose-400"
                         : "border border-zinc-800 text-zinc-100 focus:border-zinc-700 focus:ring-1 focus:ring-zinc-700"
@@ -190,7 +194,7 @@ export const SubmitModal: React.FC<SubmitModalProps> = ({
                       <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
                       <span>{t.modal.preview}</span>
                     </div>
-                    <div className="font-mono text-sm font-semibold tracking-wider text-zinc-200">
+                    <div dir="ltr" className="font-mono text-sm font-semibold tracking-wider text-zinc-200 text-left">
                       {code}
                     </div>
                   </div>

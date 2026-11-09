@@ -100,9 +100,9 @@ export const KeyGrid: React.FC<KeyGridProps> = ({
         transition={{ duration: 0.4, delay: 0.2 }}
         className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4 mb-8"
       >
-        {/* Animated Search Bar with Keyboard Hint */}
+        {/* Animated Search Bar with Keyboard Hint (RTL/LTR Adaptive) */}
         <div className="relative flex-1 max-w-md group">
-          <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-zinc-500 group-focus-within:text-zinc-300 transition-colors">
+          <div className={`absolute inset-y-0 ${isAr ? "right-0 pr-3.5" : "left-0 pl-3.5"} flex items-center pointer-events-none text-zinc-500 group-focus-within:text-zinc-300 transition-colors`}>
             <Search className="w-4 h-4" />
           </div>
 
@@ -112,12 +112,10 @@ export const KeyGrid: React.FC<KeyGridProps> = ({
             value={searchQuery}
             onChange={(e) => onSearchChange(e.target.value)}
             placeholder={t.searchPlaceholder}
-            className={`w-full pl-10 pr-16 py-2.5 rounded-full bg-zinc-900 border border-zinc-800 text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-zinc-600 focus:ring-1 focus:ring-zinc-600 shadow-sm transition-all ${
-              isAr ? "font-arabic" : ""
-            }`}
+            className={`w-full ${isAr ? "pr-10 pl-16 text-right font-arabic" : "pl-10 pr-16 text-left"} py-2.5 rounded-full bg-zinc-900 border border-zinc-800 text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-zinc-600 focus:ring-1 focus:ring-zinc-600 shadow-sm transition-all`}
           />
 
-          <div className="absolute inset-y-0 right-0 pr-3 flex items-center gap-1.5 pointer-events-none">
+          <div className={`absolute inset-y-0 ${isAr ? "left-0 pl-3" : "right-0 pr-3"} flex items-center gap-1.5 pointer-events-none`}>
             <AnimatePresence>
               {searchQuery ? (
                 <motion.button

@@ -60,12 +60,13 @@ export const InfoModal: React.FC<InfoModalProps> = ({
             transition={{ type: "spring", stiffness: 400, damping: 30 }}
             className="relative w-full max-w-lg rounded-2xl bg-zinc-900 border border-zinc-800 p-6 sm:p-7 shadow-2xl z-10"
           >
-            {/* Close Button */}
+            {/* Close Button - positioned on left in RTL, right in LTR to avoid header overlap */}
             <motion.button
               onClick={onClose}
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.9 }}
-              className="absolute top-5 right-5 p-1.5 rounded-lg text-zinc-400 hover:text-white hover:bg-zinc-800 transition-colors"
+              aria-label={t.hook.close}
+              className={`absolute top-5 ${isAr ? "left-5" : "right-5"} p-1.5 rounded-lg text-zinc-400 hover:text-white hover:bg-zinc-800 transition-colors z-20`}
             >
               <X className="w-4 h-4" />
             </motion.button>
@@ -83,8 +84,8 @@ export const InfoModal: React.FC<InfoModalProps> = ({
             </div>
 
             {/* Quranic Ayah Card in Nastaliq Style with generous breathing room */}
-            <div className="p-4 sm:p-5 rounded-2xl bg-zinc-950 border border-amber-500/25 mb-4 shadow-inner">
-              <div className="flex items-center gap-1.5 text-xs text-amber-400 font-medium mb-1.5">
+            <div className="p-4 sm:p-5 rounded-2xl bg-zinc-950 border border-amber-500/25 mb-4 shadow-inner text-center">
+              <div className="flex items-center justify-center gap-1.5 text-xs text-amber-400 font-medium mb-1.5">
                 <BookOpen className="w-3.5 h-3.5" />
                 <span>{t.hook.ayahRef}</span>
               </div>
@@ -102,8 +103,8 @@ export const InfoModal: React.FC<InfoModalProps> = ({
             </div>
 
             {/* Authentic Hadith Card in Nastaliq Style with generous breathing room */}
-            <div className="p-4 sm:p-5 rounded-2xl bg-zinc-950/80 border border-zinc-800 mb-4 shadow-inner">
-              <div className="flex items-center gap-1.5 text-xs text-zinc-400 font-medium mb-1.5">
+            <div className="p-4 sm:p-5 rounded-2xl bg-zinc-950/80 border border-zinc-800 mb-4 shadow-inner text-center">
+              <div className="flex items-center justify-center gap-1.5 text-xs text-zinc-400 font-medium mb-1.5">
                 <Quote className="w-3.5 h-3.5 text-emerald-400" />
                 <span>{t.hook.hadithRef}</span>
               </div>
@@ -121,7 +122,7 @@ export const InfoModal: React.FC<InfoModalProps> = ({
             </div>
 
             {/* Sadaqah Jariyah Motivation */}
-            <p className={`text-xs sm:text-sm text-zinc-300 leading-relaxed mb-6 ${isAr ? "font-arabic text-sm" : ""}`}>
+            <p className={`text-xs sm:text-sm text-zinc-300 leading-relaxed mb-6 text-center ${isAr ? "font-arabic text-sm" : ""}`}>
               {t.hook.rewardMessage}
             </p>
 

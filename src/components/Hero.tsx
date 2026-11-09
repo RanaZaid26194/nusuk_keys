@@ -128,7 +128,7 @@ export const Hero: React.FC<HeroProps> = ({
           </div>
         </motion.div>
 
-        {/* Spiritual Hook Callout: Interactive Refined Ayah Banner with generous vertical room */}
+        {/* Spiritual Hook Callout: Interactive Refined Ayah Banner - Centered Symmetric Layout */}
         <motion.div
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
@@ -136,18 +136,18 @@ export const Hero: React.FC<HeroProps> = ({
           onClick={handleOpenInfo}
           whileHover={{ scale: 1.02, y: -2 }}
           whileTap={{ scale: 0.98 }}
-          className="mt-6 flex flex-col sm:flex-row items-center justify-center gap-2.5 sm:gap-3.5 px-5 py-3.5 rounded-2xl bg-zinc-900/80 hover:bg-zinc-900 border border-amber-500/25 hover:border-amber-500/40 cursor-pointer transition-all max-w-2xl mx-auto shadow-sm group"
+          className="mt-6 flex flex-col items-center justify-center px-6 py-4 rounded-2xl bg-zinc-900/80 hover:bg-zinc-900 border border-amber-500/25 hover:border-amber-500/40 cursor-pointer transition-all max-w-xl mx-auto shadow-sm group text-center"
         >
-          <div className="w-8 h-8 rounded-full bg-amber-500/10 border border-amber-500/20 flex items-center justify-center flex-shrink-0 group-hover:scale-105 transition-transform">
+          <div className="w-8 h-8 rounded-full bg-amber-500/10 border border-amber-500/20 flex items-center justify-center flex-shrink-0 group-hover:scale-105 transition-transform mb-1.5">
             <HeartHandshake className="w-4 h-4 text-amber-400" />
           </div>
-          <div className="text-center sm:text-left rtl:sm:text-right overflow-visible">
-            <div dir="rtl" className="font-nastaliq font-bold text-amber-200 text-base sm:text-lg leading-[2.8] py-1 px-1 group-hover:text-amber-100 transition-colors overflow-visible">
+          <div className="text-center w-full overflow-visible">
+            <div dir="rtl" className="font-nastaliq font-bold text-amber-200 text-base sm:text-lg leading-[2.8] py-1 px-2 text-center group-hover:text-amber-100 transition-colors overflow-visible">
               «{t.hook.ayahArabic}»
             </div>
             {!isAr && (
-              <div className="text-[11px] sm:text-xs text-zinc-400 mt-0.5">
-                {t.hook.ayahTranslation} — [{t.hook.ayahRef}]
+              <div className="text-[11px] sm:text-xs text-zinc-400 mt-0.5 text-center">
+                “{t.hook.ayahTranslation}” — [{t.hook.ayahRef}]
               </div>
             )}
           </div>
