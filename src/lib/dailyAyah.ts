@@ -1,6 +1,5 @@
 // daily ayah helper logic
 import rawLimits from '../data/ayahLimits.json';
-import rawAyahs from '../data/ayahs.json';
 
 export interface DailyAyahData
 {
@@ -30,7 +29,7 @@ export const TIMEOUT_MS = 5000;
 export const RETRY_FALLBACK_AFTER_MS = 3600000; // 1 hr wait before bugging the api again
 
 export const limits = rawLimits;
-export const fallbackList: DailyAyahData[] = rawAyahs as DailyAyahData[];
+export const fallbackList: DailyAyahData[] = [];
 
 // last resort 5:2 so banner never goes blank
 export const STATIC_5_2_FALLBACK: DailyAyahData =
@@ -99,13 +98,22 @@ export function seededCandidates(dayKey: string, count: number = MAX_ATTEMPTS): 
   return candidates;
 }
 
-// grab stable pick from fallback list
-export function getFallbackAyah(dayKey: string): DailyAyahData
+// grab stable pick from fallback list lazily imported only on api failure
+export async function getFallbackAyah(dayKey: string): Promise<DailyAyahData>
 {
-  if (!Array.isArray(fallbackList) || fallbackList.length === 0)
+  try
+  {
+    const mod = await import('../data/ayahs.json');
+    const list = (mod.default || mod) as DailyAyahData[];
+    if (!Array.isArray(list) || list.length === 0)
+      return STATIC_5_2_FALLBACK;
+    const idx = seededIndex(dayKey, list.length);
+    return list[idx] || STATIC_5_2_FALLBACK;
+  }
+  catch
+  {
     return STATIC_5_2_FALLBACK;
-  const idx = seededIndex(dayKey, fallbackList.length);
-  return fallbackList[idx] || STATIC_5_2_FALLBACK;
+  }
 }
 
 // safe localstorage reader so incognito doesn't explode
@@ -281,7 +289,7 @@ export async function resolveDailyAyah(
     // all candidates struck out, drop to fallback
     if (!finalAyah)
     {
-      finalAyah = getFallbackAyah(dayKey);
+      finalAyah = await getFallbackAyah(dayKey);
       finalSource = 'fallback';
       attemptCount = MAX_ATTEMPTS;
       resolvedNum = `${finalAyah.surah}:${finalAyah.numberInSurah}`;

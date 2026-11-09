@@ -190,5 +190,877 @@
     "numberInSurah": 51,
     "arabic": "قُل لَّن يُصِيبَنَآ إِلَّا مَا كَتَبَ ٱللَّهُ لَنَا هُوَ مَوْلَىٰنَا ۚ وَعَلَى ٱللَّهِ فَلْيَتَوَكَّلِ ٱلْمُؤْمِنُونَ",
     "english": "Say, \"Never will we be struck except by what Allah has decreed for us; He is our protector.\" And upon Allah let the believers rely."
+  },
+  {
+    "surah": 93,
+    "surahNameEn": "Ad-Dhuhaa",
+    "surahNameAr": "سُورَةُ الضُّحَىٰ",
+    "numberInSurah": 2,
+    "arabic": "وَٱلَّيْلِ إِذَا سَجَىٰ",
+    "english": "And [by] the night when it covers with darkness,"
+  },
+  {
+    "surah": 93,
+    "surahNameEn": "Ad-Dhuhaa",
+    "surahNameAr": "سُورَةُ الضُّحَىٰ",
+    "numberInSurah": 4,
+    "arabic": "وَلَلْءَاخِرَةُ خَيْرٌۭ لَّكَ مِنَ ٱلْأُولَىٰ",
+    "english": "And the Hereafter is better for you than the first [life]."
+  },
+  {
+    "surah": 93,
+    "surahNameEn": "Ad-Dhuhaa",
+    "surahNameAr": "سُورَةُ الضُّحَىٰ",
+    "numberInSurah": 6,
+    "arabic": "أَلَمْ يَجِدْكَ يَتِيمًۭا فَـَٔاوَىٰ",
+    "english": "Did He not find you an orphan and give [you] refuge?"
+  },
+  {
+    "surah": 93,
+    "surahNameEn": "Ad-Dhuhaa",
+    "surahNameAr": "سُورَةُ الضُّحَىٰ",
+    "numberInSurah": 7,
+    "arabic": "وَوَجَدَكَ ضَآلًّۭا فَهَدَىٰ",
+    "english": "And He found you lost and guided [you],"
+  },
+  {
+    "surah": 93,
+    "surahNameEn": "Ad-Dhuhaa",
+    "surahNameAr": "سُورَةُ الضُّحَىٰ",
+    "numberInSurah": 8,
+    "arabic": "وَوَجَدَكَ عَآئِلًۭا فَأَغْنَىٰ",
+    "english": "And He found you poor and made [you] self-sufficient."
+  },
+  {
+    "surah": 93,
+    "surahNameEn": "Ad-Dhuhaa",
+    "surahNameAr": "سُورَةُ الضُّحَىٰ",
+    "numberInSurah": 9,
+    "arabic": "فَأَمَّا ٱلْيَتِيمَ فَلَا تَقْهَرْ",
+    "english": "So as for the orphan, do not oppress [him]."
+  },
+  {
+    "surah": 93,
+    "surahNameEn": "Ad-Dhuhaa",
+    "surahNameAr": "سُورَةُ الضُّحَىٰ",
+    "numberInSurah": 10,
+    "arabic": "وَأَمَّا ٱلسَّآئِلَ فَلَا تَنْهَرْ",
+    "english": "And as for the petitioner, do not repel [him]."
+  },
+  {
+    "surah": 93,
+    "surahNameEn": "Ad-Dhuhaa",
+    "surahNameAr": "سُورَةُ الضُّحَىٰ",
+    "numberInSurah": 11,
+    "arabic": "وَأَمَّا بِنِعْمَةِ رَبِّكَ فَحَدِّثْ",
+    "english": "But as for the favor of your Lord, report [it]."
+  },
+  {
+    "surah": 94,
+    "surahNameEn": "Ash-Sharh",
+    "surahNameAr": "سُورَةُ الشَّرۡحِ",
+    "numberInSurah": 2,
+    "arabic": "وَوَضَعْنَا عَنكَ وِزْرَكَ",
+    "english": "And We removed from you your burden"
+  },
+  {
+    "surah": 94,
+    "surahNameEn": "Ash-Sharh",
+    "surahNameAr": "سُورَةُ الشَّرۡحِ",
+    "numberInSurah": 3,
+    "arabic": "ٱلَّذِىٓ أَنقَضَ ظَهْرَكَ",
+    "english": "Which had weighed upon your back"
+  },
+  {
+    "surah": 94,
+    "surahNameEn": "Ash-Sharh",
+    "surahNameAr": "سُورَةُ الشَّرۡحِ",
+    "numberInSurah": 4,
+    "arabic": "وَرَفَعْنَا لَكَ ذِكْرَكَ",
+    "english": "And raised high for you your repute."
+  },
+  {
+    "surah": 94,
+    "surahNameEn": "Ash-Sharh",
+    "surahNameAr": "سُورَةُ الشَّرۡحِ",
+    "numberInSurah": 7,
+    "arabic": "فَإِذَا فَرَغْتَ فَٱنصَبْ",
+    "english": "So when you have finished [your duties], then stand up [for worship]."
+  },
+  {
+    "surah": 94,
+    "surahNameEn": "Ash-Sharh",
+    "surahNameAr": "سُورَةُ الشَّرۡحِ",
+    "numberInSurah": 8,
+    "arabic": "وَإِلَىٰ رَبِّكَ فَٱرْغَب",
+    "english": "And to your Lord direct [your] longing."
+  },
+  {
+    "surah": 103,
+    "surahNameEn": "Al-Asr",
+    "surahNameAr": "سُورَةُ العَصۡرِ",
+    "numberInSurah": 2,
+    "arabic": "إِنَّ ٱلْإِنسَٰنَ لَفِى خُسْرٍ",
+    "english": "Indeed, mankind is in loss,"
+  },
+  {
+    "surah": 103,
+    "surahNameEn": "Al-Asr",
+    "surahNameAr": "سُورَةُ العَصۡرِ",
+    "numberInSurah": 3,
+    "arabic": "إِلَّا ٱلَّذِينَ ءَامَنُوا۟ وَعَمِلُوا۟ ٱلصَّٰلِحَٰتِ وَتَوَاصَوْا۟ بِٱلْحَقِّ وَتَوَاصَوْا۟ بِٱلصَّبْرِ",
+    "english": "Except for those who have believed and done righteous deeds and advised each other to truth and advised each other to patience."
+  },
+  {
+    "surah": 106,
+    "surahNameEn": "Quraish",
+    "surahNameAr": "سُورَةُ قُرَيۡشٍ",
+    "numberInSurah": 2,
+    "arabic": "إِۦلَٰفِهِمْ رِحْلَةَ ٱلشِّتَآءِ وَٱلصَّيْفِ",
+    "english": "Their accustomed security [in] the caravan of winter and summer -"
+  },
+  {
+    "surah": 108,
+    "surahNameEn": "Al-Kawthar",
+    "surahNameAr": "سُورَةُ الكَوۡثَرِ",
+    "numberInSurah": 3,
+    "arabic": "إِنَّ شَانِئَكَ هُوَ ٱلْأَبْتَرُ",
+    "english": "Indeed, your enemy is the one cut off."
+  },
+  {
+    "surah": 110,
+    "surahNameEn": "An-Nasr",
+    "surahNameAr": "سُورَةُ النَّصۡرِ",
+    "numberInSurah": 2,
+    "arabic": "وَرَأَيْتَ ٱلنَّاسَ يَدْخُلُونَ فِى دِينِ ٱللَّهِ أَفْوَاجًۭا",
+    "english": "And you see the people entering into the religion of Allah in multitudes,"
+  },
+  {
+    "surah": 110,
+    "surahNameEn": "An-Nasr",
+    "surahNameAr": "سُورَةُ النَّصۡرِ",
+    "numberInSurah": 3,
+    "arabic": "فَسَبِّحْ بِحَمْدِ رَبِّكَ وَٱسْتَغْفِرْهُ ۚ إِنَّهُۥ كَانَ تَوَّابًۢا",
+    "english": "Then exalt [Him] with praise of your Lord and ask forgiveness of Him. Indeed, He is ever Accepting of repentance."
+  },
+  {
+    "surah": 112,
+    "surahNameEn": "Al-Ikhlaas",
+    "surahNameAr": "سُورَةُ الإِخۡلَاصِ",
+    "numberInSurah": 3,
+    "arabic": "لَمْ يَلِدْ وَلَمْ يُولَدْ",
+    "english": "He neither begets nor is born,"
+  },
+  {
+    "surah": 112,
+    "surahNameEn": "Al-Ikhlaas",
+    "surahNameAr": "سُورَةُ الإِخۡلَاصِ",
+    "numberInSurah": 4,
+    "arabic": "وَلَمْ يَكُن لَّهُۥ كُفُوًا أَحَدٌۢ",
+    "english": "Nor is there to Him any equivalent.\""
+  },
+  {
+    "surah": 113,
+    "surahNameEn": "Al-Falaq",
+    "surahNameAr": "سُورَةُ الفَلَقِ",
+    "numberInSurah": 2,
+    "arabic": "مِن شَرِّ مَا خَلَقَ",
+    "english": "From the evil of that which He created"
+  },
+  {
+    "surah": 113,
+    "surahNameEn": "Al-Falaq",
+    "surahNameAr": "سُورَةُ الفَلَقِ",
+    "numberInSurah": 3,
+    "arabic": "وَمِن شَرِّ غَاسِقٍ إِذَا وَقَبَ",
+    "english": "And from the evil of darkness when it settles"
+  },
+  {
+    "surah": 113,
+    "surahNameEn": "Al-Falaq",
+    "surahNameAr": "سُورَةُ الفَلَقِ",
+    "numberInSurah": 4,
+    "arabic": "وَمِن شَرِّ ٱلنَّفَّٰثَٰتِ فِى ٱلْعُقَدِ",
+    "english": "And from the evil of the blowers in knots"
+  },
+  {
+    "surah": 113,
+    "surahNameEn": "Al-Falaq",
+    "surahNameAr": "سُورَةُ الفَلَقِ",
+    "numberInSurah": 5,
+    "arabic": "وَمِن شَرِّ حَاسِدٍ إِذَا حَسَدَ",
+    "english": "And from the evil of an envier when he envies.\""
+  },
+  {
+    "surah": 114,
+    "surahNameEn": "An-Naas",
+    "surahNameAr": "سُورَةُ النَّاسِ",
+    "numberInSurah": 4,
+    "arabic": "مِن شَرِّ ٱلْوَسْوَاسِ ٱلْخَنَّاسِ",
+    "english": "From the evil of the retreating whisperer -"
+  },
+  {
+    "surah": 114,
+    "surahNameEn": "An-Naas",
+    "surahNameAr": "سُورَةُ النَّاسِ",
+    "numberInSurah": 5,
+    "arabic": "ٱلَّذِى يُوَسْوِسُ فِى صُدُورِ ٱلنَّاسِ",
+    "english": "Who whispers [evil] into the breasts of mankind -"
+  },
+  {
+    "surah": 114,
+    "surahNameEn": "An-Naas",
+    "surahNameAr": "سُورَةُ النَّاسِ",
+    "numberInSurah": 6,
+    "arabic": "مِنَ ٱلْجِنَّةِ وَٱلنَّاسِ",
+    "english": "From among the jinn and mankind.\""
+  },
+  {
+    "surah": 1,
+    "surahNameEn": "Al-Faatiha",
+    "surahNameAr": "سُورَةُ ٱلْفَاتِحَةِ",
+    "numberInSurah": 2,
+    "arabic": "ٱلْحَمْدُ لِلَّهِ رَبِّ ٱلْعَٰلَمِينَ",
+    "english": "[All] praise is [due] to Allah, Lord of the worlds -"
+  },
+  {
+    "surah": 1,
+    "surahNameEn": "Al-Faatiha",
+    "surahNameAr": "سُورَةُ ٱلْفَاتِحَةِ",
+    "numberInSurah": 3,
+    "arabic": "ٱلرَّحْمَٰنِ ٱلرَّحِيمِ",
+    "english": "The Entirely Merciful, the Especially Merciful,"
+  },
+  {
+    "surah": 1,
+    "surahNameEn": "Al-Faatiha",
+    "surahNameAr": "سُورَةُ ٱلْفَاتِحَةِ",
+    "numberInSurah": 4,
+    "arabic": "مَٰلِكِ يَوْمِ ٱلدِّينِ",
+    "english": "Sovereign of the Day of Recompense."
+  },
+  {
+    "surah": 1,
+    "surahNameEn": "Al-Faatiha",
+    "surahNameAr": "سُورَةُ ٱلْفَاتِحَةِ",
+    "numberInSurah": 5,
+    "arabic": "إِيَّاكَ نَعْبُدُ وَإِيَّاكَ نَسْتَعِينُ",
+    "english": "It is You we worship and You we ask for help."
+  },
+  {
+    "surah": 1,
+    "surahNameEn": "Al-Faatiha",
+    "surahNameAr": "سُورَةُ ٱلْفَاتِحَةِ",
+    "numberInSurah": 6,
+    "arabic": "ٱهْدِنَا ٱلصِّرَٰطَ ٱلْمُسْتَقِيمَ",
+    "english": "Guide us to the straight path -"
+  },
+  {
+    "surah": 1,
+    "surahNameEn": "Al-Faatiha",
+    "surahNameAr": "سُورَةُ ٱلْفَاتِحَةِ",
+    "numberInSurah": 7,
+    "arabic": "صِرَٰطَ ٱلَّذِينَ أَنْعَمْتَ عَلَيْهِمْ غَيْرِ ٱلْمَغْضُوبِ عَلَيْهِمْ وَلَا ٱلضَّآلِّينَ",
+    "english": "The path of those upon whom You have bestowed favor, not of those who have evoked [Your] anger or of those who are astray."
+  },
+  {
+    "surah": 55,
+    "surahNameEn": "Ar-Rahmaan",
+    "surahNameAr": "سُورَةُ الرَّحۡمَٰن",
+    "numberInSurah": 60,
+    "arabic": "هَلْ جَزَآءُ ٱلْإِحْسَٰنِ إِلَّا ٱلْإِحْسَٰنُ",
+    "english": "Is the reward for good [anything] but good?"
+  },
+  {
+    "surah": 99,
+    "surahNameEn": "Az-Zalzala",
+    "surahNameAr": "سُورَةُ الزَّلۡزَلَةِ",
+    "numberInSurah": 7,
+    "arabic": "فَمَن يَعْمَلْ مِثْقَالَ ذَرَّةٍ خَيْرًۭا يَرَهُۥ",
+    "english": "So whoever does an atom's weight of good will see it,"
+  },
+  {
+    "surah": 91,
+    "surahNameEn": "Ash-Shams",
+    "surahNameAr": "سُورَةُ الشَّمۡسِ",
+    "numberInSurah": 9,
+    "arabic": "قَدْ أَفْلَحَ مَن زَكَّىٰهَا",
+    "english": "He has succeeded who purifies it,"
+  },
+  {
+    "surah": 87,
+    "surahNameEn": "Al-A'laa",
+    "surahNameAr": "سُورَةُ الأَعۡلَىٰ",
+    "numberInSurah": 14,
+    "arabic": "قَدْ أَفْلَحَ مَن تَزَكَّىٰ",
+    "english": "He has certainly succeeded who purifies himself"
+  },
+  {
+    "surah": 73,
+    "surahNameEn": "Al-Muzzammil",
+    "surahNameAr": "سُورَةُ المُزَّمِّلِ",
+    "numberInSurah": 8,
+    "arabic": "وَٱذْكُرِ ٱسْمَ رَبِّكَ وَتَبَتَّلْ إِلَيْهِ تَبْتِيلًۭا",
+    "english": "And remember the name of your Lord and devote yourself to Him with [complete] devotion."
+  },
+  {
+    "surah": 33,
+    "surahNameEn": "Al-Ahzaab",
+    "surahNameAr": "سُورَةُ الأَحۡزَابِ",
+    "numberInSurah": 41,
+    "arabic": "يَٰٓأَيُّهَا ٱلَّذِينَ ءَامَنُوا۟ ٱذْكُرُوا۟ ٱللَّهَ ذِكْرًۭا كَثِيرًۭا",
+    "english": "O you who have believed, remember Allah with much remembrance"
+  },
+  {
+    "surah": 25,
+    "surahNameEn": "Al-Furqaan",
+    "surahNameAr": "سُورَةُ الفُرۡقَانِ",
+    "numberInSurah": 63,
+    "arabic": "وَعِبَادُ ٱلرَّحْمَٰنِ ٱلَّذِينَ يَمْشُونَ عَلَى ٱلْأَرْضِ هَوْنًۭا وَإِذَا خَاطَبَهُمُ ٱلْجَٰهِلُونَ قَالُوا۟ سَلَٰمًۭا",
+    "english": "And the servants of the Most Merciful are those who walk upon the earth easily, and when the ignorant address them [harshly], they say [words of] peace,"
+  },
+  {
+    "surah": 25,
+    "surahNameEn": "Al-Furqaan",
+    "surahNameAr": "سُورَةُ الفُرۡقَانِ",
+    "numberInSurah": 64,
+    "arabic": "وَٱلَّذِينَ يَبِيتُونَ لِرَبِّهِمْ سُجَّدًۭا وَقِيَٰمًۭا",
+    "english": "And those who spend [part of] the night to their Lord prostrating and standing [in prayer]"
+  },
+  {
+    "surah": 25,
+    "surahNameEn": "Al-Furqaan",
+    "surahNameAr": "سُورَةُ الفُرۡقَانِ",
+    "numberInSurah": 65,
+    "arabic": "وَٱلَّذِينَ يَقُولُونَ رَبَّنَا ٱصْرِفْ عَنَّا عَذَابَ جَهَنَّمَ ۖ إِنَّ عَذَابَهَا كَانَ غَرَامًا",
+    "english": "And those who say, \"Our Lord, avert from us the punishment of Hell. Indeed, its punishment is ever adhering;"
+  },
+  {
+    "surah": 25,
+    "surahNameEn": "Al-Furqaan",
+    "surahNameAr": "سُورَةُ الفُرۡقَانِ",
+    "numberInSurah": 66,
+    "arabic": "إِنَّهَا سَآءَتْ مُسْتَقَرًّۭا وَمُقَامًۭا",
+    "english": "Indeed, it is evil as a settlement and residence.\""
+  },
+  {
+    "surah": 25,
+    "surahNameEn": "Al-Furqaan",
+    "surahNameAr": "سُورَةُ الفُرۡقَانِ",
+    "numberInSurah": 67,
+    "arabic": "وَٱلَّذِينَ إِذَآ أَنفَقُوا۟ لَمْ يُسْرِفُوا۟ وَلَمْ يَقْتُرُوا۟ وَكَانَ بَيْنَ ذَٰلِكَ قَوَامًۭا",
+    "english": "And [they are] those who, when they spend, do so not excessively or sparingly but are ever, between that, [justly] moderate"
+  },
+  {
+    "surah": 25,
+    "surahNameEn": "Al-Furqaan",
+    "surahNameAr": "سُورَةُ الفُرۡقَانِ",
+    "numberInSurah": 69,
+    "arabic": "يُضَٰعَفْ لَهُ ٱلْعَذَابُ يَوْمَ ٱلْقِيَٰمَةِ وَيَخْلُدْ فِيهِۦ مُهَانًا",
+    "english": "Multiplied for him is the punishment on the Day of Resurrection, and he will abide therein humiliated -"
+  },
+  {
+    "surah": 25,
+    "surahNameEn": "Al-Furqaan",
+    "surahNameAr": "سُورَةُ الفُرۡقَانِ",
+    "numberInSurah": 71,
+    "arabic": "وَمَن تَابَ وَعَمِلَ صَٰلِحًۭا فَإِنَّهُۥ يَتُوبُ إِلَى ٱللَّهِ مَتَابًۭا",
+    "english": "And he who repents and does righteousness does indeed turn to Allah with [accepted] repentance."
+  },
+  {
+    "surah": 25,
+    "surahNameEn": "Al-Furqaan",
+    "surahNameAr": "سُورَةُ الفُرۡقَانِ",
+    "numberInSurah": 72,
+    "arabic": "وَٱلَّذِينَ لَا يَشْهَدُونَ ٱلزُّورَ وَإِذَا مَرُّوا۟ بِٱللَّغْوِ مَرُّوا۟ كِرَامًۭا",
+    "english": "And [they are] those who do not testify to falsehood, and when they pass near ill speech, they pass by with dignity."
+  },
+  {
+    "surah": 25,
+    "surahNameEn": "Al-Furqaan",
+    "surahNameAr": "سُورَةُ الفُرۡقَانِ",
+    "numberInSurah": 73,
+    "arabic": "وَٱلَّذِينَ إِذَا ذُكِّرُوا۟ بِـَٔايَٰتِ رَبِّهِمْ لَمْ يَخِرُّوا۟ عَلَيْهَا صُمًّۭا وَعُمْيَانًۭا",
+    "english": "And those who, when reminded of the verses of their Lord, do not fall upon them deaf and blind."
+  },
+  {
+    "surah": 25,
+    "surahNameEn": "Al-Furqaan",
+    "surahNameAr": "سُورَةُ الفُرۡقَانِ",
+    "numberInSurah": 75,
+    "arabic": "أُو۟لَٰٓئِكَ يُجْزَوْنَ ٱلْغُرْفَةَ بِمَا صَبَرُوا۟ وَيُلَقَّوْنَ فِيهَا تَحِيَّةًۭ وَسَلَٰمًا",
+    "english": "Those will be awarded the Chamber for what they patiently endured, and they will be received therein with greetings and [words of] peace."
+  },
+  {
+    "surah": 25,
+    "surahNameEn": "Al-Furqaan",
+    "surahNameAr": "سُورَةُ الفُرۡقَانِ",
+    "numberInSurah": 76,
+    "arabic": "خَٰلِدِينَ فِيهَا ۚ حَسُنَتْ مُسْتَقَرًّۭا وَمُقَامًۭا",
+    "english": "Abiding eternally therein. Good is the settlement and residence."
+  },
+  {
+    "surah": 25,
+    "surahNameEn": "Al-Furqaan",
+    "surahNameAr": "سُورَةُ الفُرۡقَانِ",
+    "numberInSurah": 77,
+    "arabic": "قُلْ مَا يَعْبَؤُا۟ بِكُمْ رَبِّى لَوْلَا دُعَآؤُكُمْ ۖ فَقَدْ كَذَّبْتُمْ فَسَوْفَ يَكُونُ لِزَامًۢا",
+    "english": "Say, \"What would my Lord care for you if not for your supplication?\" For you [disbelievers] have denied, so your denial is going to be adherent."
+  },
+  {
+    "surah": 21,
+    "surahNameEn": "Al-Anbiyaa",
+    "surahNameAr": "سُورَةُ الأَنبِيَاءِ",
+    "numberInSurah": 83,
+    "arabic": "۞ وَأَيُّوبَ إِذْ نَادَىٰ رَبَّهُۥٓ أَنِّى مَسَّنِىَ ٱلضُّرُّ وَأَنتَ أَرْحَمُ ٱلرَّٰحِمِينَ",
+    "english": "And [mention] Job, when he called to his Lord, \"Indeed, adversity has touched me, and you are the Most Merciful of the merciful.\""
+  },
+  {
+    "surah": 18,
+    "surahNameEn": "Al-Kahf",
+    "surahNameAr": "سُورَةُ الكَهۡفِ",
+    "numberInSurah": 10,
+    "arabic": "إِذْ أَوَى ٱلْفِتْيَةُ إِلَى ٱلْكَهْفِ فَقَالُوا۟ رَبَّنَآ ءَاتِنَا مِن لَّدُنكَ رَحْمَةًۭ وَهَيِّئْ لَنَا مِنْ أَمْرِنَا رَشَدًۭا",
+    "english": "[Mention] when the youths retreated to the cave and said, \"Our Lord, grant us from Yourself mercy and prepare for us from our affair right guidance.\""
+  },
+  {
+    "surah": 17,
+    "surahNameEn": "Al-Israa",
+    "surahNameAr": "سُورَةُ الإِسۡرَاءِ",
+    "numberInSurah": 24,
+    "arabic": "وَٱخْفِضْ لَهُمَا جَنَاحَ ٱلذُّلِّ مِنَ ٱلرَّحْمَةِ وَقُل رَّبِّ ٱرْحَمْهُمَا كَمَا رَبَّيَانِى صَغِيرًۭا",
+    "english": "And lower to them the wing of humility out of mercy and say, \"My Lord, have mercy upon them as they brought me up [when I was] small.\""
+  },
+  {
+    "surah": 2,
+    "surahNameEn": "Al-Baqara",
+    "surahNameAr": "سُورَةُ البَقَرَةِ",
+    "numberInSurah": 199,
+    "arabic": "ثُمَّ أَفِيضُوا۟ مِنْ حَيْثُ أَفَاضَ ٱلنَّاسُ وَٱسْتَغْفِرُوا۟ ٱللَّهَ ۚ إِنَّ ٱللَّهَ غَفُورٌۭ رَّحِيمٌۭ",
+    "english": "Then depart from the place from where [all] the people depart and ask forgiveness of Allah. Indeed, Allah is Forgiving and Merciful."
+  },
+  {
+    "surah": 22,
+    "surahNameEn": "Al-Hajj",
+    "surahNameAr": "سُورَةُ الحَجِّ",
+    "numberInSurah": 32,
+    "arabic": "ذَٰلِكَ وَمَن يُعَظِّمْ شَعَٰٓئِرَ ٱللَّهِ فَإِنَّهَا مِن تَقْوَى ٱلْقُلُوبِ",
+    "english": "That [is so]. And whoever honors the symbols of Allah - indeed, it is from the piety of hearts."
+  },
+  {
+    "surah": 14,
+    "surahNameEn": "Ibrahim",
+    "surahNameAr": "سُورَةُ إِبۡرَاهِيمَ",
+    "numberInSurah": 35,
+    "arabic": "وَإِذْ قَالَ إِبْرَٰهِيمُ رَبِّ ٱجْعَلْ هَٰذَا ٱلْبَلَدَ ءَامِنًۭا وَٱجْنُبْنِى وَبَنِىَّ أَن نَّعْبُدَ ٱلْأَصْنَامَ",
+    "english": "And [mention, O Muhammad], when Abraham said, \"My Lord, make this city [Makkah] secure and keep me and my sons away from worshipping idols."
+  },
+  {
+    "surah": 14,
+    "surahNameEn": "Ibrahim",
+    "surahNameAr": "سُورَةُ إِبۡرَاهِيمَ",
+    "numberInSurah": 36,
+    "arabic": "رَبِّ إِنَّهُنَّ أَضْلَلْنَ كَثِيرًۭا مِّنَ ٱلنَّاسِ ۖ فَمَن تَبِعَنِى فَإِنَّهُۥ مِنِّى ۖ وَمَنْ عَصَانِى فَإِنَّكَ غَفُورٌۭ رَّحِيمٌۭ",
+    "english": "My Lord, indeed they have led astray many among the people. So whoever follows me - then he is of me; and whoever disobeys me - indeed, You are [yet] Forgiving and Merciful."
+  },
+  {
+    "surah": 3,
+    "surahNameEn": "Aal-i-Imraan",
+    "surahNameAr": "سُورَةُ آلِ عِمۡرَانَ",
+    "numberInSurah": 8,
+    "arabic": "رَبَّنَا لَا تُزِغْ قُلُوبَنَا بَعْدَ إِذْ هَدَيْتَنَا وَهَبْ لَنَا مِن لَّدُنكَ رَحْمَةً ۚ إِنَّكَ أَنتَ ٱلْوَهَّابُ",
+    "english": "[Who say], \"Our Lord, let not our hearts deviate after You have guided us and grant us from Yourself mercy. Indeed, You are the Bestower."
+  },
+  {
+    "surah": 15,
+    "surahNameEn": "Al-Hijr",
+    "surahNameAr": "سُورَةُ الحِجۡرِ",
+    "numberInSurah": 49,
+    "arabic": "۞ نَبِّئْ عِبَادِىٓ أَنِّىٓ أَنَا ٱلْغَفُورُ ٱلرَّحِيمُ",
+    "english": "[O Muhammad], inform My servants that it is I who am the Forgiving, the Merciful."
+  },
+  {
+    "surah": 12,
+    "surahNameEn": "Yusuf",
+    "surahNameAr": "سُورَةُ يُوسُفَ",
+    "numberInSurah": 92,
+    "arabic": "قَالَ لَا تَثْرِيبَ عَلَيْكُمُ ٱلْيَوْمَ ۖ يَغْفِرُ ٱللَّهُ لَكُمْ ۖ وَهُوَ أَرْحَمُ ٱلرَّٰحِمِينَ",
+    "english": "He said, \"No blame will there be upon you today. Allah will forgive you; and He is the most merciful of the merciful.\""
+  },
+  {
+    "surah": 21,
+    "surahNameEn": "Al-Anbiyaa",
+    "surahNameAr": "سُورَةُ الأَنبِيَاءِ",
+    "numberInSurah": 107,
+    "arabic": "وَمَآ أَرْسَلْنَٰكَ إِلَّا رَحْمَةًۭ لِّلْعَٰلَمِينَ",
+    "english": "And We have not sent you, [O Muhammad], except as a mercy to the worlds."
+  },
+  {
+    "surah": 27,
+    "surahNameEn": "An-Naml",
+    "surahNameAr": "سُورَةُ النَّمۡلِ",
+    "numberInSurah": 73,
+    "arabic": "وَإِنَّ رَبَّكَ لَذُو فَضْلٍ عَلَى ٱلنَّاسِ وَلَٰكِنَّ أَكْثَرَهُمْ لَا يَشْكُرُونَ",
+    "english": "And indeed, your Lord is full of bounty for the people, but most of them do not show gratitude.\""
+  },
+  {
+    "surah": 4,
+    "surahNameEn": "An-Nisaa",
+    "surahNameAr": "سُورَةُ النِّسَاءِ",
+    "numberInSurah": 110,
+    "arabic": "وَمَن يَعْمَلْ سُوٓءًا أَوْ يَظْلِمْ نَفْسَهُۥ ثُمَّ يَسْتَغْفِرِ ٱللَّهَ يَجِدِ ٱللَّهَ غَفُورًۭا رَّحِيمًۭا",
+    "english": "And whoever does a wrong or wrongs himself but then seeks forgiveness of Allah will find Allah Forgiving and Merciful."
+  },
+  {
+    "surah": 3,
+    "surahNameEn": "Aal-i-Imraan",
+    "surahNameAr": "سُورَةُ آلِ عِمۡرَانَ",
+    "numberInSurah": 133,
+    "arabic": "۞ وَسَارِعُوٓا۟ إِلَىٰ مَغْفِرَةٍۢ مِّن رَّبِّكُمْ وَجَنَّةٍ عَرْضُهَا ٱلسَّمَٰوَٰتُ وَٱلْأَرْضُ أُعِدَّتْ لِلْمُتَّقِينَ",
+    "english": "And hasten to forgiveness from your Lord and a garden as wide as the heavens and earth, prepared for the righteous"
+  },
+  {
+    "surah": 3,
+    "surahNameEn": "Aal-i-Imraan",
+    "surahNameAr": "سُورَةُ آلِ عِمۡرَانَ",
+    "numberInSurah": 134,
+    "arabic": "ٱلَّذِينَ يُنفِقُونَ فِى ٱلسَّرَّآءِ وَٱلضَّرَّآءِ وَٱلْكَٰظِمِينَ ٱلْغَيْظَ وَٱلْعَافِينَ عَنِ ٱلنَّاسِ ۗ وَٱللَّهُ يُحِبُّ ٱلْمُحْسِنِينَ",
+    "english": "Who spend [in the cause of Allah] during ease and hardship and who restrain anger and who pardon the people - and Allah loves the doers of good;"
+  },
+  {
+    "surah": 16,
+    "surahNameEn": "An-Nahl",
+    "surahNameAr": "سُورَةُ النَّحۡلِ",
+    "numberInSurah": 18,
+    "arabic": "وَإِن تَعُدُّوا۟ نِعْمَةَ ٱللَّهِ لَا تُحْصُوهَآ ۗ إِنَّ ٱللَّهَ لَغَفُورٌۭ رَّحِيمٌۭ",
+    "english": "And if you should count the favors of Allah, you could not enumerate them. Indeed, Allah is Forgiving and Merciful."
+  },
+  {
+    "surah": 33,
+    "surahNameEn": "Al-Ahzaab",
+    "surahNameAr": "سُورَةُ الأَحۡزَابِ",
+    "numberInSurah": 42,
+    "arabic": "وَسَبِّحُوهُ بُكْرَةًۭ وَأَصِيلًا",
+    "english": "And exalt Him morning and afternoon."
+  },
+  {
+    "surah": 62,
+    "surahNameEn": "Al-Jumu'a",
+    "surahNameAr": "سُورَةُ الجُمُعَةِ",
+    "numberInSurah": 10,
+    "arabic": "فَإِذَا قُضِيَتِ ٱلصَّلَوٰةُ فَٱنتَشِرُوا۟ فِى ٱلْأَرْضِ وَٱبْتَغُوا۟ مِن فَضْلِ ٱللَّهِ وَٱذْكُرُوا۟ ٱللَّهَ كَثِيرًۭا لَّعَلَّكُمْ تُفْلِحُونَ",
+    "english": "And when the prayer has been concluded, disperse within the land and seek from the bounty of Allah, and remember Allah often that you may succeed."
+  },
+  {
+    "surah": 3,
+    "surahNameEn": "Aal-i-Imraan",
+    "surahNameAr": "سُورَةُ آلِ عِمۡرَانَ",
+    "numberInSurah": 174,
+    "arabic": "فَٱنقَلَبُوا۟ بِنِعْمَةٍۢ مِّنَ ٱللَّهِ وَفَضْلٍۢ لَّمْ يَمْسَسْهُمْ سُوٓءٌۭ وَٱتَّبَعُوا۟ رِضْوَٰنَ ٱللَّهِ ۗ وَٱللَّهُ ذُو فَضْلٍ عَظِيمٍ",
+    "english": "So they returned with favor from Allah and bounty, no harm having touched them. And they pursued the pleasure of Allah, and Allah is the possessor of great bounty."
+  },
+  {
+    "surah": 9,
+    "surahNameEn": "At-Tawba",
+    "surahNameAr": "سُورَةُ التَّوۡبَةِ",
+    "numberInSurah": 129,
+    "arabic": "فَإِن تَوَلَّوْا۟ فَقُلْ حَسْبِىَ ٱللَّهُ لَآ إِلَٰهَ إِلَّا هُوَ ۖ عَلَيْهِ تَوَكَّلْتُ ۖ وَهُوَ رَبُّ ٱلْعَرْشِ ٱلْعَظِيمِ",
+    "english": "But if they turn away, [O Muhammad], say, \"Sufficient for me is Allah; there is no deity except Him. On Him I have relied, and He is the Lord of the Great Throne.\""
+  },
+  {
+    "surah": 25,
+    "surahNameEn": "Al-Furqaan",
+    "surahNameAr": "سُورَةُ الفُرۡقَانِ",
+    "numberInSurah": 58,
+    "arabic": "وَتَوَكَّلْ عَلَى ٱلْحَىِّ ٱلَّذِى لَا يَمُوتُ وَسَبِّحْ بِحَمْدِهِۦ ۚ وَكَفَىٰ بِهِۦ بِذُنُوبِ عِبَادِهِۦ خَبِيرًا",
+    "english": "And rely upon the Ever-Living who does not die, and exalt [Allah] with His praise. And sufficient is He to be, with the sins of His servants, Acquainted -"
+  },
+  {
+    "surah": 26,
+    "surahNameEn": "Ash-Shu'araa",
+    "surahNameAr": "سُورَةُ الشُّعَرَاءِ",
+    "numberInSurah": 217,
+    "arabic": "وَتَوَكَّلْ عَلَى ٱلْعَزِيزِ ٱلرَّحِيمِ",
+    "english": "And rely upon the Exalted in Might, the Merciful,"
+  },
+  {
+    "surah": 67,
+    "surahNameEn": "Al-Mulk",
+    "surahNameAr": "سُورَةُ المُلۡكِ",
+    "numberInSurah": 29,
+    "arabic": "قُلْ هُوَ ٱلرَّحْمَٰنُ ءَامَنَّا بِهِۦ وَعَلَيْهِ تَوَكَّلْنَا ۖ فَسَتَعْلَمُونَ مَنْ هُوَ فِى ضَلَٰلٍۢ مُّبِينٍۢ",
+    "english": "Say, \"He is the Most Merciful; we have believed in Him, and upon Him we have relied. And you will [come to] know who it is that is in clear error.\""
+  },
+  {
+    "surah": 2,
+    "surahNameEn": "Al-Baqara",
+    "surahNameAr": "سُورَةُ البَقَرَةِ",
+    "numberInSurah": 45,
+    "arabic": "وَٱسْتَعِينُوا۟ بِٱلصَّبْرِ وَٱلصَّلَوٰةِ ۚ وَإِنَّهَا لَكَبِيرَةٌ إِلَّا عَلَى ٱلْخَٰشِعِينَ",
+    "english": "And seek help through patience and prayer, and indeed, it is difficult except for the humbly submissive [to Allah]"
+  },
+  {
+    "surah": 2,
+    "surahNameEn": "Al-Baqara",
+    "surahNameAr": "سُورَةُ البَقَرَةِ",
+    "numberInSurah": 155,
+    "arabic": "وَلَنَبْلُوَنَّكُم بِشَىْءٍۢ مِّنَ ٱلْخَوْفِ وَٱلْجُوعِ وَنَقْصٍۢ مِّنَ ٱلْأَمْوَٰلِ وَٱلْأَنفُسِ وَٱلثَّمَرَٰتِ ۗ وَبَشِّرِ ٱلصَّٰبِرِينَ",
+    "english": "And We will surely test you with something of fear and hunger and a loss of wealth and lives and fruits, but give good tidings to the patient,"
+  },
+  {
+    "surah": 2,
+    "surahNameEn": "Al-Baqara",
+    "surahNameAr": "سُورَةُ البَقَرَةِ",
+    "numberInSurah": 156,
+    "arabic": "ٱلَّذِينَ إِذَآ أَصَٰبَتْهُم مُّصِيبَةٌۭ قَالُوٓا۟ إِنَّا لِلَّهِ وَإِنَّآ إِلَيْهِ رَٰجِعُونَ",
+    "english": "Who, when disaster strikes them, say, \"Indeed we belong to Allah, and indeed to Him we will return.\""
+  },
+  {
+    "surah": 2,
+    "surahNameEn": "Al-Baqara",
+    "surahNameAr": "سُورَةُ البَقَرَةِ",
+    "numberInSurah": 157,
+    "arabic": "أُو۟لَٰٓئِكَ عَلَيْهِمْ صَلَوَٰتٌۭ مِّن رَّبِّهِمْ وَرَحْمَةٌۭ ۖ وَأُو۟لَٰٓئِكَ هُمُ ٱلْمُهْتَدُونَ",
+    "english": "Those are the ones upon whom are blessings from their Lord and mercy. And it is those who are the [rightly] guided."
+  },
+  {
+    "surah": 3,
+    "surahNameEn": "Aal-i-Imraan",
+    "surahNameAr": "سُورَةُ آلِ عِمۡرَانَ",
+    "numberInSurah": 200,
+    "arabic": "يَٰٓأَيُّهَا ٱلَّذِينَ ءَامَنُوا۟ ٱصْبِرُوا۟ وَصَابِرُوا۟ وَرَابِطُوا۟ وَٱتَّقُوا۟ ٱللَّهَ لَعَلَّكُمْ تُفْلِحُونَ",
+    "english": "O you who have believed, persevere and endure and remain stationed and fear Allah that you may be successful."
+  },
+  {
+    "surah": 11,
+    "surahNameEn": "Hud",
+    "surahNameAr": "سُورَةُ هُودٍ",
+    "numberInSurah": 115,
+    "arabic": "وَٱصْبِرْ فَإِنَّ ٱللَّهَ لَا يُضِيعُ أَجْرَ ٱلْمُحْسِنِينَ",
+    "english": "And be patient, for indeed, Allah does not allow to be lost the reward of those who do good."
+  },
+  {
+    "surah": 12,
+    "surahNameEn": "Yusuf",
+    "surahNameAr": "سُورَةُ يُوسُفَ",
+    "numberInSurah": 86,
+    "arabic": "قَالَ إِنَّمَآ أَشْكُوا۟ بَثِّى وَحُزْنِىٓ إِلَى ٱللَّهِ وَأَعْلَمُ مِنَ ٱللَّهِ مَا لَا تَعْلَمُونَ",
+    "english": "He said, \"I only complain of my suffering and my grief to Allah, and I know from Allah that which you do not know."
+  },
+  {
+    "surah": 16,
+    "surahNameEn": "An-Nahl",
+    "surahNameAr": "سُورَةُ النَّحۡلِ",
+    "numberInSurah": 96,
+    "arabic": "مَا عِندَكُمْ يَنفَدُ ۖ وَمَا عِندَ ٱللَّهِ بَاقٍۢ ۗ وَلَنَجْزِيَنَّ ٱلَّذِينَ صَبَرُوٓا۟ أَجْرَهُم بِأَحْسَنِ مَا كَانُوا۟ يَعْمَلُونَ",
+    "english": "Whatever you have will end, but what Allah has is lasting. And We will surely give those who were patient their reward according to the best of what they used to do."
+  },
+  {
+    "surah": 70,
+    "surahNameEn": "Al-Ma'aarij",
+    "surahNameAr": "سُورَةُ المَعَارِجِ",
+    "numberInSurah": 5,
+    "arabic": "فَٱصْبِرْ صَبْرًۭا جَمِيلًا",
+    "english": "So be patient with gracious patience."
+  },
+  {
+    "surah": 2,
+    "surahNameEn": "Al-Baqara",
+    "surahNameAr": "سُورَةُ البَقَرَةِ",
+    "numberInSurah": 195,
+    "arabic": "وَأَنفِقُوا۟ فِى سَبِيلِ ٱللَّهِ وَلَا تُلْقُوا۟ بِأَيْدِيكُمْ إِلَى ٱلتَّهْلُكَةِ ۛ وَأَحْسِنُوٓا۟ ۛ إِنَّ ٱللَّهَ يُحِبُّ ٱلْمُحْسِنِينَ",
+    "english": "And spend in the way of Allah and do not throw [yourselves] with your [own] hands into destruction [by refraining]. And do good; indeed, Allah loves the doers of good."
+  },
+  {
+    "surah": 3,
+    "surahNameEn": "Aal-i-Imraan",
+    "surahNameAr": "سُورَةُ آلِ عِمۡرَانَ",
+    "numberInSurah": 148,
+    "arabic": "فَـَٔاتَىٰهُمُ ٱللَّهُ ثَوَابَ ٱلدُّنْيَا وَحُسْنَ ثَوَابِ ٱلْءَاخِرَةِ ۗ وَٱللَّهُ يُحِبُّ ٱلْمُحْسِنِينَ",
+    "english": "So Allah gave them the reward of this world and the good reward of the Hereafter. And Allah loves the doers of good."
+  },
+  {
+    "surah": 2,
+    "surahNameEn": "Al-Baqara",
+    "surahNameAr": "سُورَةُ البَقَرَةِ",
+    "numberInSurah": 202,
+    "arabic": "أُو۟لَٰٓئِكَ لَهُمْ نَصِيبٌۭ مِّمَّا كَسَبُوا۟ ۚ وَٱللَّهُ سَرِيعُ ٱلْحِسَابِ",
+    "english": "Those will have a share of what they have earned, and Allah is swift in account."
+  },
+  {
+    "surah": 14,
+    "surahNameEn": "Ibrahim",
+    "surahNameAr": "سُورَةُ إِبۡرَاهِيمَ",
+    "numberInSurah": 41,
+    "arabic": "رَبَّنَا ٱغْفِرْ لِى وَلِوَٰلِدَىَّ وَلِلْمُؤْمِنِينَ يَوْمَ يَقُومُ ٱلْحِسَابُ",
+    "english": "Our Lord, forgive me and my parents and the believers the Day the account is established.\""
+  },
+  {
+    "surah": 22,
+    "surahNameEn": "Al-Hajj",
+    "surahNameAr": "سُورَةُ الحَجِّ",
+    "numberInSurah": 29,
+    "arabic": "ثُمَّ لْيَقْضُوا۟ تَفَثَهُمْ وَلْيُوفُوا۟ نُذُورَهُمْ وَلْيَطَّوَّفُوا۟ بِٱلْبَيْتِ ٱلْعَتِيقِ",
+    "english": "Then let them end their untidiness and fulfill their vows and perform Tawaf around the ancient House.\""
+  },
+  {
+    "surah": 3,
+    "surahNameEn": "Aal-i-Imraan",
+    "surahNameAr": "سُورَةُ آلِ عِمۡرَانَ",
+    "numberInSurah": 16,
+    "arabic": "ٱلَّذِينَ يَقُولُونَ رَبَّنَآ إِنَّنَآ ءَامَنَّا فَٱغْفِرْ لَنَا ذُنُوبَنَا وَقِنَا عَذَابَ ٱلنَّارِ",
+    "english": "Those who say, \"Our Lord, indeed we have believed, so forgive us our sins and protect us from the punishment of the Fire,\""
+  },
+  {
+    "surah": 3,
+    "surahNameEn": "Aal-i-Imraan",
+    "surahNameAr": "سُورَةُ آلِ عِمۡرَانَ",
+    "numberInSurah": 194,
+    "arabic": "رَبَّنَا وَءَاتِنَا مَا وَعَدتَّنَا عَلَىٰ رُسُلِكَ وَلَا تُخْزِنَا يَوْمَ ٱلْقِيَٰمَةِ ۗ إِنَّكَ لَا تُخْلِفُ ٱلْمِيعَادَ",
+    "english": "Our Lord, and grant us what You promised us through Your messengers and do not disgrace us on the Day of Resurrection. Indeed, You do not fail in [Your] promise.\""
+  },
+  {
+    "surah": 7,
+    "surahNameEn": "Al-A'raaf",
+    "surahNameAr": "سُورَةُ الأَعۡرَافِ",
+    "numberInSurah": 23,
+    "arabic": "قَالَا رَبَّنَا ظَلَمْنَآ أَنفُسَنَا وَإِن لَّمْ تَغْفِرْ لَنَا وَتَرْحَمْنَا لَنَكُونَنَّ مِنَ ٱلْخَٰسِرِينَ",
+    "english": "They said, \"Our Lord, we have wronged ourselves, and if You do not forgive us and have mercy upon us, we will surely be among the losers.\""
+  },
+  {
+    "surah": 10,
+    "surahNameEn": "Yunus",
+    "surahNameAr": "سُورَةُ يُونُسَ",
+    "numberInSurah": 85,
+    "arabic": "فَقَالُوا۟ عَلَى ٱللَّهِ تَوَكَّلْنَا رَبَّنَا لَا تَجْعَلْنَا فِتْنَةًۭ لِّلْقَوْمِ ٱلظَّٰلِمِينَ",
+    "english": "So they said, \"Upon Allah do we rely. Our Lord, make us not [objects of] trial for the wrongdoing people"
+  },
+  {
+    "surah": 10,
+    "surahNameEn": "Yunus",
+    "surahNameAr": "سُورَةُ يُونُسَ",
+    "numberInSurah": 86,
+    "arabic": "وَنَجِّنَا بِرَحْمَتِكَ مِنَ ٱلْقَوْمِ ٱلْكَٰفِرِينَ",
+    "english": "And save us by Your mercy from the disbelieving people.\""
+  },
+  {
+    "surah": 21,
+    "surahNameEn": "Al-Anbiyaa",
+    "surahNameAr": "سُورَةُ الأَنبِيَاءِ",
+    "numberInSurah": 89,
+    "arabic": "وَزَكَرِيَّآ إِذْ نَادَىٰ رَبَّهُۥ رَبِّ لَا تَذَرْنِى فَرْدًۭا وَأَنتَ خَيْرُ ٱلْوَٰرِثِينَ",
+    "english": "And [mention] Zechariah, when he called to his Lord, \"My Lord, do not leave me alone [with no heir], while you are the best of inheritors.\""
+  },
+  {
+    "surah": 23,
+    "surahNameEn": "Al-Muminoon",
+    "surahNameAr": "سُورَةُ المُؤۡمِنُونَ",
+    "numberInSurah": 118,
+    "arabic": "وَقُل رَّبِّ ٱغْفِرْ وَٱرْحَمْ وَأَنتَ خَيْرُ ٱلرَّٰحِمِينَ",
+    "english": "And, [O Muhammad], say, \"My Lord, forgive and have mercy, and You are the best of the merciful.\""
+  },
+  {
+    "surah": 28,
+    "surahNameEn": "Al-Qasas",
+    "surahNameAr": "سُورَةُ القَصَصِ",
+    "numberInSurah": 16,
+    "arabic": "قَالَ رَبِّ إِنِّى ظَلَمْتُ نَفْسِى فَٱغْفِرْ لِى فَغَفَرَ لَهُۥٓ ۚ إِنَّهُۥ هُوَ ٱلْغَفُورُ ٱلرَّحِيمُ",
+    "english": "He said, \"My Lord, indeed I have wronged myself, so forgive me,\" and He forgave him. Indeed, He is the Forgiving, the Merciful."
+  },
+  {
+    "surah": 28,
+    "surahNameEn": "Al-Qasas",
+    "surahNameAr": "سُورَةُ القَصَصِ",
+    "numberInSurah": 24,
+    "arabic": "فَسَقَىٰ لَهُمَا ثُمَّ تَوَلَّىٰٓ إِلَى ٱلظِّلِّ فَقَالَ رَبِّ إِنِّى لِمَآ أَنزَلْتَ إِلَىَّ مِنْ خَيْرٍۢ فَقِيرٌۭ",
+    "english": "So he watered [their flocks] for them; then he went back to the shade and said, \"My Lord, indeed I am, for whatever good You would send down to me, in need.\""
+  },
+  {
+    "surah": 20,
+    "surahNameEn": "Taa-Haa",
+    "surahNameAr": "سُورَةُ طه",
+    "numberInSurah": 26,
+    "arabic": "وَيَسِّرْ لِىٓ أَمْرِى",
+    "english": "And ease for me my task"
+  },
+  {
+    "surah": 20,
+    "surahNameEn": "Taa-Haa",
+    "surahNameAr": "سُورَةُ طه",
+    "numberInSurah": 27,
+    "arabic": "وَٱحْلُلْ عُقْدَةًۭ مِّن لِّسَانِى",
+    "english": "And untie the knot from my tongue"
+  },
+  {
+    "surah": 26,
+    "surahNameEn": "Ash-Shu'araa",
+    "surahNameAr": "سُورَةُ الشُّعَرَاءِ",
+    "numberInSurah": 83,
+    "arabic": "رَبِّ هَبْ لِى حُكْمًۭا وَأَلْحِقْنِى بِٱلصَّٰلِحِينَ",
+    "english": "[And he said], \"My Lord, grant me authority and join me with the righteous."
+  },
+  {
+    "surah": 26,
+    "surahNameEn": "Ash-Shu'araa",
+    "surahNameAr": "سُورَةُ الشُّعَرَاءِ",
+    "numberInSurah": 84,
+    "arabic": "وَٱجْعَل لِّى لِسَانَ صِدْقٍۢ فِى ٱلْءَاخِرِينَ",
+    "english": "And grant me a reputation of honor among later generations."
+  },
+  {
+    "surah": 26,
+    "surahNameEn": "Ash-Shu'araa",
+    "surahNameAr": "سُورَةُ الشُّعَرَاءِ",
+    "numberInSurah": 85,
+    "arabic": "وَٱجْعَلْنِى مِن وَرَثَةِ جَنَّةِ ٱلنَّعِيمِ",
+    "english": "And place me among the inheritors of the Garden of Pleasure."
+  },
+  {
+    "surah": 26,
+    "surahNameEn": "Ash-Shu'araa",
+    "surahNameAr": "سُورَةُ الشُّعَرَاءِ",
+    "numberInSurah": 87,
+    "arabic": "وَلَا تُخْزِنِى يَوْمَ يُبْعَثُونَ",
+    "english": "And do not disgrace me on the Day they are [all] resurrected -"
+  },
+  {
+    "surah": 26,
+    "surahNameEn": "Ash-Shu'araa",
+    "surahNameAr": "سُورَةُ الشُّعَرَاءِ",
+    "numberInSurah": 88,
+    "arabic": "يَوْمَ لَا يَنفَعُ مَالٌۭ وَلَا بَنُونَ",
+    "english": "The Day when there will not benefit [anyone] wealth or children"
+  },
+  {
+    "surah": 26,
+    "surahNameEn": "Ash-Shu'araa",
+    "surahNameAr": "سُورَةُ الشُّعَرَاءِ",
+    "numberInSurah": 89,
+    "arabic": "إِلَّا مَنْ أَتَى ٱللَّهَ بِقَلْبٍۢ سَلِيمٍۢ",
+    "english": "But only one who comes to Allah with a sound heart.\""
+  },
+  {
+    "surah": 42,
+    "surahNameEn": "Ash-Shura",
+    "surahNameAr": "سُورَةُ الشُّورَىٰ",
+    "numberInSurah": 19,
+    "arabic": "ٱللَّهُ لَطِيفٌۢ بِعِبَادِهِۦ يَرْزُقُ مَن يَشَآءُ ۖ وَهُوَ ٱلْقَوِىُّ ٱلْعَزِيزُ",
+    "english": "Allah is Subtle with His servants; He gives provisions to whom He wills. And He is the Powerful, the Exalted in Might."
+  },
+  {
+    "surah": 42,
+    "surahNameEn": "Ash-Shura",
+    "surahNameAr": "سُورَةُ الشُّورَىٰ",
+    "numberInSurah": 28,
+    "arabic": "وَهُوَ ٱلَّذِى يُنَزِّلُ ٱلْغَيْثَ مِنۢ بَعْدِ مَا قَنَطُوا۟ وَيَنشُرُ رَحْمَتَهُۥ ۚ وَهُوَ ٱلْوَلِىُّ ٱلْحَمِيدُ",
+    "english": "And it is He who sends down the rain after they had despaired and spreads His mercy. And He is the Protector, the Praiseworthy."
+  },
+  {
+    "surah": 50,
+    "surahNameEn": "Qaaf",
+    "surahNameAr": "سُورَةُ قٓ",
+    "numberInSurah": 16,
+    "arabic": "وَلَقَدْ خَلَقْنَا ٱلْإِنسَٰنَ وَنَعْلَمُ مَا تُوَسْوِسُ بِهِۦ نَفْسُهُۥ ۖ وَنَحْنُ أَقْرَبُ إِلَيْهِ مِنْ حَبْلِ ٱلْوَرِيدِ",
+    "english": "And We have already created man and know what his soul whispers to him, and We are closer to him than [his] jugular vein"
   }
 ]
