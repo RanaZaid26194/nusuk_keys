@@ -26,6 +26,16 @@ export const Hero: React.FC<HeroProps> = ({
 }) => {
   const t = translations[lang];
   const isAr = lang === "ar";
+
+  // stat card entrance variants so delay stays isolated to page load
+  const statCardVariants = {
+    hidden: { opacity: 0, y: 16 },
+    visible: (customDelay: number) => ({
+      opacity: 1,
+      y: 0,
+      transition: { duration: 0.35, delay: customDelay, ease: "easeOut" }
+    })
+  };
   const ArrowIcon = isAr ? ArrowLeft : ArrowRight;
 
   const handleOpenSubmit = () => {
@@ -91,8 +101,9 @@ export const Hero: React.FC<HeroProps> = ({
               onClick={handleOpenSubmit}
               whileHover={{ scale: 1.025, y: -1 }}
               whileTap={{ scale: 0.96 }}
+              transition={{ duration: 0.16, ease: "easeOut" }}
               aria-label={t.shareCodeBtn}
-              className="group flex items-center gap-2.5 px-7 sm:px-9 py-3 rounded-full bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-sm sm:text-base shadow-lg shadow-emerald-600/25 dark:shadow-emerald-950/60 transition-all duration-200"
+              className="group flex items-center gap-2.5 px-7 sm:px-9 py-3 rounded-full bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-sm sm:text-base shadow-lg shadow-emerald-600/25 dark:shadow-emerald-950/60 transition-colors duration-150"
             >
               <KeyRound className="w-4 h-4 sm:w-5 sm:h-5 transition-transform duration-200 group-hover:scale-110 group-hover:rotate-6" />
               <span className={isAr ? "font-arabic text-base sm:text-lg" : ""}>{t.shareCodeBtn}</span>
@@ -107,6 +118,7 @@ export const Hero: React.FC<HeroProps> = ({
               }}
               whileHover={{ scale: 1.15 }}
               whileTap={{ scale: 0.9 }}
+              transition={{ duration: 0.16, ease: "easeOut" }}
               aria-label={t.hook.infoButtonAria}
               title={t.hook.infoButtonAria}
               className="absolute -top-0.5 right-0 rtl:left-0 rtl:right-auto sm:-top-1.5 sm:-right-2 sm:rtl:-left-2 sm:rtl:right-auto w-5.5 h-5.5 sm:w-6 sm:h-6 rounded-full bg-emerald-950 hover:bg-emerald-900 text-emerald-200 hover:text-white border border-emerald-400/50 shadow-md flex items-center justify-center transition-colors z-10"
@@ -126,11 +138,14 @@ export const Hero: React.FC<HeroProps> = ({
         <div className="mt-8 sm:mt-12 grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4 max-w-4xl mx-auto">
           {/* Stat 1: Total Active Keys */}
           <motion.div
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4, delay: 0.32 }}
+            custom={0.15}
+            variants={statCardVariants}
+            initial="hidden"
+            animate="visible"
             whileHover={{ y: -4, scale: 1.015 }}
-            className="group cursor-default p-3 sm:p-4 rounded-xl sm:rounded-2xl bg-white/70 dark:bg-zinc-900/50 border border-zinc-200/80 dark:border-zinc-800/80 hover:border-emerald-500/35 dark:hover:border-emerald-500/30 text-center transition-all duration-200 shadow-sm hover:shadow-md"
+            whileTap={{ scale: 0.98 }}
+            transition={{ duration: 0.16, ease: "easeOut" }}
+            className="group cursor-default p-3 sm:p-4 rounded-xl sm:rounded-2xl bg-white/70 dark:bg-zinc-900/50 border border-zinc-200/80 dark:border-zinc-800/80 hover:border-emerald-500/35 dark:hover:border-emerald-500/30 text-center transition-colors duration-150 shadow-sm hover:shadow-md"
           >
             <div className="flex items-center justify-center w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 mx-auto mb-1.5 sm:mb-2 transition-all duration-200 group-hover:scale-110 group-hover:bg-emerald-50 dark:group-hover:bg-emerald-950/40">
               <KeyRound className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-600 dark:text-emerald-400" />
@@ -145,11 +160,14 @@ export const Hero: React.FC<HeroProps> = ({
 
           {/* Stat 2: Verification Rate */}
           <motion.div
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4, delay: 0.38 }}
+            custom={0.20}
+            variants={statCardVariants}
+            initial="hidden"
+            animate="visible"
             whileHover={{ y: -4, scale: 1.015 }}
-            className="group cursor-default p-3 sm:p-4 rounded-xl sm:rounded-2xl bg-white/70 dark:bg-zinc-900/50 border border-zinc-200/80 dark:border-zinc-800/80 hover:border-emerald-500/35 dark:hover:border-emerald-500/30 text-center transition-all duration-200 shadow-sm hover:shadow-md"
+            whileTap={{ scale: 0.98 }}
+            transition={{ duration: 0.16, ease: "easeOut" }}
+            className="group cursor-default p-3 sm:p-4 rounded-xl sm:rounded-2xl bg-white/70 dark:bg-zinc-900/50 border border-zinc-200/80 dark:border-zinc-800/80 hover:border-emerald-500/35 dark:hover:border-emerald-500/30 text-center transition-colors duration-150 shadow-sm hover:shadow-md"
           >
             <div className="flex items-center justify-center w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 mx-auto mb-1.5 sm:mb-2 transition-all duration-200 group-hover:scale-110 group-hover:bg-emerald-50 dark:group-hover:bg-emerald-950/40">
               <ShieldCheck className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-600 dark:text-emerald-400" />
@@ -164,11 +182,14 @@ export const Hero: React.FC<HeroProps> = ({
 
           {/* Stat 3: Total Copies Count */}
           <motion.div
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4, delay: 0.44 }}
+            custom={0.25}
+            variants={statCardVariants}
+            initial="hidden"
+            animate="visible"
             whileHover={{ y: -4, scale: 1.015 }}
-            className="group cursor-default p-3 sm:p-4 rounded-xl sm:rounded-2xl bg-white/70 dark:bg-zinc-900/50 border border-zinc-200/80 dark:border-zinc-800/80 hover:border-emerald-500/35 dark:hover:border-emerald-500/30 text-center transition-all duration-200 shadow-sm hover:shadow-md"
+            whileTap={{ scale: 0.98 }}
+            transition={{ duration: 0.16, ease: "easeOut" }}
+            className="group cursor-default p-3 sm:p-4 rounded-xl sm:rounded-2xl bg-white/70 dark:bg-zinc-900/50 border border-zinc-200/80 dark:border-zinc-800/80 hover:border-emerald-500/35 dark:hover:border-emerald-500/30 text-center transition-colors duration-150 shadow-sm hover:shadow-md"
           >
             <div className="flex items-center justify-center w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 mx-auto mb-1.5 sm:mb-2 transition-all duration-200 group-hover:scale-110 group-hover:bg-emerald-50 dark:group-hover:bg-emerald-950/40">
               <Copy className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-600 dark:text-emerald-400" />
@@ -183,11 +204,14 @@ export const Hero: React.FC<HeroProps> = ({
 
           {/* Stat 4: Live Status with Radar Wave */}
           <motion.div
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4, delay: 0.50 }}
+            custom={0.30}
+            variants={statCardVariants}
+            initial="hidden"
+            animate="visible"
             whileHover={{ y: -4, scale: 1.015 }}
-            className="group cursor-default p-3 sm:p-4 rounded-xl sm:rounded-2xl bg-white/70 dark:bg-zinc-900/50 border border-zinc-200/80 dark:border-zinc-800/80 hover:border-emerald-500/35 dark:hover:border-emerald-500/30 text-center transition-all duration-200 shadow-sm hover:shadow-md"
+            whileTap={{ scale: 0.98 }}
+            transition={{ duration: 0.16, ease: "easeOut" }}
+            className="group cursor-default p-3 sm:p-4 rounded-xl sm:rounded-2xl bg-white/70 dark:bg-zinc-900/50 border border-zinc-200/80 dark:border-zinc-800/80 hover:border-emerald-500/35 dark:hover:border-emerald-500/30 text-center transition-colors duration-150 shadow-sm hover:shadow-md"
           >
             <div className="flex items-center justify-center w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 mx-auto mb-1.5 sm:mb-2 transition-all duration-200 group-hover:scale-110 group-hover:bg-emerald-50 dark:group-hover:bg-emerald-950/40">
               <Activity className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-600 dark:text-emerald-400" />

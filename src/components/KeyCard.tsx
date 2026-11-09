@@ -8,7 +8,8 @@ import { translations } from "@/lib/translations";
 import { calculateSuccessRate, formatTimeAgo, getNusukDeepLink } from "@/lib/utils";
 import { playHapticSound } from "@/lib/audio";
 
-interface KeyCardProps {
+interface KeyCardProps
+{
   item: ChallengeKey;
   lang: Language;
   searchQuery?: string;
@@ -28,10 +29,11 @@ export const KeyCard: React.FC<KeyCardProps> = ({
   onCopy,
   onOpenNusuk,
   onToggleUsed,
-}) => {
+}) =>
+{
   const [copied, setCopied] = useState(false);
-  const [mousePos, setMousePos] = useState<{ x: number; y: number } | null>(null);
   const cardRef = useRef<HTMLDivElement>(null);
+  const spotlightRef = useRef<HTMLDivElement>(null);
 
   const t = translations[lang];
   const isAr = lang === "ar";
@@ -40,45 +42,54 @@ export const KeyCard: React.FC<KeyCardProps> = ({
   const isVerified = successRate >= 75 && item.upvotes >= 2;
   const isExpired = item.downvotes > item.upvotes + 3;
 
-  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!cardRef.current) return;
+  // zero-react-rerender spotlight tracking
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) =>
+  {
+    if (!cardRef.current || !spotlightRef.current)
+      return;
     const rect = cardRef.current.getBoundingClientRect();
-    setMousePos({
-      x: e.clientX - rect.left,
-      y: e.clientY - rect.top,
-    });
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    spotlightRef.current.style.opacity = "1";
+    spotlightRef.current.style.background = `radial-gradient(350px circle at ${x}px ${y}px, var(--spotlight-glow, rgba(16, 185, 129, 0.08)), transparent 80%)`;
   };
 
-  const handleMouseLeave = () => {
-    setMousePos(null);
+  const handleMouseLeave = () =>
+  {
+    if (spotlightRef.current)
+      spotlightRef.current.style.opacity = "0";
   };
 
-  const handleCopy = (e: React.MouseEvent) => {
+  const handleCopy = (e: React.MouseEvent) =>
+  {
     e.stopPropagation();
     navigator.clipboard.writeText(item.code);
     setCopied(true);
     onCopy(item.id);
     playHapticSound('success');
 
-    setTimeout(() => {
+    setTimeout(() =>
+    {
       setCopied(false);
     }, 2000);
   };
 
-  const handleVoteClick = (type: 'UP' | 'DOWN') => {
-    if (item.userVoted === type) return;
+  const handleVoteClick = (type: 'UP' | 'DOWN') =>
+  {
+    if (item.userVoted === type)
+      return;
     playHapticSound('vote');
     onVote(item.id, type);
   };
 
   // Highlight search term in code cleanly
-  const renderHighlightedCode = () => {
+  const renderHighlightedCode = () =>
+  {
     const code = item.code;
     const query = searchQuery.trim().toUpperCase();
 
-    if (!query || !code.includes(query)) {
+    if (!query || !code.includes(query))
       return <span>{code}</span>;
-    }
 
     const index = code.indexOf(query);
     const before = code.slice(0, index);
@@ -100,8 +111,9 @@ export const KeyCard: React.FC<KeyCardProps> = ({
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
       whileHover={{ y: -4, scale: 1.008 }}
-      transition={{ type: "spring", stiffness: 450, damping: 28 }}
-      className={`relative rounded-2xl bg-white dark:bg-zinc-900/70 p-4 sm:p-5 border transition-all duration-300 overflow-hidden shadow-xs hover:shadow-md dark:shadow-none dark:hover:shadow-black/40 ${
+      whileTap={{ scale: 0.99 }}
+      transition={{ duration: 0.16, ease: "easeOut" }}
+      className={`relative rounded-2xl bg-white dark:bg-zinc-900/70 p-4 sm:p-5 border transition-colors duration-150 overflow-hidden shadow-xs hover:shadow-md dark:shadow-none dark:hover:shadow-black/40 ${
         copied
           ? "border-emerald-500/80 ring-1 ring-emerald-500/40 shadow-[0_0_24px_rgba(16,185,129,0.18)]"
           : isVerified
@@ -110,14 +122,10 @@ export const KeyCard: React.FC<KeyCardProps> = ({
       }`}
     >
       {/* Interactive Cursor Spotlight Glow */}
-      {mousePos && (
-        <div
-          className="pointer-events-none absolute -inset-px rounded-2xl opacity-100 transition-opacity duration-300"
-          style={{
-            background: `radial-gradient(350px circle at ${mousePos.x}px ${mousePos.y}px, var(--spotlight-glow, rgba(16, 185, 129, 0.08)), transparent 80%)`,
-          }}
-        />
-      )}
+      <div
+        ref={spotlightRef}
+        className="pointer-events-none absolute -inset-px rounded-2xl opacity-0 transition-opacity duration-200"
+      />
 
       {/* Header: Badge & Time */}
       <div className="relative z-10 flex items-center justify-between gap-2 mb-3.5">
@@ -162,7 +170,7 @@ export const KeyCard: React.FC<KeyCardProps> = ({
         onClick={handleCopy}
         whileHover={{ scale: 1.01 }}
         whileTap={{ scale: 0.98 }}
-        className={`relative z-10 flex items-center justify-between p-3 sm:p-3.5 rounded-xl border transition-all duration-200 cursor-pointer select-none mb-3.5 shadow-xs group ${
+        className={`relative z-10 flex items-center justify-between p-3 sm:p-3.5 rounded-xl border transition-colors duration-150 cursor-pointer select-none mb-3.5 shadow-xs group ${
           copied
             ? "bg-emerald-500/10 dark:bg-emerald-500/15 border-emerald-500/60 ring-1 ring-emerald-500/30"
             : "bg-zinc-50 dark:bg-zinc-950 border-zinc-200 dark:border-zinc-800/80 hover:border-emerald-500/40 dark:hover:border-emerald-500/40 hover:bg-emerald-500/[0.02]"
@@ -180,7 +188,7 @@ export const KeyCard: React.FC<KeyCardProps> = ({
           whileTap={{ scale: 0.94 }}
           title={t.keyCard.copyKey}
           aria-label={t.keyCard.copyKey}
-          className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold transition-all shadow-xs ${
+          className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold transition-colors duration-150 shadow-xs ${
             copied
               ? "bg-emerald-600 text-white shadow-emerald-600/25 dark:shadow-emerald-950/60"
               : "bg-white hover:bg-zinc-100 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-200 border border-zinc-200 dark:border-zinc-700/80"

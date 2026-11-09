@@ -187,6 +187,7 @@ export const KeyGrid: React.FC<KeyGridProps> = ({
                 onClick={() => handleTabClick(tab)}
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.96 }}
+                transition={{ duration: 0.16, ease: "easeOut" }}
                 className={`relative flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs sm:text-sm font-medium whitespace-nowrap transition-colors select-none ${
                   isActive ? "text-zinc-900 dark:text-white font-semibold" : "text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200"
                 } ${isAr ? "font-arabic" : ""}`}
@@ -328,8 +329,9 @@ export const KeyGrid: React.FC<KeyGridProps> = ({
                 onClick={handleLoadMore}
                 whileHover={{ scale: 1.03, y: -1 }}
                 whileTap={{ scale: 0.96 }}
+                transition={{ duration: 0.16, ease: "easeOut" }}
                 aria-label={isAr ? "عرض المزيد من المفاتيح" : "Show more keys"}
-                className="group flex items-center gap-2 px-6 py-2.5 rounded-full bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700/80 hover:bg-zinc-50 dark:hover:bg-zinc-800 text-xs sm:text-sm font-semibold text-zinc-800 dark:text-zinc-200 shadow-sm hover:shadow transition-all"
+                className="group flex items-center gap-2 px-6 py-2.5 rounded-full bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700/80 hover:bg-zinc-50 dark:hover:bg-zinc-800 text-xs sm:text-sm font-semibold text-zinc-800 dark:text-zinc-200 shadow-sm hover:shadow transition-colors duration-150"
               >
                 <span>
                   {isAr

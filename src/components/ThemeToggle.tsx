@@ -71,6 +71,7 @@ export const ThemeToggle: React.FC<ThemeToggleProps> = ({ isAr = false }) =>
       onClick={handleToggle}
       whileHover={{ scale: 1.05 }}
       whileTap={{ scale: 0.92 }}
+      transition={{ duration: 0.16, ease: "easeOut" }}
       aria-label={label}
       title={label}
       className="p-2 rounded-xl bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-700 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white shadow-sm transition-colors flex items-center justify-center relative overflow-hidden"

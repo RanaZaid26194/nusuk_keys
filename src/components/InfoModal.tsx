@@ -133,6 +133,7 @@ export const InfoModal: React.FC<InfoModalProps> = ({
                 onClick={onClose}
                 whileHover={{ scale: 1.03 }}
                 whileTap={{ scale: 0.96 }}
+                transition={{ duration: 0.16, ease: "easeOut" }}
                 className="px-4 py-2 rounded-xl bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300 text-xs sm:text-sm font-medium transition-colors"
               >
                 {t.hook.close}
@@ -143,6 +144,7 @@ export const InfoModal: React.FC<InfoModalProps> = ({
                 onClick={handleActionSubmit}
                 whileHover={{ scale: 1.04 }}
                 whileTap={{ scale: 0.95 }}
+                transition={{ duration: 0.16, ease: "easeOut" }}
                 className="px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs sm:text-sm font-semibold transition-colors shadow-sm"
               >
                 {t.shareCodeBtn}

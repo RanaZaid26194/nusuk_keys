@@ -59,7 +59,7 @@ export const Header: React.FC<HeaderProps> = ({
         >
           <motion.div
             whileHover={{ rotate: 14, scale: 1.08 }}
-            transition={{ type: "spring", stiffness: 400, damping: 20 }}
+            transition={{ duration: 0.16, ease: "easeOut" }}
             className="flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-emerald-600 dark:text-emerald-400 shadow-sm transition-colors cursor-pointer"
           >
             <KeyRound className="w-4 h-4 sm:w-5 sm:h-5" />
@@ -133,9 +133,10 @@ export const Header: React.FC<HeaderProps> = ({
               onClick={handleOpenSubmit}
               whileHover={{ scale: 1.03, y: -0.5 }}
               whileTap={{ scale: 0.96 }}
+              transition={{ duration: 0.16, ease: "easeOut" }}
               aria-label={t.shareCodeBtn}
               title={t.shareCodeBtn}
-              className="group flex items-center justify-center gap-1.5 p-2 sm:px-4 sm:py-2 rounded-full bg-emerald-600 hover:bg-emerald-500 text-white font-medium text-xs sm:text-sm transition-all shadow-sm shadow-emerald-600/20 hover:shadow-emerald-600/35"
+              className="group flex items-center justify-center gap-1.5 p-2 sm:px-4 sm:py-2 rounded-full bg-emerald-600 hover:bg-emerald-500 text-white font-medium text-xs sm:text-sm transition-colors duration-150 shadow-sm shadow-emerald-600/20 hover:shadow-emerald-600/35"
             >
               <Plus className="w-4 h-4 stroke-[2.5] group-hover:rotate-90 transition-transform duration-300" />
               <span className={`hidden sm:inline ${lang === 'ar' ? 'font-arabic text-sm' : ''}`}>{t.shareCodeBtn}</span>
@@ -149,6 +150,7 @@ export const Header: React.FC<HeaderProps> = ({
               }}
               whileHover={{ scale: 1.15 }}
               whileTap={{ scale: 0.9 }}
+              transition={{ duration: 0.16, ease: "easeOut" }}
               aria-label={t.hook.infoButtonAria}
               title={t.hook.infoButtonAria}
               className="absolute -top-0.5 right-0 rtl:left-0 rtl:right-auto sm:-top-1.5 sm:-right-1.5 sm:rtl:-left-1.5 sm:rtl:right-auto w-4.5 h-4.5 sm:w-5 sm:h-5 rounded-full bg-emerald-950 hover:bg-emerald-900 text-emerald-200 hover:text-white border border-emerald-400/50 shadow-md flex items-center justify-center transition-colors z-10"
