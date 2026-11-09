@@ -8,6 +8,7 @@ import { translations } from "@/lib/translations";
 import { checkSubmissionRateLimit, recordSubmissionRateLimit } from "@/lib/security";
 import { isValidKey, sanitizeKeyInput, getBodyCharCount, KEY_PREFIX, KEY_BODY_LENGTH, KEY_TOTAL_LENGTH } from "@/lib/keyFormat";
 import { playHapticSound } from "@/lib/audio";
+import { Tooltip } from "./Tooltip";
 
 interface SubmitModalProps
 {
@@ -343,17 +344,23 @@ export const SubmitModal: React.FC<SubmitModalProps> = ({
                       {t.modal.inputLabel}
                     </label>
                     <div className="flex items-center gap-2">
-                      <motion.button
-                        type="button"
-                        onClick={handleClipboardPaste}
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.94 }}
-                        className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300 text-[11px] font-medium border border-zinc-200 dark:border-zinc-700/60 shadow-xs transition-colors"
-                        title={t.modal.paste || "Paste"}
+                      <Tooltip
+                        content={isAr ? "لصق الرمز من الحافظة" : "Paste code from clipboard"}
+                        position="top"
+                        dotColor="emerald"
                       >
-                        <Clipboard className="w-3 h-3 text-emerald-600 dark:text-emerald-400" />
-                        <span className={isAr ? "font-arabic" : ""}>{t.modal.paste || "Paste"}</span>
-                      </motion.button>
+                        <motion.button
+                          type="button"
+                          onClick={handleClipboardPaste}
+                          whileHover={{ scale: 1.05 }}
+                          whileTap={{ scale: 0.94 }}
+                          className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300 text-[11px] font-medium border border-zinc-200 dark:border-zinc-700/60 shadow-xs transition-colors"
+                          aria-label={t.modal.paste || "Paste"}
+                        >
+                          <Clipboard className="w-3 h-3 text-emerald-600 dark:text-emerald-400" />
+                          <span className={isAr ? "font-arabic" : ""}>{t.modal.paste || "Paste"}</span>
+                        </motion.button>
+                      </Tooltip>
                       <span className={`text-[11px] font-mono font-medium transition-colors ${bodyCount === KEY_BODY_LENGTH ? "text-emerald-600 dark:text-emerald-400 font-bold" : "text-zinc-400 dark:text-zinc-500"}`}>
                         {bodyCount}/{KEY_BODY_LENGTH}
                       </span>

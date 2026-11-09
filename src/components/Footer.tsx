@@ -5,6 +5,7 @@ import { Shield, ExternalLink, Github, Flag } from "lucide-react";
 import { Language } from "@/lib/types";
 import { translations } from "@/lib/translations";
 import { checkReportRateLimit, recordReportRateLimit } from "@/lib/security";
+import { Tooltip } from "./Tooltip";
 
 interface FooterProps {
   lang: Language;
@@ -92,41 +93,52 @@ export const Footer: React.FC<FooterProps> = ({ lang }) =>
 
           {/* Quick Actions & Live Sync Indicator */}
           <div className="flex items-center flex-wrap justify-center gap-3 sm:gap-4 text-xs">
-            {/* Live Sync Status */}
-            <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-zinc-200/60 dark:bg-zinc-900 border border-zinc-300/60 dark:border-zinc-800 text-[11px] text-zinc-700 dark:text-zinc-300">
-              <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
-              </span>
-              <span className={isAr ? "font-arabic" : ""}>
-                {t.footer.lastSync || "Live sync"}: <span className="font-mono">{syncTime}</span>
-              </span>
-            </div>
+            {/* Live Sync Status with custom tooltip */}
+            <Tooltip
+              content={isAr ? "تزامن مباشر مع قاعدة بيانات Supabase" : "Real-time updates via Supabase"}
+              position="top"
+              dotColor="emerald"
+            >
+              <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-zinc-200/60 dark:bg-zinc-900 border border-zinc-300/60 dark:border-zinc-800 text-[11px] text-zinc-700 dark:text-zinc-300 cursor-default">
+                <span className="relative flex h-2 w-2">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
+                </span>
+                <span className={isAr ? "font-arabic" : ""}>
+                  {t.footer.lastSync || "Live sync"}: <span className="font-mono">{syncTime}</span>
+                </span>
+              </div>
+            </Tooltip>
 
-            {/* Report a broken key with rate-limit protection */}
+            {/* Report a broken key with rate-limit protection and theme tooltip */}
             <div className="relative inline-flex items-center">
-              <a
-                href={cooldown > 0 ? undefined : mailtoUrl}
-                onClick={handleReportClick}
-                className={`group flex items-center gap-1 text-xs transition-colors ${
-                  cooldown > 0
-                    ? "cursor-not-allowed text-amber-600 dark:text-amber-400"
-                    : "text-zinc-600 hover:text-rose-600 dark:text-zinc-400 dark:hover:text-rose-400"
-                }`}
-                title={
+              <Tooltip
+                content={
                   cooldown > 0
                     ? (t.footer.reportCooldown || "Please wait {s}s before reporting another key.").replace("{s}", cooldown.toString())
-                    : (t.footer.reportBroken || "Report a broken key")
+                    : (isAr ? "الإبلاغ عن رمز منتهي أو غير صالح للدعم" : "Report an expired or invalid key")
                 }
-                aria-label={t.footer.reportBroken || "Report a broken key"}
+                position="top"
+                dotColor={cooldown > 0 ? "amber" : "none"}
               >
-                <Flag className={`w-3.5 h-3.5 transition-colors ${cooldown > 0 ? "text-amber-500 animate-pulse" : "text-zinc-400 group-hover:text-rose-500"}`} />
-                <span className={isAr ? "font-arabic" : ""}>
-                  {cooldown > 0
-                    ? (isAr ? `انتظر ${cooldown} ث` : `Wait ${cooldown}s`)
-                    : (t.footer.reportBroken || "Report broken key")}
-                </span>
-              </a>
+                <a
+                  href={cooldown > 0 ? undefined : mailtoUrl}
+                  onClick={handleReportClick}
+                  className={`group flex items-center gap-1 text-xs transition-colors ${
+                    cooldown > 0
+                      ? "cursor-not-allowed text-amber-600 dark:text-amber-400"
+                      : "text-zinc-600 hover:text-rose-600 dark:text-zinc-400 dark:hover:text-rose-400"
+                  }`}
+                  aria-label={t.footer.reportBroken || "Report a broken key"}
+                >
+                  <Flag className={`w-3.5 h-3.5 transition-colors ${cooldown > 0 ? "text-amber-500 animate-pulse" : "text-zinc-400 group-hover:text-rose-500"}`} />
+                  <span className={isAr ? "font-arabic" : ""}>
+                    {cooldown > 0
+                      ? (isAr ? `انتظر ${cooldown} ث` : `Wait ${cooldown}s`)
+                      : (t.footer.reportBroken || "Report broken key")}
+                  </span>
+                </a>
+              </Tooltip>
 
               {/* Toast warning on attempted spam/rate-limit hit */}
               {showWarning && (
@@ -140,27 +152,39 @@ export const Footer: React.FC<FooterProps> = ({ lang }) =>
             </div>
 
             {/* GitHub Repo */}
-            <a
-              href="https://github.com/RanaZaid26194/nusuk_keys"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="group flex items-center gap-1.5 text-xs text-zinc-600 hover:text-zinc-950 dark:text-zinc-400 dark:hover:text-white transition-colors"
-              title={t.footer.github || "GitHub Repository"}
+            <Tooltip
+              content={isAr ? "استعراض الكود المصدري على GitHub" : "View source code on GitHub"}
+              position="top"
             >
-              <Github className="w-3.5 h-3.5 opacity-80 group-hover:opacity-100" />
-              <span>{t.footer.github || "GitHub"}</span>
-            </a>
+              <a
+                href="https://github.com/RanaZaid26194/nusuk_keys"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group flex items-center gap-1.5 text-xs text-zinc-600 hover:text-zinc-950 dark:text-zinc-400 dark:hover:text-white transition-colors"
+                aria-label={t.footer.github || "GitHub Repository"}
+              >
+                <Github className="w-3.5 h-3.5 opacity-80 group-hover:opacity-100" />
+                <span>{t.footer.github || "GitHub"}</span>
+              </a>
+            </Tooltip>
 
             {/* Official Nusuk Portal Link */}
-            <a
-              href="https://services.nusuk.sa"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="group flex items-center gap-1 text-xs text-zinc-600 hover:text-emerald-600 dark:text-zinc-400 dark:hover:text-emerald-400 transition-colors"
+            <Tooltip
+              content={isAr ? "بوابة منصة خدمات نسك الرسمية" : "Official Saudi Nusuk Platform Portal"}
+              position="top"
+              dotColor="emerald"
             >
-              <span>services.nusuk.sa</span>
-              <ExternalLink className="w-3 h-3 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform duration-200" />
-            </a>
+              <a
+                href="https://services.nusuk.sa"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group flex items-center gap-1 text-xs text-zinc-600 hover:text-emerald-600 dark:text-zinc-400 dark:hover:text-emerald-400 transition-colors"
+                aria-label="services.nusuk.sa"
+              >
+                <span>services.nusuk.sa</span>
+                <ExternalLink className="w-3 h-3 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform duration-200" />
+              </a>
+            </Tooltip>
           </div>
         </div>
       </div>

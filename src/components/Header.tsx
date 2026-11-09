@@ -7,6 +7,7 @@ import { Language } from "@/lib/types";
 import { translations } from "@/lib/translations";
 import { playHapticSound } from "@/lib/audio";
 import { ThemeToggle } from "./ThemeToggle";
+import { Tooltip } from "./Tooltip";
 
 interface HeaderProps {
   lang: Language;
@@ -135,31 +136,37 @@ export const Header: React.FC<HeaderProps> = ({
               whileTap={{ scale: 0.96 }}
               transition={{ duration: 0.16, ease: "easeOut" }}
               aria-label={t.shareCodeBtn}
-              title={t.shareCodeBtn}
               className="group flex items-center justify-center gap-1.5 p-2 sm:px-4 sm:py-2 rounded-full bg-emerald-600 hover:bg-emerald-500 text-white font-medium text-xs sm:text-sm transition-colors duration-150 shadow-sm shadow-emerald-600/20 hover:shadow-emerald-600/35"
             >
               <Plus className="w-4 h-4 stroke-[2.5] group-hover:rotate-90 transition-transform duration-300" />
               <span className={`hidden sm:inline ${lang === 'ar' ? 'font-arabic text-sm' : ''}`}>{t.shareCodeBtn}</span>
             </motion.button>
 
-            {/* Apple-style single circle (i) button */}
-            <motion.button
-              onClick={(e) => {
-                e.stopPropagation();
-                handleOpenInfo();
-              }}
-              whileHover={{ scale: 1.15 }}
-              whileTap={{ scale: 0.9 }}
-              transition={{ duration: 0.16, ease: "easeOut" }}
-              aria-label={t.hook.infoButtonAria}
-              title={t.hook.infoButtonAria}
-              className="absolute -top-0.5 right-0 rtl:left-0 rtl:right-auto sm:-top-1.5 sm:-right-1.5 sm:rtl:-left-1.5 sm:rtl:right-auto w-[18px] h-[18px] sm:w-5 sm:h-5 rounded-full bg-emerald-950 hover:bg-emerald-900 text-emerald-200 hover:text-white border border-emerald-400/50 shadow-md flex items-center justify-center transition-colors z-10"
+            {/* Apple-style single circle (i) button with theme-matched tooltip */}
+            <Tooltip
+              content={t.hook.title}
+              position="bottom"
+              align="end"
+              dotColor="emerald"
+              containerClassName="absolute -top-0.5 right-0 rtl:left-0 rtl:right-auto sm:-top-1.5 sm:-right-1.5 sm:rtl:-left-1.5 sm:rtl:right-auto z-10"
             >
-              <svg className="w-2.5 h-2.5 sm:w-3 sm:h-3" viewBox="0 0 12 12" fill="currentColor">
-                <circle cx="6" cy="2.5" r="1.1" />
-                <path d="M5 5h1.6v4.2H7.6v.8H4.4v-.8h1.2V5.8H5V5z" />
-              </svg>
-            </motion.button>
+              <motion.button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleOpenInfo();
+                }}
+                whileHover={{ scale: 1.15 }}
+                whileTap={{ scale: 0.9 }}
+                transition={{ duration: 0.16, ease: "easeOut" }}
+                aria-label={t.hook.infoButtonAria}
+                className="w-[18px] h-[18px] sm:w-5 sm:h-5 rounded-full bg-emerald-950 hover:bg-emerald-900 text-emerald-200 hover:text-white border border-emerald-400/50 shadow-md flex items-center justify-center transition-colors"
+              >
+                <svg className="w-2.5 h-2.5 sm:w-3 sm:h-3" viewBox="0 0 12 12" fill="currentColor">
+                  <circle cx="6" cy="2.5" r="1.1" />
+                  <path d="M5 5h1.6v4.2H7.6v.8H4.4v-.8h1.2V5.8H5V5z" />
+                </svg>
+              </motion.button>
+            </Tooltip>
           </div>
         </motion.div>
       </div>

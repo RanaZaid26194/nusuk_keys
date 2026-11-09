@@ -9,6 +9,7 @@ import { calculateSuccessRate, formatTimeAgo, getNusukDeepLink } from "@/lib/uti
 import { playHapticSound } from "@/lib/audio";
 import { copyToClipboard } from "@/lib/clipboard";
 import { useCanHover } from "@/lib/useCanHover";
+import { Tooltip } from "./Tooltip";
 
 interface KeyCardProps
 {
@@ -293,7 +294,7 @@ const KeyCardComponent: React.FC<KeyCardProps> = ({
             ? "bg-amber-500/10 dark:bg-amber-500/15 border-amber-500/60 ring-1 ring-amber-500/30"
             : "bg-zinc-50 dark:bg-zinc-950 border-zinc-300/80 dark:border-zinc-800/80 hover:border-emerald-500/40 dark:hover:border-emerald-500/40 hover:bg-emerald-500/[0.02]"
         }`}
-        title={copyFailed ? (t.keyCard.copyFailed || (isAr ? "اضغط مطولاً للنسخ" : "Press & hold to copy")) : t.keyCard.copyKey}
+        aria-label={copyFailed ? (t.keyCard.copyFailed || (isAr ? "اضغط مطولاً للنسخ" : "Press & hold to copy")) : t.keyCard.copyKey}
       >
         {/* Shimmer sweep flourish across key box on copy */}
         {copied && (
@@ -318,7 +319,6 @@ const KeyCardComponent: React.FC<KeyCardProps> = ({
           onClick={handleCopy}
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.94 }}
-          title={copyFailed ? (t.keyCard.copyFailed || (isAr ? "اضغط مطولاً للنسخ" : "Press & hold to copy")) : t.keyCard.copyKey}
           aria-label={t.keyCard.copyKey}
           className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold transition-colors duration-150 shadow-xs ${
             copied
@@ -397,123 +397,146 @@ const KeyCardComponent: React.FC<KeyCardProps> = ({
       <div className="relative z-10 flex items-center justify-between gap-2 pt-3 border-t border-zinc-200 dark:border-zinc-800/80">
         {/* Voting Buttons with Flip Counter Roll & Personality Thumbs */}
         <div className="flex items-center gap-1.5">
-          <motion.button
-            onClick={() => handleVoteClick('UP')}
-            whileHover={{ scale: 1.08 }}
-            whileTap={{ scale: 0.90 }}
-            disabled={item.userVoted === 'UP'}
-            aria-label={isAr ? `تصويت إيجابي للمفتاح ${item.code}` : `Upvote key ${item.code}`}
-            className={`flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium transition-colors ${
-              item.userVoted === 'UP'
-                ? "bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border border-emerald-500/40 shadow-xs"
-                : "bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800/70 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-700/60"
-            }`}
+          <Tooltip
+            content={isAr ? "يعمل بنجاح" : "Works for me"}
+            position="top"
+            dotColor="emerald"
           >
-            <motion.div
-              animate={item.userVoted === 'UP' ? { rotate: [0, -15, 6, 0], scale: [1, 1.25, 1] } : {}}
-              transition={{ duration: 0.35, ease: "backOut" }}
+            <motion.button
+              onClick={() => handleVoteClick('UP')}
+              whileHover={{ scale: 1.08 }}
+              whileTap={{ scale: 0.90 }}
+              disabled={item.userVoted === 'UP'}
+              aria-label={isAr ? `تصويت إيجابي للمفتاح ${item.code}` : `Upvote key ${item.code}`}
+              className={`flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium transition-colors ${
+                item.userVoted === 'UP'
+                  ? "bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border border-emerald-500/40 shadow-xs"
+                  : "bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800/70 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-700/60"
+              }`}
             >
-              <ThumbsUp className={`w-3.5 h-3.5 ${item.userVoted === 'UP' ? 'fill-emerald-600 text-emerald-600 dark:fill-emerald-400 dark:text-emerald-400' : ''}`} />
-            </motion.div>
-            <span className="font-mono inline-block overflow-hidden relative h-[18px] min-w-[12px] text-center leading-[18px]" dir="ltr">
-              <AnimatePresence mode="popLayout" initial={false}>
-                <motion.span
-                  key={item.upvotes}
-                  initial={{ y: 12, opacity: 0 }}
-                  animate={{ y: 0, opacity: 1 }}
-                  exit={{ y: -12, opacity: 0 }}
-                  transition={{ duration: 0.18, ease: "easeOut" }}
-                  className="inline-block font-mono leading-[18px]"
-                  dir="ltr"
-                >
-                  {item.upvotes}
-                </motion.span>
-              </AnimatePresence>
-            </span>
-          </motion.button>
+              <motion.div
+                animate={item.userVoted === 'UP' ? { rotate: [0, -15, 6, 0], scale: [1, 1.25, 1] } : {}}
+                transition={{ duration: 0.35, ease: "backOut" }}
+              >
+                <ThumbsUp className={`w-3.5 h-3.5 ${item.userVoted === 'UP' ? 'fill-emerald-600 text-emerald-600 dark:fill-emerald-400 dark:text-emerald-400' : ''}`} />
+              </motion.div>
+              <span className="font-mono inline-block overflow-hidden relative h-[18px] min-w-[12px] text-center leading-[18px]" dir="ltr">
+                <AnimatePresence mode="popLayout" initial={false}>
+                  <motion.span
+                    key={item.upvotes}
+                    initial={{ y: 12, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    exit={{ y: -12, opacity: 0 }}
+                    transition={{ duration: 0.18, ease: "easeOut" }}
+                    className="inline-block font-mono leading-[18px]"
+                    dir="ltr"
+                  >
+                    {item.upvotes}
+                  </motion.span>
+                </AnimatePresence>
+              </span>
+            </motion.button>
+          </Tooltip>
 
-          <motion.button
-            onClick={() => handleVoteClick('DOWN')}
-            whileHover={{ scale: 1.08 }}
-            whileTap={{ scale: 0.90 }}
-            disabled={item.userVoted === 'DOWN'}
-            aria-label={isAr ? `تصويت سلبي للمفتاح ${item.code}` : `Downvote key ${item.code}`}
-            className={`flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium transition-colors ${
-              item.userVoted === 'DOWN'
-                ? "bg-rose-500/15 text-rose-700 dark:text-rose-300 border border-rose-500/40 shadow-xs"
-                : "bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800/70 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-400 border border-zinc-200 dark:border-zinc-700/60"
-            }`}
+          <Tooltip
+            content={isAr ? "منتهي أو معطل" : "Expired or invalid"}
+            position="top"
+            dotColor="rose"
           >
-            <motion.div
-              animate={item.userVoted === 'DOWN' ? { rotate: [0, 15, -4, 0], y: [0, 3, 0], scale: [1, 1.2, 1] } : {}}
-              transition={{ duration: 0.35, ease: "easeOut" }}
+            <motion.button
+              onClick={() => handleVoteClick('DOWN')}
+              whileHover={{ scale: 1.08 }}
+              whileTap={{ scale: 0.90 }}
+              disabled={item.userVoted === 'DOWN'}
+              aria-label={isAr ? `تصويت سلبي للمفتاح ${item.code}` : `Downvote key ${item.code}`}
+              className={`flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium transition-colors ${
+                item.userVoted === 'DOWN'
+                  ? "bg-rose-500/15 text-rose-700 dark:text-rose-300 border border-rose-500/40 shadow-xs"
+                  : "bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800/70 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-400 border border-zinc-200 dark:border-zinc-700/60"
+              }`}
             >
-              <ThumbsDown className={`w-3.5 h-3.5 ${item.userVoted === 'DOWN' ? 'fill-rose-600 text-rose-600 dark:fill-rose-400 dark:text-rose-400' : ''}`} />
-            </motion.div>
-            <span className="font-mono inline-block overflow-hidden relative h-[18px] min-w-[12px] text-center leading-[18px]" dir="ltr">
-              <AnimatePresence mode="popLayout" initial={false}>
-                <motion.span
-                  key={item.downvotes}
-                  initial={{ y: 12, opacity: 0 }}
-                  animate={{ y: 0, opacity: 1 }}
-                  exit={{ y: -12, opacity: 0 }}
-                  transition={{ duration: 0.18, ease: "easeOut" }}
-                  className="inline-block font-mono leading-[18px]"
-                  dir="ltr"
-                >
-                  {item.downvotes}
-                </motion.span>
-              </AnimatePresence>
-            </span>
-          </motion.button>
+              <motion.div
+                animate={item.userVoted === 'DOWN' ? { rotate: [0, 15, -4, 0], y: [0, 3, 0], scale: [1, 1.2, 1] } : {}}
+                transition={{ duration: 0.35, ease: "easeOut" }}
+              >
+                <ThumbsDown className={`w-3.5 h-3.5 ${item.userVoted === 'DOWN' ? 'fill-rose-600 text-rose-600 dark:fill-rose-400 dark:text-rose-400' : ''}`} />
+              </motion.div>
+              <span className="font-mono inline-block overflow-hidden relative h-[18px] min-w-[12px] text-center leading-[18px]" dir="ltr">
+                <AnimatePresence mode="popLayout" initial={false}>
+                  <motion.span
+                    key={item.downvotes}
+                    initial={{ y: 12, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    exit={{ y: -12, opacity: 0 }}
+                    transition={{ duration: 0.18, ease: "easeOut" }}
+                    className="inline-block font-mono leading-[18px]"
+                    dir="ltr"
+                  >
+                    {item.downvotes}
+                  </motion.span>
+                </AnimatePresence>
+              </span>
+            </motion.button>
+          </Tooltip>
         </div>
 
         {/* Right side: Mark as unused & Deep link */}
         <div className="flex items-center gap-2 sm:gap-3">
           {isUsed && onToggleUsed && (
-            <motion.button
-              type="button"
-              onClick={(e) => {
-                e.stopPropagation();
-                playHapticSound('click');
-                onToggleUsed(item.code);
-              }}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              title={t.keyCard.markUnused}
-              aria-label={t.keyCard.markUnused}
-              className="group/unused flex items-center gap-1.5 text-xs text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-200 transition-colors"
+            <Tooltip
+              content={t.keyCard.markUnused}
+              position="top"
+              align="end"
             >
-              <RotateCcw className="w-4 h-4 sm:w-[18px] sm:h-[18px] flex-shrink-0 stroke-[2] text-zinc-500 group-hover/unused:text-zinc-900 dark:text-zinc-400 dark:group-hover/unused:text-zinc-100 group-hover/unused:-rotate-45 transition-all duration-200" />
-              <span className={`text-[11px] sm:text-xs leading-tight ${isAr ? "font-arabic" : ""}`}>{t.keyCard.markUnused}</span>
-            </motion.button>
+              <motion.button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  playHapticSound('click');
+                  onToggleUsed(item.code);
+                }}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                aria-label={t.keyCard.markUnused}
+                className="group/unused flex items-center gap-1.5 text-xs text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-200 transition-colors"
+              >
+                <RotateCcw className="w-4 h-4 sm:w-[18px] sm:h-[18px] flex-shrink-0 stroke-[2] text-zinc-500 group-hover/unused:text-zinc-900 dark:text-zinc-400 dark:group-hover/unused:text-zinc-100 group-hover/unused:-rotate-45 transition-all duration-200" />
+                <span className={`text-[11px] sm:text-xs leading-tight ${isAr ? "font-arabic" : ""}`}>{t.keyCard.markUnused}</span>
+              </motion.button>
+            </Tooltip>
           )}
 
           {/* Deep Link to Nusuk App with loading ring indicator */}
-          <motion.a
-            href={getNusukDeepLink(item.code)}
-            target="_blank"
-            rel="noopener noreferrer"
-            onClick={() => {
-              playHapticSound('click');
-              setOpeningNusuk(true);
-              setTimeout(() => {
-                setOpeningNusuk(false);
-              }, 2000);
-              onOpenNusuk?.(item.code);
-            }}
-            whileHover={{ x: isAr ? -3 : 3 }}
-            className="group/link flex items-center gap-1.5 text-xs text-zinc-600 hover:text-emerald-600 dark:text-zinc-400 dark:hover:text-emerald-400 transition-colors"
-            title={t.keyCard.openNusuk}
-            aria-label={t.keyCard.openNusuk}
+          <Tooltip
+            content={t.keyCard.openNusuk}
+            position="top"
+            align="end"
+            dotColor="emerald"
           >
-            <span className={`text-[11px] sm:text-xs leading-tight ${isAr ? "font-arabic" : ""}`}>{t.keyCard.openNusuk}</span>
-            {openingNusuk ? (
-              <span className="w-4 h-4 sm:w-[18px] sm:h-[18px] border-2 border-emerald-500 border-t-transparent rounded-full animate-spin inline-block flex-shrink-0" />
-            ) : (
-              <ExternalLink className="w-4 h-4 sm:w-[18px] sm:h-[18px] flex-shrink-0 stroke-[2] text-zinc-500 group-hover/link:text-emerald-600 dark:text-zinc-400 dark:group-hover/link:text-emerald-400 group-hover/link:translate-x-0.5 group-hover/link:-translate-y-0.5 transition-all duration-200" />
-            )}
-          </motion.a>
+            <motion.a
+              href={getNusukDeepLink(item.code)}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={() => {
+                playHapticSound('click');
+                setOpeningNusuk(true);
+                setTimeout(() => {
+                  setOpeningNusuk(false);
+                }, 2000);
+                onOpenNusuk?.(item.code);
+              }}
+              whileHover={{ x: isAr ? -3 : 3 }}
+              className="group/link flex items-center gap-1.5 text-xs text-zinc-600 hover:text-emerald-600 dark:text-zinc-400 dark:hover:text-emerald-400 transition-colors"
+              aria-label={t.keyCard.openNusuk}
+            >
+              <span className={`text-[11px] sm:text-xs leading-tight ${isAr ? "font-arabic" : ""}`}>{t.keyCard.openNusuk}</span>
+              {openingNusuk ? (
+                <span className="w-4 h-4 sm:w-[18px] sm:h-[18px] border-2 border-emerald-500 border-t-transparent rounded-full animate-spin inline-block flex-shrink-0" />
+              ) : (
+                <ExternalLink className="w-4 h-4 sm:w-[18px] sm:h-[18px] flex-shrink-0 stroke-[2] text-zinc-500 group-hover/link:text-emerald-600 dark:text-zinc-400 dark:group-hover/link:text-emerald-400 group-hover/link:translate-x-0.5 group-hover/link:-translate-y-0.5 transition-all duration-200" />
+              )}
+            </motion.a>
+          </Tooltip>
         </div>
       </div>
     </motion.div>

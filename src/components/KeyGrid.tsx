@@ -7,6 +7,7 @@ import { ChallengeKey, FilterTab, Language, SortOption } from "@/lib/types";
 import { translations } from "@/lib/translations";
 import { KeyCard } from "./KeyCard";
 import { playHapticSound } from "@/lib/audio";
+import { Tooltip } from "./Tooltip";
 
 interface KeyGridProps
 {
@@ -275,21 +276,27 @@ export const KeyGrid: React.FC<KeyGridProps> = ({
               })}
             </div>
 
-            {/* Sort Dropdown Control */}
+            {/* Sort Dropdown Control with theme tooltip */}
             {onSortChange && (
               <div className="relative" ref={sortRef}>
-                <button
-                  type="button"
-                  onClick={() => setIsSortOpen(!isSortOpen)}
-                  aria-expanded={isSortOpen}
-                  aria-label={`${t.sort.label}: ${t.sort[sortBy]}`}
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700 text-xs sm:text-sm font-medium text-zinc-700 dark:text-zinc-300 shadow-sm transition-all"
+                <Tooltip
+                  content={isSortOpen ? null : (isAr ? "تغيير ترتيب المفاتيح" : "Change sorting order")}
+                  position="bottom"
+                  align={isAr ? "start" : "end"}
                 >
-                  <ArrowUpDown className="w-3.5 h-3.5 text-zinc-400 dark:text-zinc-500" />
-                  <span className="hidden sm:inline text-zinc-500 dark:text-zinc-400">{t.sort.label}:</span>
-                  <span className="font-semibold text-zinc-900 dark:text-zinc-100">{t.sort[sortBy]}</span>
-                  <ChevronDown className={`w-3.5 h-3.5 text-zinc-400 transition-transform duration-200 ${isSortOpen ? "rotate-180" : ""}`} />
-                </button>
+                  <button
+                    type="button"
+                    onClick={() => setIsSortOpen(!isSortOpen)}
+                    aria-expanded={isSortOpen}
+                    aria-label={`${t.sort.label}: ${t.sort[sortBy]}`}
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700 text-xs sm:text-sm font-medium text-zinc-700 dark:text-zinc-300 shadow-sm transition-all"
+                  >
+                    <ArrowUpDown className="w-3.5 h-3.5 text-zinc-400 dark:text-zinc-500" />
+                    <span className="hidden sm:inline text-zinc-500 dark:text-zinc-400">{t.sort.label}:</span>
+                    <span className="font-semibold text-zinc-900 dark:text-zinc-100">{t.sort[sortBy]}</span>
+                    <ChevronDown className={`w-3.5 h-3.5 text-zinc-400 transition-transform duration-200 ${isSortOpen ? "rotate-180" : ""}`} />
+                  </button>
+                </Tooltip>
 
                 <AnimatePresence>
                   {isSortOpen && (
@@ -384,20 +391,26 @@ export const KeyGrid: React.FC<KeyGridProps> = ({
                       </button>
                     </div>
                   ) : (
-                    <button
-                      type="button"
-                      onClick={() =>
-                      {
-                        playHapticSound('click');
-                        setConfirmingClear(true);
-                      }}
-                      className={`flex items-center gap-1 text-[11px] text-zinc-500 hover:text-rose-600 dark:text-zinc-400 dark:hover:text-rose-400 transition-colors ${
-                        isAr ? "font-arabic" : ""
-                      }`}
+                    <Tooltip
+                      content={isAr ? "مسح جميع المفاتيح التي تم نسخها" : "Clear all copied keys history"}
+                      position="top"
+                      dotColor="rose"
                     >
-                      <Trash2 className="w-3 h-3" />
-                      <span>{t.clearHistory}</span>
-                    </button>
+                      <button
+                        type="button"
+                        onClick={() =>
+                        {
+                          playHapticSound('click');
+                          setConfirmingClear(true);
+                        }}
+                        className={`flex items-center gap-1 text-[11px] text-zinc-500 hover:text-rose-600 dark:text-zinc-400 dark:hover:text-rose-400 transition-colors ${
+                          isAr ? "font-arabic" : ""
+                        }`}
+                      >
+                        <Trash2 className="w-3 h-3" />
+                        <span>{t.clearHistory}</span>
+                      </button>
+                    </Tooltip>
                   )}
                 </div>
               )}
