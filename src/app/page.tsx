@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useMemo, useCallback } from "react";
+import { MotionConfig } from "framer-motion";
 import { ChallengeKey, FilterTab, Language, Stats } from "@/lib/types";
 import { Header } from "@/components/Header";
 import { Hero } from "@/components/Hero";
@@ -770,64 +771,66 @@ export default function Home()
   }, [keys]);
 
   return (
-    <div className="flex flex-col min-h-screen bg-zinc-50 dark:bg-[#09090b] text-zinc-900 dark:text-zinc-100 selection:bg-emerald-500/20 selection:text-emerald-900 dark:selection:text-emerald-200 transition-colors">
-      {/* Top Navbar */}
-      <Header
-        lang={lang}
-        onLanguageChange={handleLanguageChange}
-        onOpenSubmit={() => setIsSubmitModalOpen(true)}
-        onOpenInfo={() => setIsInfoModalOpen(true)}
-      />
-
-      {/* Main Content Area */}
-      <main className="flex-1">
-        <Hero
+    <MotionConfig reducedMotion="user">
+      <div className="flex flex-col min-h-screen bg-zinc-50 dark:bg-[#09090b] text-zinc-900 dark:text-zinc-100 selection:bg-emerald-500/20 selection:text-emerald-900 dark:selection:text-emerald-200 transition-colors">
+        {/* Top Navbar */}
+        <Header
           lang={lang}
-          stats={stats}
-          isConnectedToSupabase={isSupabaseConfigured}
+          onLanguageChange={handleLanguageChange}
           onOpenSubmit={() => setIsSubmitModalOpen(true)}
           onOpenInfo={() => setIsInfoModalOpen(true)}
         />
 
-        <KeyGrid
-          items={filteredKeys}
-          isLoading={isLoading}
+        {/* Main Content Area */}
+        <main className="flex-1">
+          <Hero
+            lang={lang}
+            stats={stats}
+            isConnectedToSupabase={isSupabaseConfigured}
+            onOpenSubmit={() => setIsSubmitModalOpen(true)}
+            onOpenInfo={() => setIsInfoModalOpen(true)}
+          />
+
+          <KeyGrid
+            items={filteredKeys}
+            isLoading={isLoading}
+            lang={lang}
+            searchQuery={searchQuery}
+            activeTab={activeTab}
+            usedMap={usedMap}
+            usedCount={usedCount}
+            shouldPulseUsedBadge={shouldPulseUsedBadge}
+            hasUnvotedUsedKeys={hasUnvotedUsedKeys}
+            onSearchChange={setSearchQuery}
+            onTabChange={handleTabChange}
+            onVote={handleVote}
+            onCopy={handleCopy}
+            onOpenSubmit={() => setIsSubmitModalOpen(true)}
+            onOpenNusuk={handleOpenNusuk}
+            onToggleUsed={handleToggleUsed}
+            onClearUsed={handleClearUsed}
+          />
+        </main>
+
+        {/* Share Modal Dialog */}
+        <SubmitModal
+          isOpen={isSubmitModalOpen}
           lang={lang}
-          searchQuery={searchQuery}
-          activeTab={activeTab}
-          usedMap={usedMap}
-          usedCount={usedCount}
-          shouldPulseUsedBadge={shouldPulseUsedBadge}
-          hasUnvotedUsedKeys={hasUnvotedUsedKeys}
-          onSearchChange={setSearchQuery}
-          onTabChange={handleTabChange}
-          onVote={handleVote}
-          onCopy={handleCopy}
-          onOpenSubmit={() => setIsSubmitModalOpen(true)}
-          onOpenNusuk={handleOpenNusuk}
-          onToggleUsed={handleToggleUsed}
-          onClearUsed={handleClearUsed}
+          onClose={() => setIsSubmitModalOpen(false)}
+          onSubmit={handleSubmitKey}
         />
-      </main>
 
-      {/* Share Modal Dialog */}
-      <SubmitModal
-        isOpen={isSubmitModalOpen}
-        lang={lang}
-        onClose={() => setIsSubmitModalOpen(false)}
-        onSubmit={handleSubmitKey}
-      />
+        {/* Noble Motivation (i) Modal */}
+        <InfoModal
+          isOpen={isInfoModalOpen}
+          lang={lang}
+          onClose={() => setIsInfoModalOpen(false)}
+          onOpenSubmit={() => setIsSubmitModalOpen(true)}
+        />
 
-      {/* Noble Motivation (i) Modal */}
-      <InfoModal
-        isOpen={isInfoModalOpen}
-        lang={lang}
-        onClose={() => setIsInfoModalOpen(false)}
-        onOpenSubmit={() => setIsSubmitModalOpen(true)}
-      />
-
-      {/* Footer */}
-      <Footer lang={lang} />
-    </div>
+        {/* Footer */}
+        <Footer lang={lang} />
+      </div>
+    </MotionConfig>
   );
 }

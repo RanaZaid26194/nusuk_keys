@@ -7,6 +7,7 @@ import { Language } from "@/lib/types";
 import { translations } from "@/lib/translations";
 import { playHapticSound } from "@/lib/audio";
 import { DailyAyahData, getDayKey, resolveDailyAyah } from "@/lib/dailyAyah";
+import { useCanHover } from "@/lib/useCanHover";
 
 interface DailyAyahProps
 {
@@ -56,6 +57,7 @@ export const DailyAyah: React.FC<DailyAyahProps> = ({ lang, onOpenInfo, mockFrid
   const [ayah, setAyah] = useState<DailyAyahData | null>(null);
   const [isFriday, setIsFriday] = useState<boolean>(false);
   const shouldReduceMotion = useReducedMotion();
+  const canHover = useCanHover();
   const t = translations[lang];
   const isAr = lang === "ar";
 
@@ -176,11 +178,11 @@ export const DailyAyah: React.FC<DailyAyahProps> = ({ lang, onOpenInfo, mockFrid
       animate="visible"
       onClick={handleClick}
       onKeyDown={handleKeyDown}
-      whileHover={{
+      whileHover={canHover ? {
         y: -3,
         scale: 1.006,
         transition: { duration: 0.16, ease: "easeOut" }
-      }}
+      } : undefined}
       whileTap={{ scale: 0.98 }}
       transition={{ duration: 0.16, ease: "easeOut" }}
       className={`mt-6 relative overflow-hidden flex flex-col items-center justify-center px-4 sm:px-6 py-3.5 sm:py-4 rounded-2xl bg-white/90 dark:bg-zinc-900/80 hover:bg-white dark:hover:bg-zinc-900 border ${

@@ -1,13 +1,14 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, HeartHandshake, BookOpen, Quote } from "lucide-react";
 import { Language } from "@/lib/types";
 import { translations } from "@/lib/translations";
 import { playHapticSound } from "@/lib/audio";
 
-interface InfoModalProps {
+interface InfoModalProps
+{
   isOpen: boolean;
   lang: Language;
   onClose: () => void;
@@ -19,21 +20,89 @@ export const InfoModal: React.FC<InfoModalProps> = ({
   lang,
   onClose,
   onOpenSubmit,
-}) => {
+}) =>
+{
   const t = translations[lang];
   const isAr = lang === "ar";
+  const previousFocusRef = useRef<HTMLElement | null>(null);
+  const modalRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape" && isOpen) {
+  useEffect(() =>
+  {
+    if (isOpen)
+      previousFocusRef.current = document.activeElement as HTMLElement | null;
+    else if (previousFocusRef.current)
+    {
+      previousFocusRef.current.focus();
+      previousFocusRef.current = null;
+    }
+  }, [isOpen]);
+
+  // lock page scroll while modal is open
+  useEffect(() =>
+  {
+    if (!isOpen)
+      return;
+
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
+    return () =>
+    {
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [isOpen]);
+
+  // trap keyboard focus and handle escape
+  useEffect(() =>
+  {
+    if (!isOpen)
+      return;
+
+    const handleKeyDown = (e: KeyboardEvent) =>
+    {
+      if (e.key === "Escape")
+      {
         onClose();
+        return;
+      }
+
+      if (e.key === "Tab" && modalRef.current)
+      {
+        const focusable = modalRef.current.querySelectorAll<HTMLElement>(
+          'button:not([disabled]), [href], [tabindex]:not([tabindex="-1"])'
+        );
+        if (focusable.length === 0)
+          return;
+
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+
+        if (e.shiftKey)
+        {
+          if (document.activeElement === first)
+          {
+            e.preventDefault();
+            last.focus();
+          }
+        }
+        else
+        {
+          if (document.activeElement === last)
+          {
+            e.preventDefault();
+            first.focus();
+          }
+        }
       }
     };
+
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [isOpen, onClose]);
 
-  const handleActionSubmit = () => {
+  const handleActionSubmit = () =>
+  {
     playHapticSound('click');
     onClose();
     onOpenSubmit();
@@ -54,6 +123,10 @@ export const InfoModal: React.FC<InfoModalProps> = ({
 
           {/* Modal Container */}
           <motion.div
+            ref={modalRef}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="info-modal-title"
             initial={{ opacity: 0, scale: 0.94, y: 12 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.94, y: 12 }}
@@ -77,7 +150,7 @@ export const InfoModal: React.FC<InfoModalProps> = ({
                 <HeartHandshake className="w-4 h-4 sm:w-5 sm:h-5" />
               </div>
               <div>
-                <h3 className={`text-base sm:text-xl font-bold text-zinc-900 dark:text-white ${isAr ? "font-arabic text-lg sm:text-xl" : ""}`}>
+                <h3 id="info-modal-title" className={`text-base sm:text-xl font-bold text-zinc-900 dark:text-white ${isAr ? "font-arabic text-lg sm:text-xl" : ""}`}>
                   {t.hook.title}
                 </h3>
               </div>

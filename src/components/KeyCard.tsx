@@ -8,6 +8,7 @@ import { translations } from "@/lib/translations";
 import { calculateSuccessRate, formatTimeAgo, getNusukDeepLink } from "@/lib/utils";
 import { playHapticSound } from "@/lib/audio";
 import { copyToClipboard } from "@/lib/clipboard";
+import { useCanHover } from "@/lib/useCanHover";
 
 interface KeyCardProps
 {
@@ -36,6 +37,7 @@ export const KeyCard: React.FC<KeyCardProps> = ({
   const [copyFailed, setCopyFailed] = useState(false);
   const cardRef = useRef<HTMLDivElement>(null);
   const spotlightRef = useRef<HTMLDivElement>(null);
+  const canHover = useCanHover();
 
   const t = translations[lang];
   const isAr = lang === "ar";
@@ -124,9 +126,9 @@ export const KeyCard: React.FC<KeyCardProps> = ({
   return (
     <motion.div
       ref={cardRef}
-      onMouseMove={handleMouseMove}
-      onMouseLeave={handleMouseLeave}
-      whileHover={{ y: -4, scale: 1.008 }}
+      onMouseMove={canHover ? handleMouseMove : undefined}
+      onMouseLeave={canHover ? handleMouseLeave : undefined}
+      whileHover={canHover ? { y: -4, scale: 1.008 } : undefined}
       whileTap={{ scale: 0.99 }}
       transition={{ duration: 0.16, ease: "easeOut" }}
       className={`relative rounded-2xl bg-white dark:bg-zinc-900/70 p-4 sm:p-5 border transition-colors duration-150 overflow-hidden shadow-xs hover:shadow-md dark:shadow-none dark:hover:shadow-black/40 ${

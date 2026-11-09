@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, KeyRound, CheckCircle2, AlertCircle, Send, HeartHandshake } from "lucide-react";
 import { Language } from "@/lib/types";
@@ -33,24 +33,84 @@ export const SubmitModal: React.FC<SubmitModalProps> = ({
   const isAr = lang === "ar";
   const bodyCount = getBodyCharCount(code);
   const isComplete = bodyCount === KEY_BODY_LENGTH && isValidKey(code);
+  const previousFocusRef = useRef<HTMLElement | null>(null);
+  const modalRef = useRef<HTMLDivElement>(null);
 
   useEffect(() =>
   {
     if (isOpen)
     {
+      previousFocusRef.current = document.activeElement as HTMLElement | null;
       setCode(KEY_PREFIX);
       setErrorMessage(null);
       setIsSuccess(false);
     }
+    else if (previousFocusRef.current)
+    {
+      previousFocusRef.current.focus();
+      previousFocusRef.current = null;
+    }
   }, [isOpen]);
 
+  // lock page scroll while modal is open
   useEffect(() =>
   {
+    if (!isOpen)
+      return;
+
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
+    return () =>
+    {
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [isOpen]);
+
+  // trap keyboard focus and handle escape
+  useEffect(() =>
+  {
+    if (!isOpen)
+      return;
+
     const handleKeyDown = (e: KeyboardEvent) =>
     {
-      if (e.key === "Escape" && isOpen)
+      if (e.key === "Escape")
+      {
         onClose();
+        return;
+      }
+
+      if (e.key === "Tab" && modalRef.current)
+      {
+        const focusable = modalRef.current.querySelectorAll<HTMLElement>(
+          'button:not([disabled]), input:not([disabled]), [tabindex]:not([tabindex="-1"])'
+        );
+        if (focusable.length === 0)
+          return;
+
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+
+        if (e.shiftKey)
+        {
+          if (document.activeElement === first)
+          {
+            e.preventDefault();
+            last.focus();
+          }
+        }
+        else
+        {
+          if (document.activeElement === last)
+          {
+            e.preventDefault();
+            first.focus();
+          }
+        }
+      }
     };
+
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [isOpen, onClose]);
@@ -145,6 +205,10 @@ export const SubmitModal: React.FC<SubmitModalProps> = ({
 
           {/* Dialog Container */}
           <motion.div
+            ref={modalRef}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="submit-modal-title"
             initial={{ opacity: 0, scale: 0.94, y: 12 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.94, y: 12 }}
@@ -167,7 +231,7 @@ export const SubmitModal: React.FC<SubmitModalProps> = ({
                 <div className="w-12 h-12 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30 flex items-center justify-center mx-auto mb-3">
                   <CheckCircle2 className="w-6 h-6" />
                 </div>
-                <h3 className={`text-lg sm:text-xl font-bold text-zinc-900 dark:text-white mb-1.5 ${isAr ? "font-arabic" : ""}`}>
+                <h3 id="submit-modal-title" className={`text-lg sm:text-xl font-bold text-zinc-900 dark:text-white mb-1.5 ${isAr ? "font-arabic" : ""}`}>
                   {t.modal.successTitle}
                 </h3>
                 <p className={`text-xs sm:text-sm text-zinc-600 dark:text-zinc-300 max-w-xs mx-auto ${isAr ? "font-arabic" : ""}`}>
@@ -181,7 +245,7 @@ export const SubmitModal: React.FC<SubmitModalProps> = ({
                     <KeyRound className="w-4 h-4" />
                   </div>
                   <div>
-                    <h3 className={`text-base sm:text-lg font-bold text-zinc-900 dark:text-white ${isAr ? "font-arabic" : ""}`}>
+                    <h3 id="submit-modal-title" className={`text-base sm:text-lg font-bold text-zinc-900 dark:text-white ${isAr ? "font-arabic" : ""}`}>
                       {t.modal.title}
                     </h3>
                     <p className={`text-xs text-zinc-500 dark:text-zinc-400 ${isAr ? "font-arabic" : ""}`}>
