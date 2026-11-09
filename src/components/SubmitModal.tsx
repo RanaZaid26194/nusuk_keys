@@ -63,6 +63,18 @@ export const SubmitModal: React.FC<SubmitModalProps> = ({
     setErrorMessage(null);
   };
 
+  // smart paste handler: parses URLs, WhatsApp forwards, or keys directly
+  const handlePaste = (e: React.ClipboardEvent<HTMLInputElement>) =>
+  {
+    e.preventDefault();
+    const pasted = e.clipboardData.getData("text");
+    if (!pasted)
+      return;
+    const sanitized = sanitizeKeyInput(pasted);
+    setCode(sanitized);
+    setErrorMessage(null);
+  };
+
   const handleSubmit = async (e: React.FormEvent) =>
   {
     e.preventDefault();
@@ -202,8 +214,8 @@ export const SubmitModal: React.FC<SubmitModalProps> = ({
                     dir="ltr"
                     value={code}
                     onChange={handleInputChange}
+                    onPaste={handlePaste}
                     placeholder={t.modal.placeholder}
-                    maxLength={KEY_TOTAL_LENGTH}
                     autoFocus
                     className={`w-full px-3.5 py-3 rounded-xl bg-zinc-50 dark:bg-zinc-950 font-mono text-base font-bold tracking-widest text-left focus:outline-none shadow-xs transition-colors ${
                       errorMessage

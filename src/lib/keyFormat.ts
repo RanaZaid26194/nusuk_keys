@@ -37,20 +37,28 @@ export function sanitizeKeyInput(raw?: string | null): string
   // 2. convert Arabic-Indic and Persian numerals to ASCII digits
   const withAsciiDigits = normalizeNumerals(clean);
 
-  // 3. if user pasted a link or message containing NG-XXXXXX, extract the code part
-  let bodyOnly = withAsciiDigits;
-  if (/^ng-?/i.test(withAsciiDigits))
-    bodyOnly = withAsciiDigits.replace(/^ng-?/i, "");
-  else
+  // 3. check if string contains an explicit 8-character NG- key anywhere (e.g. inside a URL or WhatsApp message)
+  const ng8Match = withAsciiDigits.match(/ng-([A-Za-z0-9]{8})\b/i);
+  if (ng8Match)
+    return KEY_PREFIX + ng8Match[1];
+
+  // 4. check for nusuk deep-link query parameter ?id=... or &id=...
+  const urlParamMatch = withAsciiDigits.match(/[?&]id=(?:ng-)?([A-Za-z0-9]{8})\b/i);
+  if (urlParamMatch)
+    return KEY_PREFIX + urlParamMatch[1];
+
+  // 5. if input is a URL or full sentence, extract any ng- followed by alphanumeric characters
+  if (withAsciiDigits.includes("http") || withAsciiDigits.includes("://") || /\s/.test(withAsciiDigits))
   {
-    const matchWithPrefix = withAsciiDigits.match(/ng-([A-Za-z0-9]{1,8})/i);
-    if (matchWithPrefix)
-      bodyOnly = matchWithPrefix[1];
-    else
-      bodyOnly = withAsciiDigits;
+    const anyNgMatch = withAsciiDigits.match(/ng-([A-Za-z0-9]{1,8})/i);
+    if (anyNgMatch)
+      return KEY_PREFIX + anyNgMatch[1];
   }
 
-  // 4. keep only letters and numbers, cap at exactly 8 chars, preserving case
+  // 6. standard typing: strip leading ng- prefix (supports double pasting like ng-ng-XXXX)
+  let bodyOnly = withAsciiDigits.replace(/^ng-?/i, "").replace(/^ng-?/i, "");
+
+  // 7. keep only letters and numbers, cap at exactly 8 chars, preserving case
   const sanitizedBody = bodyOnly.replace(/[^A-Za-z0-9]/g, "").slice(0, KEY_BODY_LENGTH);
 
   return KEY_PREFIX + sanitizedBody;
