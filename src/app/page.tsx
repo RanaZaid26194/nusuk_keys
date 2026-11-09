@@ -82,82 +82,125 @@ export default function Home() {
     }
   }, []);
 
-  // Fetch initial keys with 2-stage progressive hydration
+  // Fetch initial keys with 4-stage progressive hydration
   const loadKeys = useCallback(async () => {
     const userVotes = getUserVotes();
 
     if (isSupabaseConfigured && supabase) {
       try {
-        const BATCH_SIZE = 1000;
+        const STAGE_1_SIZE = 500;
 
-        // 1. Fetch first batch with exact count from Postgres (~150-250ms)
-        const { data: firstBatch, count, error } = await supabase
+        // ⭐ STAGE 1: Ultra-fast initial chunk (<100ms, 0 - 499 keys)
+        const { data: stage1Data, count, error } = await supabase
           .from("challenge_keys")
           .select("*", { count: "exact" })
           .eq("is_active", true)
           .order("created_at", { ascending: false })
-          .range(0, BATCH_SIZE - 1);
+          .range(0, STAGE_1_SIZE - 1);
 
         if (error) {
           console.error("Supabase loadKeys error:", error);
-        } else if (firstBatch && firstBatch.length > 0) {
-          const totalCount = count || firstBatch.length;
+        } else if (stage1Data && stage1Data.length > 0) {
+          const totalCount = count || stage1Data.length;
 
-          // ⭐ STAGE 1: Instantly render the first 1,000 keys in ~200ms!
-          const firstBatchMapped: ChallengeKey[] = firstBatch.map((d: any) => ({
+          // Paint Stage 1 immediately in <100ms
+          const stage1Mapped: ChallengeKey[] = stage1Data.map((d: any) => ({
             ...d,
             userVoted: userVotes[d.id] || null,
           }));
 
           setKeys((prev) => {
-            // Keep full dataset if we already had all keys loaded previously
-            if (prev.length > firstBatchMapped.length) {
-              const existingIds = new Set(firstBatchMapped.map(k => k.id));
+            if (prev.length > stage1Mapped.length) {
+              const existingIds = new Set(stage1Mapped.map(k => k.id));
               const remainingOld = prev.filter(k => !existingIds.has(k.id));
-              return [...firstBatchMapped, ...remainingOld];
+              return [...stage1Mapped, ...remainingOld];
             }
-            return firstBatchMapped;
+            return stage1Mapped;
           });
           setIsLoading(false);
 
-          // Save Stage 1 to cache immediately
+          // Save Stage 1 to local cache immediately
           try {
-            localStorage.setItem(LOCAL_STORAGE_CACHE, JSON.stringify(firstBatchMapped));
+            localStorage.setItem(LOCAL_STORAGE_CACHE, JSON.stringify(stage1Mapped));
           } catch {}
 
-          // ⭐ STAGE 2: If there are more than 1,000 keys, fetch remaining batches in the background
-          if (totalCount > BATCH_SIZE) {
-            const batchPromises = [];
-            for (let from = BATCH_SIZE; from < totalCount; from += BATCH_SIZE) {
-              const to = Math.min(from + BATCH_SIZE - 1, totalCount - 1);
-              batchPromises.push(
-                supabase
-                  .from("challenge_keys")
-                  .select("*")
-                  .eq("is_active", true)
-                  .order("created_at", { ascending: false })
-                  .range(from, to)
-              );
-            }
+          // If database has more than 500 keys, progressively hydrate Stages 2, 3, and 4
+          if (totalCount > STAGE_1_SIZE) {
+            let accumulated: any[] = [...stage1Data];
 
-            const results = await Promise.all(batchPromises);
-            let combinedData: any[] = [...firstBatch];
-            for (const res of results) {
-              if (res.data && res.data.length > 0) {
-                combinedData = combinedData.concat(res.data);
+            // ⭐ STAGE 2 (Background Sync): Next 500 keys (500 - 999)
+            if (totalCount > 500) {
+              const { data: stage2Data } = await supabase
+                .from("challenge_keys")
+                .select("*")
+                .eq("is_active", true)
+                .order("created_at", { ascending: false })
+                .range(500, Math.min(999, totalCount - 1));
+
+              if (stage2Data && stage2Data.length > 0) {
+                accumulated = accumulated.concat(stage2Data);
+                const stage2Mapped = accumulated.map((d: any) => ({
+                  ...d,
+                  userVoted: userVotes[d.id] || null,
+                }));
+                setKeys((prev) => (prev.length > stage2Mapped.length ? prev : stage2Mapped));
               }
             }
 
-            const allMapped: ChallengeKey[] = combinedData.map((d: any) => ({
-              ...d,
-              userVoted: userVotes[d.id] || null,
-            }));
+            // ⭐ STAGE 3 (Background Sync): Next 500 keys (1,000 - 1,499)
+            if (totalCount > 1000) {
+              const { data: stage3Data } = await supabase
+                .from("challenge_keys")
+                .select("*")
+                .eq("is_active", true)
+                .order("created_at", { ascending: false })
+                .range(1000, Math.min(1499, totalCount - 1));
 
-            setKeys(allMapped);
-            try {
-              localStorage.setItem(LOCAL_STORAGE_CACHE, JSON.stringify(allMapped));
-            } catch {
-              // If quota exceeded for 6,000 keys, firstBatchMapped is already preserved
+              if (stage3Data && stage3Data.length > 0) {
+                accumulated = accumulated.concat(stage3Data);
+                const stage3Mapped = accumulated.map((d: any) => ({
+                  ...d,
+                  userVoted: userVotes[d.id] || null,
+                }));
+                setKeys((prev) => (prev.length > stage3Mapped.length ? prev : stage3Mapped));
+              }
+            }
+
+            // ⭐ STAGE 4 (Background Sync): All remaining keys (1,500 -> totalCount) in parallel
+            if (totalCount > 1500) {
+              const remainingPromises = [];
+              for (let from = 1500; from < totalCount; from += 1000) {
+                const to = Math.min(from + 999, totalCount - 1);
+                remainingPromises.push(
+                  supabase
+                    .from("challenge_keys")
+                    .select("*")
+                    .eq("is_active", true)
+                    .order("created_at", { ascending: false })
+                    .range(from, to)
+                );
+              }
+
+              const remainingResults = await Promise.all(remainingPromises);
+              for (const res of remainingResults) {
+                if (res.data && res.data.length > 0) {
+                  accumulated = accumulated.concat(res.data);
+                }
+              }
+
+              const allMapped = accumulated.map((d: any) => ({
+                ...d,
+                userVoted: userVotes[d.id] || null,
+              }));
+              setKeys(allMapped);
+
+              try {
+                localStorage.setItem(LOCAL_STORAGE_CACHE, JSON.stringify(allMapped));
+              } catch {
+                try {
+                  localStorage.setItem(LOCAL_STORAGE_CACHE, JSON.stringify(stage1Mapped));
+                } catch {}
+              }
             }
           }
           return;
