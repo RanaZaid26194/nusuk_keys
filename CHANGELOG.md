@@ -6,6 +6,33 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ---
 
+## [2.6.0] - 2026-11-10
+
+### Added
+- **Platform-Aware Ayah End Marker Engine (`DailyAyah.tsx`)**:
+  - Resolves WebKit/CoreText ligature limitation on iOS devices (where `U+06DD` and digits rendered side-by-side) by applying dynamic composite centering for Arabic-Indic numerals inside the ornamental medallion `۝`.
+  - Native HarfBuzz font shaping on Desktop (Windows, macOS, Linux) and Android remains 100% untouched and unaffected.
+  - Dynamic font scaling and letter-spacing for 1-digit, 2-digit, and 3-digit ayah numbers.
+- **Responsive Report Modal (`ReportModal.tsx`)**:
+  - Dedicated reporting interface with direct native `mailto:` links and one-tap clipboard copy for support email (`ranazaide288@gmail.com`).
+  - Pre-filled bug reporting template for pilgrims reporting invalid or expired keys.
+  - Bilingual English and Arabic translations (`reportModal`).
+- **Omni-Channel Social Media Marketing Suite**:
+  - High-resolution promotional graphics in both English and Arabic with scannable QR codes and unobstructed 3D emerald-and-gold key visuals:
+    - Landscape Banners (`1920×1080`): `nusuk_keys_promo.png` and `nusuk_keys_promo_ar.png`.
+    - Square Social Posts (`1080×1080`): `nusuk_keys_promo_square.png` and `nusuk_keys_promo_square_ar.png`.
+
+### Changed
+- **Header Scroll Compression**:
+  - Fixed initial page scroll jump by isolating tab horizontal scrolling into `tabContainerRef`.
+  - Header compresses smoothly from `h-16`/`72px` to `h-14`/`56px` with deepened backdrop-blur-xl and border elevation.
+- **Viewport Boundary Clamping**:
+  - Clamped all tooltips, cooldown notifications, and popups with `max-w-[calc(100vw-2rem)]` to prevent overflow across small screens (320px–390px).
+- **Directory Milestone**:
+  - Updated all counters and metadata to reflect **7,000+ active verified challenge keys**.
+
+---
+
 ## [2.5.0] - 2026-11-09
 
 ### Added

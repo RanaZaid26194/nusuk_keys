@@ -38,9 +38,11 @@ A high-performance, modern progressive web application designed to help pilgrims
 - **🕌 Native Bi-directional RTL & Sacred Calligraphy**:
   - Instant one-tap switcher between **English (LTR)** and **العربية (RTL)** with mirrored layouts.
   - Daily Quranic Ayah banner rotating automatically with live API integration and verified offline fallback.
+  - Platform-aware Ayah end marker engine (`۝`): precision composite centering on iOS WebKit while preserving native HarfBuzz ligatures on Desktop and Android.
   - Handcrafted **Nasta'liq** calligraphy style typography for Quranic Ayahs (*Surah Al-Ma'idah 5:2*) and Hadith (*Sahih Muslim 2699*), rendered with vertical breathing room.
-- **🛡️ Multi-Tier Security & Anti-Abuse**:
+- **🛡️ Multi-Tier Security, Anti-Abuse & Moderation**:
   - Client & database level Regex sanitization: `^NG-[A-Za-z0-9_-]+$`.
+  - Dedicated pilgrim **Report Modal** with native mailto routing and instant clipboard copy for rapid invalid key removal.
   - Token-bucket client-side rate limiting (prevents rapid submission spam).
   - Real-time duplicate key detection against Supabase Postgres with animated shake alerts.
   - Postgres Row-Level Security (RLS) guaranteeing tamper-proof public read/insert permissions.
