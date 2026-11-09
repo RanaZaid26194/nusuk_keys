@@ -60,24 +60,30 @@ const KeyCardComponent: React.FC<KeyCardProps> = ({
     return () => clearInterval(timer);
   }, [item.created_at, lang]);
 
-  // Full timestamp for hover inspection
-  const fullDate = useMemo(() =>
+  // Exact timestamp for hover inspection (YYYY-MM-DD HH:MM:SS)
+  const exactTimestamp = useMemo(() =>
   {
     if (!item.created_at)
       return "";
     try
     {
       const d = new Date(item.created_at);
-      return d.toLocaleString(lang === "ar" ? "ar-SA" : "en-US", {
-        dateStyle: "medium",
-        timeStyle: "short",
-      });
+      if (isNaN(d.getTime()))
+        return item.created_at;
+      const pad = (n: number) => n.toString().padStart(2, "0");
+      const y = d.getFullYear();
+      const m = pad(d.getMonth() + 1);
+      const day = pad(d.getDate());
+      const h = pad(d.getHours());
+      const min = pad(d.getMinutes());
+      const s = pad(d.getSeconds());
+      return `${y}-${m}-${day} ${h}:${min}:${s}`;
     }
     catch
     {
       return item.created_at;
     }
-  }, [item.created_at, lang]);
+  }, [item.created_at]);
 
   // zero-react-rerender spotlight tracking and subtle 3D tilt (max 2deg)
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) =>
@@ -194,8 +200,8 @@ const KeyCardComponent: React.FC<KeyCardProps> = ({
         className="pointer-events-none absolute -inset-px rounded-2xl opacity-0 transition-opacity duration-200"
       />
 
-      {/* Header: Badge & Time */}
-      <div className="relative z-10 flex items-center justify-between gap-2 mb-3.5">
+      {/* Header: Badge & Time (Higher z-index so hover tooltip floats cleanly over key box) */}
+      <div className="relative z-20 flex items-center justify-between gap-2 mb-3.5">
         <div className="flex items-center gap-1.5 flex-wrap">
           {isExpired ? (
             <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium bg-rose-500/10 text-rose-700 dark:text-rose-300 border border-rose-500/20">
@@ -225,15 +231,48 @@ const KeyCardComponent: React.FC<KeyCardProps> = ({
           )}
         </div>
 
-        {/* Time Ago with full timestamp on hover */}
-        <span
-          suppressHydrationWarning
-          title={fullDate}
-          className={`text-[11px] text-zinc-600 dark:text-zinc-400 flex items-center gap-1 flex-shrink-0 cursor-help ${isAr ? "font-arabic leading-none" : ""}`}
-        >
-          <Clock className="w-3 h-3 opacity-60 flex-shrink-0" />
-          <span>{timeAgo}</span>
-        </span>
+        {/* Time Ago with theme-aligned custom tooltip on hover */}
+        <div className="relative group/time flex items-center flex-shrink-0">
+          <span
+            suppressHydrationWarning
+            className={`text-[11px] text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-200 flex items-center gap-1 cursor-help transition-colors select-none ${isAr ? "font-arabic leading-none" : ""}`}
+          >
+            <Clock className="w-3 h-3 opacity-60 flex-shrink-0" />
+            <span>{timeAgo}</span>
+          </span>
+
+          {/* Luxury emerald/obsidian theme-matching tooltip */}
+          <div
+            role="tooltip"
+            className={`absolute top-full mt-1.5 z-30 pointer-events-none opacity-0 invisible -translate-y-1 group-hover/time:opacity-100 group-hover/time:visible group-hover/time:translate-y-0 transition-all duration-150 ease-out ${
+              isAr ? "left-0" : "right-0"
+            }`}
+          >
+            {/* Caret pointing up to the clock badge */}
+            <div
+              className={`absolute bottom-full -mb-px w-2.5 h-1.5 overflow-hidden ${
+                isAr ? "left-5" : "right-5"
+              }`}
+            >
+              <div className="w-2 h-2 bg-zinc-900 dark:bg-zinc-900 border-l border-t border-zinc-700/80 dark:border-zinc-700/80 rotate-45 translate-y-1 mx-auto" />
+            </div>
+
+            <div className="flex items-center gap-2 px-2.5 py-1.5 rounded-lg bg-zinc-900/95 dark:bg-zinc-900/95 text-zinc-200 border border-zinc-700/80 dark:border-zinc-700/80 ring-1 ring-emerald-500/20 shadow-2xl shadow-black/60 backdrop-blur-md whitespace-nowrap text-[11px]">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse flex-shrink-0" />
+              <div className="flex flex-col gap-0.5">
+                <div className="flex items-center gap-1 leading-none">
+                  <Clock className="w-2.5 h-2.5 text-emerald-400 flex-shrink-0" />
+                  <span className="text-[10px] text-zinc-400 font-medium">
+                    {isAr ? "الوقت الدقيق للإضافة" : "Exact Timestamp"}
+                  </span>
+                </div>
+                <span className="font-mono font-semibold text-zinc-100 tracking-tight leading-none pt-0.5" dir="ltr">
+                  {exactTimestamp}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Main Key Box (Click to copy with tactile press & flourish) */}
