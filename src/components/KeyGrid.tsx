@@ -217,11 +217,12 @@ export const KeyGrid: React.FC<KeyGridProps> = ({
                       initial={{ scale: 0 }}
                       animate={shouldPulseUsedBadge ? { scale: [1, 1.45, 1], transition: { duration: 0.6 } } : { scale: 1 }}
                       transition={{ type: "spring", stiffness: 500, damping: 25 }}
-                      className={`px-1.5 py-0.5 rounded-full text-[10px] font-mono font-bold leading-tight ${
+                      className={`px-1.5 py-0.5 rounded-full text-[10px] font-mono font-bold leading-none ${
                         isActive
                           ? "bg-amber-500/20 text-amber-900 dark:text-amber-200"
                           : "bg-zinc-200 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300"
                       }`}
+                      dir="ltr"
                     >
                       {usedCount > 999 ? "999+" : usedCount}
                     </motion.span>
@@ -369,7 +370,7 @@ export const KeyGrid: React.FC<KeyGridProps> = ({
               {Array.from({ length: 8 }).map((_, idx) => (
                 <div
                   key={idx}
-                  className="relative p-5 rounded-2xl bg-white/80 dark:bg-zinc-900/60 border border-zinc-200/80 dark:border-zinc-800/80 flex flex-col justify-between h-44 overflow-hidden animate-pulse shadow-xs"
+                  className="relative p-5 rounded-2xl bg-white/80 dark:bg-zinc-900/60 border border-zinc-300/80 dark:border-zinc-800/80 flex flex-col justify-between h-44 overflow-hidden animate-pulse shadow-xs dark:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.04)]"
                 >
                   {/* Top row: badge + time shimmer */}
                   <div className="flex items-center justify-between">

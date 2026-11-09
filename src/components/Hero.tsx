@@ -173,7 +173,7 @@ export const Hero: React.FC<HeroProps> = ({
             whileHover={{ y: -4, scale: 1.015 }}
             whileTap={{ scale: 0.98 }}
             transition={{ duration: 0.16, ease: "easeOut" }}
-            className="group cursor-default p-3 sm:p-4 rounded-xl sm:rounded-2xl bg-white/70 dark:bg-zinc-900/50 border border-zinc-200/80 dark:border-zinc-800/80 hover:border-emerald-500/35 dark:hover:border-emerald-500/30 text-center transition-colors duration-150 shadow-sm hover:shadow-md"
+            className="group cursor-default p-3 sm:p-4 rounded-xl sm:rounded-2xl bg-white/70 dark:bg-zinc-900/50 border border-zinc-300/80 dark:border-zinc-800/80 hover:border-emerald-500/35 dark:hover:border-emerald-500/30 text-center transition-all duration-150 shadow-sm hover:shadow-md dark:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.04)]"
           >
             <div className="flex items-center justify-center w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 mx-auto mb-1.5 sm:mb-2 transition-all duration-200 group-hover:scale-110 group-hover:bg-emerald-50 dark:group-hover:bg-emerald-950/40">
               <KeyRound className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-600 dark:text-emerald-400" />
@@ -195,7 +195,7 @@ export const Hero: React.FC<HeroProps> = ({
             whileHover={{ y: -4, scale: 1.015 }}
             whileTap={{ scale: 0.98 }}
             transition={{ duration: 0.16, ease: "easeOut" }}
-            className="group cursor-default p-3 sm:p-4 rounded-xl sm:rounded-2xl bg-white/70 dark:bg-zinc-900/50 border border-zinc-200/80 dark:border-zinc-800/80 hover:border-emerald-500/35 dark:hover:border-emerald-500/30 text-center transition-colors duration-150 shadow-sm hover:shadow-md"
+            className="group cursor-default p-3 sm:p-4 rounded-xl sm:rounded-2xl bg-white/70 dark:bg-zinc-900/50 border border-zinc-300/80 dark:border-zinc-800/80 hover:border-emerald-500/35 dark:hover:border-emerald-500/30 text-center transition-all duration-150 shadow-sm hover:shadow-md dark:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.04)]"
           >
             <div className="flex items-center justify-center w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 mx-auto mb-1.5 sm:mb-2 transition-all duration-200 group-hover:scale-110 group-hover:bg-emerald-50 dark:group-hover:bg-emerald-950/40">
               <ShieldCheck className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-600 dark:text-emerald-400" />
@@ -217,7 +217,7 @@ export const Hero: React.FC<HeroProps> = ({
             whileHover={{ y: -4, scale: 1.015 }}
             whileTap={{ scale: 0.98 }}
             transition={{ duration: 0.16, ease: "easeOut" }}
-            className="group cursor-default p-3 sm:p-4 rounded-xl sm:rounded-2xl bg-white/70 dark:bg-zinc-900/50 border border-zinc-200/80 dark:border-zinc-800/80 hover:border-emerald-500/35 dark:hover:border-emerald-500/30 text-center transition-colors duration-150 shadow-sm hover:shadow-md"
+            className="group cursor-default p-3 sm:p-4 rounded-xl sm:rounded-2xl bg-white/70 dark:bg-zinc-900/50 border border-zinc-300/80 dark:border-zinc-800/80 hover:border-emerald-500/35 dark:hover:border-emerald-500/30 text-center transition-all duration-150 shadow-sm hover:shadow-md dark:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.04)]"
           >
             <div className="flex items-center justify-center w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 mx-auto mb-1.5 sm:mb-2 transition-all duration-200 group-hover:scale-110 group-hover:bg-emerald-50 dark:group-hover:bg-emerald-950/40">
               <Copy className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-600 dark:text-emerald-400" />
@@ -239,7 +239,7 @@ export const Hero: React.FC<HeroProps> = ({
             whileHover={{ y: -4, scale: 1.015 }}
             whileTap={{ scale: 0.98 }}
             transition={{ duration: 0.16, ease: "easeOut" }}
-            className="group cursor-default p-3 sm:p-4 rounded-xl sm:rounded-2xl bg-white/70 dark:bg-zinc-900/50 border border-zinc-200/80 dark:border-zinc-800/80 hover:border-emerald-500/35 dark:hover:border-emerald-500/30 text-center transition-colors duration-150 shadow-sm hover:shadow-md"
+            className="group cursor-default p-3 sm:p-4 rounded-xl sm:rounded-2xl bg-white/70 dark:bg-zinc-900/50 border border-zinc-300/80 dark:border-zinc-800/80 hover:border-emerald-500/35 dark:hover:border-emerald-500/30 text-center transition-all duration-150 shadow-sm hover:shadow-md dark:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.04)]"
           >
             <div className="flex items-center justify-center w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 mx-auto mb-1.5 sm:mb-2 transition-all duration-200 group-hover:scale-110 group-hover:bg-emerald-50 dark:group-hover:bg-emerald-950/40">
               <Activity className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-600 dark:text-emerald-400" />

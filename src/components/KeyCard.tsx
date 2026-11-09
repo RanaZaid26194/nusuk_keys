@@ -148,12 +148,12 @@ const KeyCardComponent: React.FC<KeyCardProps> = ({
       whileHover={canHover ? { y: -4, scale: 1.008 } : undefined}
       whileTap={{ scale: 0.99 }}
       transition={{ duration: 0.16, ease: "easeOut" }}
-      className={`relative rounded-2xl bg-white dark:bg-zinc-900/70 p-4 sm:p-5 border transition-colors duration-150 overflow-hidden shadow-xs hover:shadow-md dark:shadow-none dark:hover:shadow-black/40 ${
+      className={`relative rounded-2xl bg-white dark:bg-zinc-900/70 p-4 sm:p-5 border transition-all duration-150 overflow-hidden shadow-xs hover:shadow-md dark:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.04)] dark:hover:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.07),0_8px_24px_-4px_rgba(0,0,0,0.5)] ${
         copied
           ? "border-emerald-500/80 ring-1 ring-emerald-500/40 shadow-[0_0_24px_rgba(16,185,129,0.18)]"
           : isVerified
-          ? "border-zinc-200/90 dark:border-zinc-800/80 hover:border-zinc-300 dark:hover:border-zinc-700"
-          : "border-zinc-200/70 dark:border-zinc-800/60 hover:border-zinc-300 dark:hover:border-zinc-700"
+          ? "border-zinc-300 dark:border-zinc-800/80 hover:border-zinc-400 dark:hover:border-zinc-700"
+          : "border-zinc-300/80 dark:border-zinc-800/60 hover:border-zinc-400 dark:hover:border-zinc-700"
       }`}
     >
       {/* Interactive Cursor Spotlight Glow */}
@@ -167,25 +167,28 @@ const KeyCardComponent: React.FC<KeyCardProps> = ({
         <div className="flex items-center gap-1.5 flex-wrap">
           {isExpired ? (
             <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium bg-rose-500/10 text-rose-700 dark:text-rose-300 border border-rose-500/20">
-              <AlertCircle className="w-3.5 h-3.5 text-rose-500 dark:text-rose-400" />
-              <span className={isAr ? "font-arabic" : ""}>{t.keyCard.expired}</span>
+              <AlertCircle className="w-3.5 h-3.5 text-rose-500 dark:text-rose-400 flex-shrink-0" />
+              <span className={isAr ? "font-arabic leading-none" : ""}>{t.keyCard.expired}</span>
             </span>
           ) : isVerified ? (
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30">
-              <ShieldCheck className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
-              <span className={isAr ? "font-arabic" : ""}>{t.keyCard.verified} ({successRate}%)</span>
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30 ring-1 ring-gold-400/40 dark:ring-gold-400/35 shadow-[0_0_8px_rgba(245,158,11,0.12)]">
+              <ShieldCheck className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 flex-shrink-0" />
+              <span className={`inline-flex items-center gap-1 ${isAr ? "font-arabic leading-none" : ""}`}>
+                <span>{t.keyCard.verified}</span>
+                <span className="font-mono text-[11px] font-semibold leading-none opacity-90" dir="ltr">({successRate}%)</span>
+              </span>
             </span>
           ) : (
             <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-500/10 text-amber-800 dark:text-amber-300 border border-amber-500/20">
-              <Clock className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
-              <span className={isAr ? "font-arabic" : ""}>{t.keyCard.needsReview}</span>
+              <Clock className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400 flex-shrink-0" />
+              <span className={isAr ? "font-arabic leading-none" : ""}>{t.keyCard.needsReview}</span>
             </span>
           )}
 
           {isUsed && (
             <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-semibold bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-700/80 shadow-xs">
-              <Check className="w-3 h-3 text-emerald-600 dark:text-emerald-400 stroke-[2.5]" />
-              <span className={isAr ? "font-arabic" : ""}>{t.keyCard.used}</span>
+              <Check className="w-3 h-3 text-emerald-600 dark:text-emerald-400 stroke-[2.5] flex-shrink-0" />
+              <span className={isAr ? "font-arabic leading-none" : ""}>{t.keyCard.used}</span>
             </span>
           )}
         </div>
@@ -193,10 +196,10 @@ const KeyCardComponent: React.FC<KeyCardProps> = ({
         {/* Time Ago */}
         <span
           suppressHydrationWarning
-          className={`text-[11px] text-zinc-600 dark:text-zinc-400 flex items-center gap-1 flex-shrink-0 ${isAr ? "font-arabic" : ""}`}
+          className={`text-[11px] text-zinc-600 dark:text-zinc-400 flex items-center gap-1 flex-shrink-0 ${isAr ? "font-arabic leading-none" : ""}`}
         >
-          <Clock className="w-3 h-3 opacity-60" />
-          {formatTimeAgo(item.created_at, lang)}
+          <Clock className="w-3 h-3 opacity-60 flex-shrink-0" />
+          <span>{formatTimeAgo(item.created_at, lang)}</span>
         </span>
       </div>
 
@@ -210,7 +213,7 @@ const KeyCardComponent: React.FC<KeyCardProps> = ({
             ? "bg-emerald-500/10 dark:bg-emerald-500/15 border-emerald-500/60 ring-1 ring-emerald-500/30"
             : copyFailed
             ? "bg-amber-500/10 dark:bg-amber-500/15 border-amber-500/60 ring-1 ring-amber-500/30"
-            : "bg-zinc-50 dark:bg-zinc-950 border-zinc-200 dark:border-zinc-800/80 hover:border-emerald-500/40 dark:hover:border-emerald-500/40 hover:bg-emerald-500/[0.02]"
+            : "bg-zinc-50 dark:bg-zinc-950 border-zinc-300/80 dark:border-zinc-800/80 hover:border-emerald-500/40 dark:hover:border-emerald-500/40 hover:bg-emerald-500/[0.02]"
         }`}
         title={copyFailed ? (t.keyCard.copyFailed || (isAr ? "اضغط مطولاً للنسخ" : "Press & hold to copy")) : t.keyCard.copyKey}
       >
@@ -292,10 +295,11 @@ const KeyCardComponent: React.FC<KeyCardProps> = ({
       {/* Trust & Usage Progress Bar with smooth color transitions */}
       <div className="relative z-10 space-y-1.5 mb-4">
         <div className="flex justify-between items-center text-xs text-zinc-600 dark:text-zinc-400">
-          <span className={isAr ? "font-arabic" : ""}>
-            <span className="font-mono text-zinc-800 dark:text-zinc-300 font-semibold">{item.copies_count}</span> {t.keyCard.copiedTimes}
+          <span className={`inline-flex items-center gap-1 ${isAr ? "font-arabic leading-none" : ""}`}>
+            <span className="font-mono text-zinc-800 dark:text-zinc-300 font-semibold leading-none" dir="ltr">{item.copies_count}</span>
+            <span>{t.keyCard.copiedTimes}</span>
           </span>
-          <span className="font-mono text-zinc-600 dark:text-zinc-300 text-[11px] font-medium">
+          <span className="font-mono text-zinc-600 dark:text-zinc-300 text-[11px] font-medium leading-none" dir="ltr">
             {successRate}% {t.keyCard.successRate}
           </span>
         </div>
@@ -312,7 +316,7 @@ const KeyCardComponent: React.FC<KeyCardProps> = ({
       </div>
 
       {/* Footer Actions: Vote & Deep Link */}
-      <div className="relative z-10 flex items-center justify-between gap-2 pt-3 border-t border-zinc-200/80 dark:border-zinc-800/80">
+      <div className="relative z-10 flex items-center justify-between gap-2 pt-3 border-t border-zinc-200 dark:border-zinc-800/80">
         {/* Voting Buttons with Flip Counter Roll & Personality Thumbs */}
         <div className="flex items-center gap-1.5">
           <motion.button
@@ -333,7 +337,7 @@ const KeyCardComponent: React.FC<KeyCardProps> = ({
             >
               <ThumbsUp className={`w-3.5 h-3.5 ${item.userVoted === 'UP' ? 'fill-emerald-600 text-emerald-600 dark:fill-emerald-400 dark:text-emerald-400' : ''}`} />
             </motion.div>
-            <span className="font-mono inline-block overflow-hidden relative h-[18px] min-w-[12px] text-center leading-[18px]">
+            <span className="font-mono inline-block overflow-hidden relative h-[18px] min-w-[12px] text-center leading-[18px]" dir="ltr">
               <AnimatePresence mode="popLayout" initial={false}>
                 <motion.span
                   key={item.upvotes}
@@ -341,7 +345,8 @@ const KeyCardComponent: React.FC<KeyCardProps> = ({
                   animate={{ y: 0, opacity: 1 }}
                   exit={{ y: -12, opacity: 0 }}
                   transition={{ duration: 0.18, ease: "easeOut" }}
-                  className="inline-block"
+                  className="inline-block font-mono leading-[18px]"
+                  dir="ltr"
                 >
                   {item.upvotes}
                 </motion.span>
@@ -367,7 +372,7 @@ const KeyCardComponent: React.FC<KeyCardProps> = ({
             >
               <ThumbsDown className={`w-3.5 h-3.5 ${item.userVoted === 'DOWN' ? 'fill-rose-600 text-rose-600 dark:fill-rose-400 dark:text-rose-400' : ''}`} />
             </motion.div>
-            <span className="font-mono inline-block overflow-hidden relative h-[18px] min-w-[12px] text-center leading-[18px]">
+            <span className="font-mono inline-block overflow-hidden relative h-[18px] min-w-[12px] text-center leading-[18px]" dir="ltr">
               <AnimatePresence mode="popLayout" initial={false}>
                 <motion.span
                   key={item.downvotes}
@@ -375,7 +380,8 @@ const KeyCardComponent: React.FC<KeyCardProps> = ({
                   animate={{ y: 0, opacity: 1 }}
                   exit={{ y: -12, opacity: 0 }}
                   transition={{ duration: 0.18, ease: "easeOut" }}
-                  className="inline-block"
+                  className="inline-block font-mono leading-[18px]"
+                  dir="ltr"
                 >
                   {item.downvotes}
                 </motion.span>
@@ -401,7 +407,7 @@ const KeyCardComponent: React.FC<KeyCardProps> = ({
               className="flex items-center gap-1 text-[11px] text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-200 transition-colors"
             >
               <RotateCcw className="w-3 h-3 opacity-70" />
-              <span className={isAr ? "font-arabic" : ""}>{t.keyCard.markUnused}</span>
+              <span className={isAr ? "font-arabic leading-none" : ""}>{t.keyCard.markUnused}</span>
             </motion.button>
           )}
 
@@ -423,7 +429,7 @@ const KeyCardComponent: React.FC<KeyCardProps> = ({
             title={t.keyCard.openNusuk}
             aria-label={t.keyCard.openNusuk}
           >
-            <span className={isAr ? "font-arabic" : ""}>{t.keyCard.openNusuk}</span>
+            <span className={isAr ? "font-arabic leading-none" : ""}>{t.keyCard.openNusuk}</span>
             {openingNusuk ? (
               <span className="w-3 h-3 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin inline-block" />
             ) : (

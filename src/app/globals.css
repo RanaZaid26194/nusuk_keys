@@ -2,12 +2,12 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Self-hosted Noto Nastaliq Urdu font (zero external requests) */
+/* Self-hosted Noto Nastaliq Urdu font (zero external requests, optional to prevent reflow) */
 @font-face {
   font-family: 'Noto Nastaliq Urdu';
   font-style: normal;
   font-weight: 400 700;
-  font-display: swap;
+  font-display: optional;
   src: url('/fonts/NotoNastaliqUrdu.woff2') format('woff2');
 }
 
