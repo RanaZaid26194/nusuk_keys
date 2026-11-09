@@ -151,11 +151,11 @@ export const DailyAyah: React.FC<DailyAyahProps> = ({ lang, onOpenInfo, mockFrid
       onKeyDown={handleKeyDown}
       whileHover={{ y: -2 }}
       whileTap={{ scale: 0.98 }}
-      className={`mt-6 relative overflow-hidden flex flex-col items-center justify-center px-6 py-4 rounded-2xl bg-white/90 dark:bg-zinc-900/80 hover:bg-white dark:hover:bg-zinc-900 border ${
+      className={`mt-6 relative overflow-hidden flex flex-col items-center justify-center px-4 sm:px-6 py-3.5 sm:py-4 rounded-2xl bg-white/90 dark:bg-zinc-900/80 hover:bg-white dark:hover:bg-zinc-900 border ${
         isFriday
           ? "border-gold-accent/40 dark:border-gold-accent/35 hover:border-gold-accent/60 dark:hover:border-gold-accent/50 shadow-[0_0_20px_rgba(212,175,55,0.12)] dark:shadow-[0_0_20px_rgba(212,175,55,0.06)]"
           : "border-gold-accent/30 dark:border-gold-accent/20 hover:border-gold-accent/45 dark:hover:border-gold-accent/35 shadow-xs"
-      } cursor-pointer transition-all max-w-xl mx-auto group text-center min-h-[176px]`}
+      } cursor-pointer transition-all max-w-xl mx-auto group text-center min-h-[160px] sm:min-h-[176px]`}
     >
       {/* 3. Soft gold ambient radial glow at the top */}
       <div

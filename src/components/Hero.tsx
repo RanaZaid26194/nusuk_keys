@@ -133,22 +133,22 @@ export const Hero: React.FC<HeroProps> = ({
         <DailyAyah lang={lang} onOpenInfo={onOpenInfo} />
 
         {/* Exact, Clean Minimalist Stats Grid with Staggered Entrance */}
-        <div className="mt-10 sm:mt-12 grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 max-w-4xl mx-auto">
+        <div className="mt-8 sm:mt-12 grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4 max-w-4xl mx-auto">
           {/* Stat 1: Total Active Keys */}
           <motion.div
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, delay: 0.32 }}
             whileHover={{ y: -4 }}
-            className="p-4 rounded-2xl bg-white/70 dark:bg-zinc-900/50 border border-zinc-200/80 dark:border-zinc-800/80 hover:border-zinc-300 dark:hover:border-zinc-700/80 text-center transition-all shadow-sm"
+            className="p-3 sm:p-4 rounded-xl sm:rounded-2xl bg-white/70 dark:bg-zinc-900/50 border border-zinc-200/80 dark:border-zinc-800/80 hover:border-zinc-300 dark:hover:border-zinc-700/80 text-center transition-all shadow-sm"
           >
-            <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 mx-auto mb-2 transition-colors">
-              <KeyRound className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+            <div className="flex items-center justify-center w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 mx-auto mb-1.5 sm:mb-2 transition-colors">
+              <KeyRound className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-600 dark:text-emerald-400" />
             </div>
-            <div className="text-2xl sm:text-3xl font-bold text-zinc-900 dark:text-white tracking-tight font-mono transition-colors">
+            <div className="text-xl sm:text-3xl font-bold text-zinc-900 dark:text-white tracking-tight font-mono transition-colors">
               <NumberCounter value={stats.totalKeys} />
             </div>
-            <div className={`text-xs text-zinc-500 dark:text-zinc-400 mt-1 ${isAr ? "font-arabic" : ""}`}>
+            <div className={`text-[11px] sm:text-xs text-zinc-500 dark:text-zinc-400 mt-0.5 sm:mt-1 ${isAr ? "font-arabic" : ""}`}>
               {t.stats.totalKeys}
             </div>
           </motion.div>
@@ -159,15 +159,15 @@ export const Hero: React.FC<HeroProps> = ({
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, delay: 0.38 }}
             whileHover={{ y: -4 }}
-            className="p-4 rounded-2xl bg-white/70 dark:bg-zinc-900/50 border border-zinc-200/80 dark:border-zinc-800/80 hover:border-zinc-300 dark:hover:border-zinc-700/80 text-center transition-all shadow-sm"
+            className="p-3 sm:p-4 rounded-xl sm:rounded-2xl bg-white/70 dark:bg-zinc-900/50 border border-zinc-200/80 dark:border-zinc-800/80 hover:border-zinc-300 dark:hover:border-zinc-700/80 text-center transition-all shadow-sm"
           >
-            <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 mx-auto mb-2 transition-colors">
-              <ShieldCheck className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+            <div className="flex items-center justify-center w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 mx-auto mb-1.5 sm:mb-2 transition-colors">
+              <ShieldCheck className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-600 dark:text-emerald-400" />
             </div>
-            <div className="text-2xl sm:text-3xl font-bold text-zinc-900 dark:text-white tracking-tight font-mono transition-colors">
+            <div className="text-xl sm:text-3xl font-bold text-zinc-900 dark:text-white tracking-tight font-mono transition-colors">
               <NumberCounter value={stats.successRate} suffix="%" />
             </div>
-            <div className={`text-xs text-zinc-500 dark:text-zinc-400 mt-1 ${isAr ? "font-arabic" : ""}`}>
+            <div className={`text-[11px] sm:text-xs text-zinc-500 dark:text-zinc-400 mt-0.5 sm:mt-1 ${isAr ? "font-arabic" : ""}`}>
               {t.stats.activeRate}
             </div>
           </motion.div>
@@ -178,15 +178,15 @@ export const Hero: React.FC<HeroProps> = ({
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, delay: 0.44 }}
             whileHover={{ y: -4 }}
-            className="p-4 rounded-2xl bg-white/70 dark:bg-zinc-900/50 border border-zinc-200/80 dark:border-zinc-800/80 hover:border-zinc-300 dark:hover:border-zinc-700/80 text-center transition-all shadow-sm"
+            className="p-3 sm:p-4 rounded-xl sm:rounded-2xl bg-white/70 dark:bg-zinc-900/50 border border-zinc-200/80 dark:border-zinc-800/80 hover:border-zinc-300 dark:hover:border-zinc-700/80 text-center transition-all shadow-sm"
           >
-            <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 mx-auto mb-2 transition-colors">
-              <Copy className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+            <div className="flex items-center justify-center w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 mx-auto mb-1.5 sm:mb-2 transition-colors">
+              <Copy className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-600 dark:text-emerald-400" />
             </div>
-            <div className="text-2xl sm:text-3xl font-bold text-zinc-900 dark:text-white tracking-tight font-mono transition-colors">
+            <div className="text-xl sm:text-3xl font-bold text-zinc-900 dark:text-white tracking-tight font-mono transition-colors">
               <NumberCounter value={stats.totalCopies} />
             </div>
-            <div className={`text-xs text-zinc-500 dark:text-zinc-400 mt-1 ${isAr ? "font-arabic" : ""}`}>
+            <div className={`text-[11px] sm:text-xs text-zinc-500 dark:text-zinc-400 mt-0.5 sm:mt-1 ${isAr ? "font-arabic" : ""}`}>
               {t.stats.totalCopies}
             </div>
           </motion.div>
@@ -197,19 +197,19 @@ export const Hero: React.FC<HeroProps> = ({
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, delay: 0.50 }}
             whileHover={{ y: -4 }}
-            className="p-4 rounded-2xl bg-white/70 dark:bg-zinc-900/50 border border-zinc-200/80 dark:border-zinc-800/80 hover:border-zinc-300 dark:hover:border-zinc-700/80 text-center transition-all shadow-sm"
+            className="p-3 sm:p-4 rounded-xl sm:rounded-2xl bg-white/70 dark:bg-zinc-900/50 border border-zinc-200/80 dark:border-zinc-800/80 hover:border-zinc-300 dark:hover:border-zinc-700/80 text-center transition-all shadow-sm"
           >
-            <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 mx-auto mb-2 transition-colors">
-              <Activity className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+            <div className="flex items-center justify-center w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 mx-auto mb-1.5 sm:mb-2 transition-colors">
+              <Activity className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-600 dark:text-emerald-400" />
             </div>
-            <div className="flex items-center justify-center gap-2 text-2xl sm:text-3xl font-bold text-zinc-900 dark:text-white tracking-tight transition-colors">
-              <span className="relative flex h-3 w-3">
+            <div className="flex items-center justify-center gap-1.5 sm:gap-2 text-xl sm:text-3xl font-bold text-zinc-900 dark:text-white tracking-tight transition-colors">
+              <span className="relative flex h-2.5 w-2.5 sm:h-3 sm:w-3">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-                <span className="relative inline-flex rounded-full h-3 w-3 bg-emerald-500" />
+                <span className="relative inline-flex rounded-full h-2.5 w-2.5 sm:h-3 sm:w-3 bg-emerald-500" />
               </span>
               <span>{isConnectedToSupabase ? "Sync" : "Active"}</span>
             </div>
-            <div className={`text-xs text-zinc-500 dark:text-zinc-400 mt-1 ${isAr ? "font-arabic" : ""}`}>
+            <div className={`text-[11px] sm:text-xs text-zinc-500 dark:text-zinc-400 mt-0.5 sm:mt-1 ${isAr ? "font-arabic" : ""}`}>
               {t.stats.liveStatus}
             </div>
           </motion.div>

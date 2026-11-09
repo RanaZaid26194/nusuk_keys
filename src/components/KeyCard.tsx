@@ -95,7 +95,7 @@ export const KeyCard: React.FC<KeyCardProps> = ({
       onMouseLeave={handleMouseLeave}
       whileHover={{ y: -4 }}
       transition={{ duration: 0.25, ease: "easeOut" }}
-      className={`relative rounded-2xl bg-white dark:bg-zinc-900/70 p-5 border transition-all duration-300 overflow-hidden shadow-xs hover:shadow-md dark:shadow-none dark:hover:shadow-black/40 ${
+      className={`relative rounded-2xl bg-white dark:bg-zinc-900/70 p-4 sm:p-5 border transition-all duration-300 overflow-hidden shadow-xs hover:shadow-md dark:shadow-none dark:hover:shadow-black/40 ${
         copied
           ? "border-emerald-500/80 ring-1 ring-emerald-500/40 shadow-[0_0_24px_rgba(16,185,129,0.18)]"
           : isVerified
@@ -144,10 +144,10 @@ export const KeyCard: React.FC<KeyCardProps> = ({
         onClick={handleCopy}
         whileHover={{ scale: 1.01 }}
         whileTap={{ scale: 0.98 }}
-        className="relative z-10 flex items-center justify-between p-3.5 rounded-xl bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800/80 hover:border-zinc-300 dark:hover:border-zinc-700 transition-colors cursor-pointer select-none mb-3.5 shadow-xs group"
+        className="relative z-10 flex items-center justify-between p-3 sm:p-3.5 rounded-xl bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800/80 hover:border-zinc-300 dark:hover:border-zinc-700 transition-colors cursor-pointer select-none mb-3.5 shadow-xs group"
         title={t.keyCard.copyKey}
       >
-        <div className="font-mono text-base sm:text-lg font-bold tracking-widest text-zinc-900 dark:text-zinc-100 group-hover:text-black dark:group-hover:text-white transition-colors truncate">
+        <div className="font-mono text-sm sm:text-base md:text-lg font-bold tracking-wider sm:tracking-widest text-zinc-900 dark:text-zinc-100 group-hover:text-black dark:group-hover:text-white transition-colors truncate">
           {renderHighlightedCode()}
         </div>
 

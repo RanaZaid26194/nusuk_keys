@@ -21,6 +21,10 @@
   --background-rgb: 9, 9, 11;
 }
 
+html {
+  overflow-x: hidden;
+}
+
 body {
   color: rgb(var(--foreground-rgb));
   background-color: #fafafa;
