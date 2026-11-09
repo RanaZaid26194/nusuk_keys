@@ -89,3 +89,54 @@ export function recordSubmissionRateLimit() {
     // Ignore storage issues
   }
 }
+
+// Report a broken key rate limiting
+const REPORT_RATE_LIMIT_KEY = "nusuk_report_timestamps_v1";
+const MAX_REPORTS_PER_WINDOW = 3;
+const REPORT_WINDOW_DURATION_MS = 5 * 60 * 1000; // 5 minutes
+const REPORT_COOLDOWN_MS = 30 * 1000; // 30 seconds cooldown between reports
+
+export function checkReportRateLimit(): { allowed: boolean; waitSeconds?: number } {
+  if (typeof window === "undefined") return { allowed: true };
+
+  try {
+    const now = Date.now();
+    const stored = localStorage.getItem(REPORT_RATE_LIMIT_KEY);
+    const timestamps: number[] = stored ? JSON.parse(stored) : [];
+
+    const activeTimestamps = timestamps.filter(t => now - t < REPORT_WINDOW_DURATION_MS);
+
+    if (activeTimestamps.length > 0) {
+      const lastReport = Math.max(...activeTimestamps);
+      const elapsedSinceLast = now - lastReport;
+      if (elapsedSinceLast < REPORT_COOLDOWN_MS) {
+        const waitSeconds = Math.ceil((REPORT_COOLDOWN_MS - elapsedSinceLast) / 1000);
+        return { allowed: false, waitSeconds };
+      }
+    }
+
+    if (activeTimestamps.length >= MAX_REPORTS_PER_WINDOW) {
+      const oldest = Math.min(...activeTimestamps);
+      const waitSeconds = Math.ceil((REPORT_WINDOW_DURATION_MS - (now - oldest)) / 1000);
+      return { allowed: false, waitSeconds };
+    }
+
+    return { allowed: true };
+  } catch {
+    return { allowed: true };
+  }
+}
+
+export function recordReportRateLimit() {
+  if (typeof window === "undefined") return;
+
+  try {
+    const now = Date.now();
+    const stored = localStorage.getItem(REPORT_RATE_LIMIT_KEY);
+    const timestamps: number[] = stored ? JSON.parse(stored) : [];
+    const updated = [...timestamps.filter(t => now - t < REPORT_WINDOW_DURATION_MS), now];
+    localStorage.setItem(REPORT_RATE_LIMIT_KEY, JSON.stringify(updated));
+  } catch {
+    // Ignore storage issues
+  }
+}

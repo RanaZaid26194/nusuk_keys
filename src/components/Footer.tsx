@@ -1,16 +1,20 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Shield, ExternalLink, Github, Flag, Activity } from "lucide-react";
+import { Shield, ExternalLink, Github, Flag } from "lucide-react";
 import { Language } from "@/lib/types";
 import { translations } from "@/lib/translations";
+import { checkReportRateLimit, recordReportRateLimit } from "@/lib/security";
 
 interface FooterProps {
   lang: Language;
 }
 
-export const Footer: React.FC<FooterProps> = ({ lang }) => {
+export const Footer: React.FC<FooterProps> = ({ lang }) =>
+{
   const [syncTime, setSyncTime] = useState<string>("Live");
+  const [cooldown, setCooldown] = useState<number>(0);
+  const [showWarning, setShowWarning] = useState<boolean>(false);
   const t = translations[lang];
   const isAr = lang === "ar";
 
@@ -25,6 +29,56 @@ export const Footer: React.FC<FooterProps> = ({ lang }) => {
     const interval = setInterval(updateTime, 60000);
     return () => clearInterval(interval);
   }, [isAr]);
+
+  // Sync remaining cooldown on mount
+  useEffect(() =>
+  {
+    const rateCheck = checkReportRateLimit();
+    if (!rateCheck.allowed && rateCheck.waitSeconds)
+      setCooldown(rateCheck.waitSeconds);
+  }, []);
+
+  // Cooldown countdown interval
+  useEffect(() =>
+  {
+    if (cooldown <= 0)
+      return;
+    const timer = setInterval(() =>
+    {
+      setCooldown((prev) =>
+      {
+        if (prev <= 1)
+        {
+          clearInterval(timer);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+    return () => clearInterval(timer);
+  }, [cooldown]);
+
+  const mailtoBody = encodeURIComponent(
+    "Assalamu Alaikum,\n\nI would like to report an expired or broken Nusuk key.\n\nKey Code: NG-\nIssue: (Expired / Reached Max Pilgrims / Invalid Code)\nDetails: \n\nSent from Nusuk Keys Directory"
+  );
+  const mailtoUrl = `mailto:ranazaide288@gmail.com?subject=Report%20Broken%20Nusuk%20Key&body=${mailtoBody}`;
+
+  const handleReportClick = (e: React.MouseEvent<HTMLAnchorElement>) =>
+  {
+    const rateCheck = checkReportRateLimit();
+    if (!rateCheck.allowed)
+    {
+      e.preventDefault();
+      const wait = rateCheck.waitSeconds ?? 30;
+      setCooldown(wait);
+      setShowWarning(true);
+      setTimeout(() => setShowWarning(false), 3000);
+      return;
+    }
+
+    recordReportRateLimit();
+    setCooldown(30);
+  };
 
   return (
     <footer className="w-full border-t border-zinc-200/80 dark:border-zinc-800/80 bg-zinc-100/70 dark:bg-zinc-950 py-8 px-4 sm:px-6 lg:px-8 mt-auto transition-colors pb-[max(5.5rem,calc(env(safe-area-inset-bottom)+4.5rem))] sm:pb-8">
@@ -49,15 +103,41 @@ export const Footer: React.FC<FooterProps> = ({ lang }) => {
               </span>
             </div>
 
-            {/* Report a broken key */}
-            <a
-              href="mailto:support@nusuk-keys.org?subject=Report%20Broken%20Nusuk%20Key&body=Hello,%20I%20would%20like%20to%20report%20this%20expired/broken%20key:%20NG-"
-              className="group flex items-center gap-1 text-xs text-zinc-600 hover:text-rose-600 dark:text-zinc-400 dark:hover:text-rose-400 transition-colors"
-              title={t.footer.reportBroken || "Report a broken key"}
-            >
-              <Flag className="w-3.5 h-3.5 text-zinc-400 group-hover:text-rose-500 transition-colors" />
-              <span className={isAr ? "font-arabic" : ""}>{t.footer.reportBroken || "Report broken key"}</span>
-            </a>
+            {/* Report a broken key with rate-limit protection */}
+            <div className="relative inline-flex items-center">
+              <a
+                href={cooldown > 0 ? undefined : mailtoUrl}
+                onClick={handleReportClick}
+                className={`group flex items-center gap-1 text-xs transition-colors ${
+                  cooldown > 0
+                    ? "cursor-not-allowed text-amber-600 dark:text-amber-400"
+                    : "text-zinc-600 hover:text-rose-600 dark:text-zinc-400 dark:hover:text-rose-400"
+                }`}
+                title={
+                  cooldown > 0
+                    ? (t.footer.reportCooldown || "Please wait {s}s before reporting another key.").replace("{s}", cooldown.toString())
+                    : (t.footer.reportBroken || "Report a broken key")
+                }
+                aria-label={t.footer.reportBroken || "Report a broken key"}
+              >
+                <Flag className={`w-3.5 h-3.5 transition-colors ${cooldown > 0 ? "text-amber-500 animate-pulse" : "text-zinc-400 group-hover:text-rose-500"}`} />
+                <span className={isAr ? "font-arabic" : ""}>
+                  {cooldown > 0
+                    ? (isAr ? `انتظر ${cooldown} ث` : `Wait ${cooldown}s`)
+                    : (t.footer.reportBroken || "Report broken key")}
+                </span>
+              </a>
+
+              {/* Toast warning on attempted spam/rate-limit hit */}
+              {showWarning && (
+                <div
+                  role="alert"
+                  className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 z-30 px-2.5 py-1 text-[11px] font-medium rounded-lg bg-zinc-900 dark:bg-zinc-800 text-amber-300 border border-amber-500/40 shadow-lg whitespace-nowrap animate-in fade-in slide-in-from-bottom-1"
+                >
+                  {t.footer.reportCooldown?.replace("{s}", cooldown.toString()) || `Wait ${cooldown}s (anti-spam)`}
+                </div>
+              )}
+            </div>
 
             {/* GitHub Repo */}
             <a

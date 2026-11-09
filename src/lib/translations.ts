@@ -102,6 +102,7 @@ export const translations = {
       lastSync: "Live sync active",
       github: "GitHub Repository",
       reportBroken: "Report a broken key",
+      reportCooldown: "Please wait {s}s before reporting another key.",
     },
   },
   ar: {
@@ -207,6 +208,7 @@ export const translations = {
       lastSync: "تزامن مباشر نشط",
       github: "مستودع GitHub",
       reportBroken: "الإبلاغ عن مفتاح معطل",
+      reportCooldown: "يرجى الانتظار {s} ثانية قبل إرسال بلاغ آخر.",
     },
   },
 };
