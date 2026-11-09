@@ -28,7 +28,13 @@ ON challenge_keys FOR SELECT USING (is_active = true);
 
 DROP POLICY IF EXISTS "Allow public submit new keys" ON challenge_keys;
 CREATE POLICY "Allow public submit new keys" 
-ON challenge_keys FOR INSERT WITH CHECK (code ~ '^NG-[A-Za-z0-9_-]+$');
+ON challenge_keys FOR INSERT WITH CHECK (
+  code ~ '^NG-[A-Za-z0-9_-]+$'
+  AND upvotes = 1
+  AND downvotes = 0
+  AND copies_count = 0
+  AND is_active = true
+);
 
 -- 5. Atomic RPC Server-Side Functions (SECURITY DEFINER)
 CREATE OR REPLACE FUNCTION increment_copy(p_key_id UUID)

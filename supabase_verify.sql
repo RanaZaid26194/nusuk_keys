@@ -1,6 +1,6 @@
 -- read-only verification queries to check challenge_keys table security in supabase sql editor.
 
--- 1. check active policies on challenge_keys (expected: 2 rows, SELECT and INSERT only, zero UPDATE or ALL)
+-- 1. check active policies on challenge_keys (expected: exactly one SELECT and one INSERT policy, zero UPDATE or ALL)
 select policyname, cmd, roles
 from pg_policies
 where schemaname = 'public' and tablename = 'challenge_keys';
