@@ -150,14 +150,14 @@ export const SubmitModal: React.FC<SubmitModalProps> = ({
                   </div>
                 </div>
 
-                {/* Noble Spiritual Hook Reminder Card */}
-                <div className="p-3.5 rounded-xl bg-zinc-950 border border-amber-500/25 mb-4 flex items-start gap-2.5">
-                  <HeartHandshake className="w-4 h-4 text-amber-400 flex-shrink-0 mt-1" />
-                  <div className="text-xs text-zinc-300 leading-relaxed">
-                    <span dir="rtl" className="font-nastaliq font-bold text-amber-200 block text-sm sm:text-base mb-1">
+                {/* Noble Spiritual Hook Reminder Card with ample vertical room */}
+                <div className="p-4 rounded-2xl bg-zinc-950 border border-amber-500/25 mb-4 flex items-start gap-3 shadow-inner">
+                  <HeartHandshake className="w-4 h-4 text-amber-400 flex-shrink-0 mt-2" />
+                  <div className="text-xs text-zinc-300 leading-relaxed w-full overflow-visible">
+                    <div dir="rtl" className="font-nastaliq font-bold text-amber-200 block text-base sm:text-lg leading-[2.8] py-2 px-1 text-center overflow-visible">
                       «{t.hook.hadithArabic}»
-                    </span>
-                    <span className="text-[11px] text-zinc-400 block">
+                    </div>
+                    <span className="text-[11px] text-zinc-400 block text-center mt-1">
                       {t.hook.rewardMessage}
                     </span>
                   </div>

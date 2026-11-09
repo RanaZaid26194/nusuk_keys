@@ -115,19 +115,21 @@ export const Header: React.FC<HeaderProps> = ({
               <span className={lang === 'ar' ? 'font-arabic text-sm' : ''}>{t.shareCodeBtn}</span>
             </motion.button>
 
-            {/* Apple-style corner accessory (i) button */}
+            {/* Apple-style single circle (i) button */}
             <motion.button
               onClick={(e) => {
                 e.stopPropagation();
                 handleOpenInfo();
               }}
-              whileHover={{ scale: 1.18 }}
+              whileHover={{ scale: 1.15 }}
               whileTap={{ scale: 0.9 }}
               aria-label={t.hook.infoButtonAria}
               title={t.hook.infoButtonAria}
-              className="absolute -top-1 -right-1 sm:-top-1.5 sm:-right-1.5 w-5 h-5 rounded-full bg-zinc-950 border border-amber-500/60 hover:border-amber-400 text-amber-400 hover:text-amber-300 flex items-center justify-center text-[10px] font-bold shadow-md transition-all z-10"
+              className="absolute -top-1 -right-1 sm:-top-1.5 sm:-right-1.5 w-4 h-4 sm:w-4.5 sm:h-4.5 rounded-full bg-zinc-950/90 hover:bg-black text-zinc-300 hover:text-white border border-white/25 shadow-md flex items-center justify-center transition-colors z-10"
             >
-              <Info className="w-2.5 h-2.5" />
+              <span className="font-serif text-[10px] sm:text-[11px] font-bold italic leading-none select-none">
+                i
+              </span>
             </motion.button>
           </div>
         </motion.div>

@@ -108,24 +108,26 @@ export const Hero: React.FC<HeroProps> = ({
               <ArrowIcon className="w-4 h-4" />
             </motion.button>
 
-            {/* Noble motivation info button (top right corner of the share button) */}
+            {/* Apple-style single circle (i) button */}
             <motion.button
               onClick={(e) => {
                 e.stopPropagation();
                 handleOpenInfo();
               }}
-              whileHover={{ scale: 1.18 }}
+              whileHover={{ scale: 1.15 }}
               whileTap={{ scale: 0.9 }}
               aria-label={t.hook.infoButtonAria}
               title={t.hook.infoButtonAria}
-              className="absolute -top-1.5 -right-2 sm:-top-2 sm:-right-2.5 w-6 h-6 rounded-full bg-zinc-950 border border-amber-500/60 hover:border-amber-400 text-amber-400 hover:text-amber-300 flex items-center justify-center text-xs font-bold shadow-md transition-all z-10"
+              className="absolute -top-1 -right-1 sm:-top-1.5 sm:-right-1.5 w-5 h-5 sm:w-5.5 sm:h-5.5 rounded-full bg-zinc-950/90 hover:bg-black text-zinc-300 hover:text-white border border-white/25 shadow-md flex items-center justify-center transition-colors z-10"
             >
-              <Info className="w-3 h-3" />
+              <span className="font-serif text-xs sm:text-sm font-bold italic leading-none select-none">
+                i
+              </span>
             </motion.button>
           </div>
         </motion.div>
 
-        {/* Spiritual Hook Callout: Interactive Refined Ayah Banner */}
+        {/* Spiritual Hook Callout: Interactive Refined Ayah Banner with generous vertical room */}
         <motion.div
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
@@ -133,17 +135,21 @@ export const Hero: React.FC<HeroProps> = ({
           onClick={handleOpenInfo}
           whileHover={{ scale: 1.02, y: -2 }}
           whileTap={{ scale: 0.98 }}
-          className="mt-5 inline-flex items-center gap-3 px-4 py-2.5 rounded-2xl bg-zinc-900/80 hover:bg-zinc-900 border border-amber-500/25 hover:border-amber-500/50 cursor-pointer transition-all max-w-xl mx-auto shadow-sm group"
+          className="mt-6 flex flex-col sm:flex-row items-center justify-center gap-2.5 sm:gap-3.5 px-5 py-3.5 rounded-2xl bg-zinc-900/80 hover:bg-zinc-900 border border-amber-500/25 hover:border-amber-500/40 cursor-pointer transition-all max-w-2xl mx-auto shadow-sm group"
         >
-          <div className="w-7 h-7 rounded-lg bg-amber-500/10 border border-amber-500/20 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
-            <HeartHandshake className="w-3.5 h-3.5 text-amber-400" />
+          <div className="w-8 h-8 rounded-full bg-amber-500/10 border border-amber-500/20 flex items-center justify-center flex-shrink-0 group-hover:scale-105 transition-transform">
+            <HeartHandshake className="w-4 h-4 text-amber-400" />
           </div>
-          <p className="text-xs text-zinc-300 truncate text-left rtl:text-right">
-            <span dir="rtl" className="font-nastaliq font-bold text-amber-200 text-sm sm:text-base group-hover:text-amber-100 transition-colors">
+          <div className="text-center sm:text-left rtl:sm:text-right overflow-visible">
+            <div dir="rtl" className="font-nastaliq font-bold text-amber-200 text-base sm:text-lg leading-[2.8] py-1 px-1 group-hover:text-amber-100 transition-colors overflow-visible">
               «{t.hook.ayahArabic}»
-            </span>
-            {!isAr && <span className="opacity-80 ml-2 text-[11px] text-zinc-400">— {t.hook.ayahTranslation}</span>}
-          </p>
+            </div>
+            {!isAr && (
+              <div className="text-[11px] sm:text-xs text-zinc-400 mt-0.5">
+                {t.hook.ayahTranslation} — [{t.hook.ayahRef}]
+              </div>
+            )}
+          </div>
         </motion.div>
 
         {/* Exact, Clean Minimalist Stats Grid with Staggered Entrance */}

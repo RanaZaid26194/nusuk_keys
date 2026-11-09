@@ -82,40 +82,40 @@ export const InfoModal: React.FC<InfoModalProps> = ({
               </div>
             </div>
 
-            {/* Quranic Ayah Card in Nastaliq Style */}
-            <div className="p-4 rounded-xl bg-zinc-950 border border-amber-500/25 mb-4 shadow-inner">
-              <div className="flex items-center gap-1.5 text-xs text-amber-400 font-medium mb-1">
+            {/* Quranic Ayah Card in Nastaliq Style with generous breathing room */}
+            <div className="p-4 sm:p-5 rounded-2xl bg-zinc-950 border border-amber-500/25 mb-4 shadow-inner">
+              <div className="flex items-center gap-1.5 text-xs text-amber-400 font-medium mb-1.5">
                 <BookOpen className="w-3.5 h-3.5" />
-                <span>{isAr ? "آية قرآنية كريمة" : "Quranic Ayah"} — {t.hook.ayahRef}</span>
+                <span>{t.hook.ayahRef}</span>
               </div>
-              <p
+              <div
                 dir="rtl"
-                className="font-nastaliq text-2xl sm:text-3xl text-amber-200 leading-[2.3] sm:leading-[2.4] text-center py-1 select-text"
+                className="font-nastaliq text-2xl sm:text-3xl text-amber-200 leading-[2.9] sm:leading-[3] text-center py-3 px-2 select-text overflow-visible"
               >
                 «{t.hook.ayahArabic}»
-              </p>
+              </div>
               {!isAr && (
-                <p className="text-xs sm:text-sm text-zinc-300 italic text-center mt-1">
-                  “And cooperate in righteousness and piety...” — [Surah Al-Ma&apos;idah 5:2]
+                <p className="text-xs sm:text-sm text-zinc-300 italic text-center mt-2">
+                  “And cooperate in righteousness and piety...” — [{t.hook.ayahRef}]
                 </p>
               )}
             </div>
 
-            {/* Authentic Hadith Card in Nastaliq Style */}
-            <div className="p-4 rounded-xl bg-zinc-950/80 border border-zinc-800 mb-4 shadow-inner">
-              <div className="flex items-center gap-1.5 text-xs text-zinc-400 font-medium mb-1">
+            {/* Authentic Hadith Card in Nastaliq Style with generous breathing room */}
+            <div className="p-4 sm:p-5 rounded-2xl bg-zinc-950/80 border border-zinc-800 mb-4 shadow-inner">
+              <div className="flex items-center gap-1.5 text-xs text-zinc-400 font-medium mb-1.5">
                 <Quote className="w-3.5 h-3.5 text-emerald-400" />
-                <span>{isAr ? "حديث نبوي شريف" : "Authentic Hadith"} — {t.hook.hadithRef}</span>
+                <span>{t.hook.hadithRef}</span>
               </div>
-              <p
+              <div
                 dir="rtl"
-                className="font-nastaliq text-xl sm:text-2xl text-zinc-100 leading-[2.2] sm:leading-[2.3] text-center py-1 select-text"
+                className="font-nastaliq text-xl sm:text-2xl text-zinc-100 leading-[2.8] sm:leading-[2.9] text-center py-3 px-2 select-text overflow-visible"
               >
                 «{t.hook.hadithArabic}»
-              </p>
+              </div>
               {!isAr && (
-                <p className="text-xs sm:text-sm text-zinc-300 italic text-center mt-1">
-                  “Allah helps His servant as long as the servant is helping his brother.” — [Sahih Muslim 2699]
+                <p className="text-xs sm:text-sm text-zinc-300 italic text-center mt-2">
+                  “Allah helps His servant as long as the servant is helping his brother.” — [{t.hook.hadithRef}]
                 </p>
               )}
             </div>

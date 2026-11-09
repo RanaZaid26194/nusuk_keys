@@ -27,11 +27,15 @@ body {
   overflow-x: hidden;
 }
 
-/* Nastaliq Calligraphy Class */
+/* Nastaliq Calligraphy Class with ample vertical room for diacritics & cursive ligatures */
 .font-nastaliq {
   font-family: 'Noto Nastaliq Urdu', 'Amiri', serif;
-  line-height: 2.2;
+  line-height: 2.8;
   letter-spacing: 0.02em;
+  display: inline-block;
+  padding-top: 0.35rem;
+  padding-bottom: 0.35rem;
+  overflow: visible;
 }
 
 /* Custom scrollbars */
