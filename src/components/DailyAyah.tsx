@@ -56,10 +56,65 @@ export const DailyAyah: React.FC<DailyAyahProps> = ({ lang, onOpenInfo, mockFrid
 {
   const [ayah, setAyah] = useState<DailyAyahData | null>(null);
   const [isFriday, setIsFriday] = useState<boolean>(false);
+  const [isIOS, setIsIOS] = useState<boolean>(false);
   const shouldReduceMotion = useReducedMotion();
   const canHover = useCanHover();
   const t = translations[lang];
   const isAr = lang === "ar";
+
+  useEffect(() =>
+  {
+    if (typeof navigator !== "undefined")
+    {
+      const isAppleMobile =
+        /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+        (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+      setIsIOS(isAppleMobile);
+    }
+  }, []);
+
+  // Platform-aware Ayah End Marker:
+  // Desktop & Android remain 100% untouched using native HarfBuzz ligature.
+  // iOS Safari CoreText (which renders U+06DD and digits side-by-side) uses precision composite centering.
+  const renderAyahMarker = (num?: number | null) =>
+  {
+    const arabicDigits = toArabicIndic(num);
+    if (!arabicDigits)
+      return null;
+
+    if (isIOS)
+    {
+      const digitLen = arabicDigits.length;
+      const digitSizeClass =
+        digitLen >= 3
+          ? "text-[0.40em] tracking-tighter"
+          : digitLen === 2
+            ? "text-[0.50em] tracking-normal"
+            : "text-[0.52em] tracking-normal";
+
+      return (
+        <span
+          className="inline-flex items-center justify-center relative select-none align-middle font-arabic text-gold-700/80 dark:text-gold-accent/80 mx-0.5 w-[1.3em] h-[1.3em] leading-none"
+          aria-hidden="true"
+        >
+          <span className="absolute inset-0 flex items-center justify-center text-[1.3em] leading-none select-none">
+            &#x06DD;
+          </span>
+          <span
+            className={`relative z-10 flex items-center justify-center font-arabic font-bold ${digitSizeClass} leading-none pt-[0.12em] text-gold-700/95 dark:text-gold-accent/95 select-none`}
+          >
+            {arabicDigits}
+          </span>
+        </span>
+      );
+    }
+
+    return (
+      <span className="font-arabic text-gold-700/80 dark:text-gold-accent/80 select-none text-[1.05em] leading-none" aria-hidden="true">
+        &#x06DD;{arabicDigits}
+      </span>
+    );
+  };
 
   // click trigger with haptics
   const handleClick = () =>
@@ -270,7 +325,7 @@ export const DailyAyah: React.FC<DailyAyahProps> = ({ lang, onOpenInfo, mockFrid
                   {
                     return (
                       <motion.span key={idx} variants={wordVariants} className="inline-block whitespace-nowrap">
-                        «{word}&nbsp;<span className="font-arabic text-gold-700/80 dark:text-gold-accent/80 select-none text-[1.05em] leading-none" aria-hidden="true">&#x06DD;{toArabicIndic(ayah.numberInSurah)}</span>»
+                        «{word}&nbsp;{renderAyahMarker(ayah.numberInSurah)}»
                       </motion.span>
                     );
                   }
@@ -291,7 +346,7 @@ export const DailyAyah: React.FC<DailyAyahProps> = ({ lang, onOpenInfo, mockFrid
                   {
                     return (
                       <motion.span key={idx} variants={wordVariants} className="inline-block whitespace-nowrap">
-                        {word}&nbsp;<span className="font-arabic text-gold-700/80 dark:text-gold-accent/80 select-none text-[1.05em] leading-none" aria-hidden="true">&#x06DD;{toArabicIndic(ayah.numberInSurah)}</span>»
+                        {word}&nbsp;{renderAyahMarker(ayah.numberInSurah)}»
                       </motion.span>
                     );
                   }
