@@ -23,8 +23,8 @@ interface KeyGridProps
   onSearchChange: (query: string) => void;
   onTabChange: (tab: FilterTab) => void;
   onSortChange?: (sort: SortOption) => void;
-  onVote: (id: string, type: 'UP' | 'DOWN') => void;
-  onCopy: (id: string) => void;
+  onVote: (id: string, type: 'UP' | 'DOWN', code?: string) => void;
+  onCopy: (id: string, code?: string) => void;
   onOpenSubmit: () => void;
   onOpenNusuk?: (code: string) => void;
   onToggleUsed?: (code: string) => void;
@@ -200,8 +200,18 @@ export const KeyGrid: React.FC<KeyGridProps> = ({
                   className={`text-xs text-zinc-500 dark:text-zinc-400 mt-1 px-3 font-medium ${isAr ? "font-arabic text-right" : "text-left"}`}
                 >
                   {isAr
-                    ? `تم العثور على ${items.length.toLocaleString()} مفتاح`
-                    : `${items.length.toLocaleString()} keys match`}
+                    ? (items.length === 0
+                        ? "لا توجد مفاتيح مطابقة"
+                        : items.length === 1
+                        ? "تم العثور على مفتاح واحد"
+                        : items.length === 2
+                        ? "تم العثور على مفتاحين"
+                        : `تم العثور على ${items.length.toLocaleString()} مفاتيح`)
+                    : (items.length === 0
+                        ? "No keys match"
+                        : items.length === 1
+                        ? "1 key matches"
+                        : `${items.length.toLocaleString()} keys match`)}
                 </motion.p>
               )}
             </AnimatePresence>
@@ -449,7 +459,7 @@ export const KeyGrid: React.FC<KeyGridProps> = ({
                         item={item}
                         lang={lang}
                         searchQuery={searchQuery}
-                        isUsed={Boolean(usedMap[item.code.toUpperCase().trim()])}
+                        isUsed={Boolean(item?.code && usedMap[item.code.toUpperCase().trim()])}
                         onVote={onVote}
                         onCopy={onCopy}
                         onOpenNusuk={onOpenNusuk}

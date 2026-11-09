@@ -21,7 +21,7 @@ export default function ErrorBoundary({ error, reset }: ErrorProps)
     // read stored language preference on mount safely
     try
     {
-      const savedLang = localStorage.getItem("nusuk_lang");
+      const savedLang = localStorage.getItem("nusuk_keys_lang_v1") || localStorage.getItem("nusuk_lang");
       if (savedLang === "ar" || savedLang === "en")
         setLang(savedLang);
     }

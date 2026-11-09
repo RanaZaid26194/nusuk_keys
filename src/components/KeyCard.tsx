@@ -16,8 +16,8 @@ interface KeyCardProps
   lang: Language;
   searchQuery?: string;
   isUsed?: boolean;
-  onVote: (id: string, type: 'UP' | 'DOWN') => void;
-  onCopy: (id: string) => void;
+  onVote: (id: string, type: 'UP' | 'DOWN', code?: string) => void;
+  onCopy: (id: string, code?: string) => void;
   onOpenNusuk?: (code: string) => void;
   onToggleUsed?: (code: string) => void;
 }
@@ -120,7 +120,7 @@ const KeyCardComponent: React.FC<KeyCardProps> = ({
     {
       setCopied(true);
       setCopyFailed(false);
-      onCopy(item.id);
+      onCopy(item.id, item.code);
       playHapticSound('success');
 
       setTimeout(() =>
@@ -145,22 +145,28 @@ const KeyCardComponent: React.FC<KeyCardProps> = ({
     if (item.userVoted === type)
       return;
     playHapticSound('vote');
-    onVote(item.id, type);
+    onVote(item.id, type, item.code);
   };
 
-  // Highlight search term in code cleanly
+  // Highlight search term in code cleanly and case-insensitively
   const renderHighlightedCode = () =>
   {
-    const code = item.code;
-    const query = searchQuery.trim().toUpperCase();
+    const code = item.code || "";
+    const cleanQuery = searchQuery.trim();
 
-    if (!query || !code.includes(query))
+    if (!cleanQuery || !code)
       return <span>{code}</span>;
 
-    const index = code.indexOf(query);
+    const lowerCode = code.toLowerCase();
+    const lowerQuery = cleanQuery.toLowerCase();
+    const index = lowerCode.indexOf(lowerQuery);
+
+    if (index === -1)
+      return <span>{code}</span>;
+
     const before = code.slice(0, index);
-    const match = code.slice(index, index + query.length);
-    const after = code.slice(index + query.length);
+    const match = code.slice(index, index + cleanQuery.length);
+    const after = code.slice(index + cleanQuery.length);
 
     return (
       <span>
@@ -478,7 +484,7 @@ const KeyCardComponent: React.FC<KeyCardProps> = ({
               aria-label={t.keyCard.markUnused}
               className="group/unused flex items-center gap-1.5 text-xs text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-200 transition-colors"
             >
-              <RotateCcw className="w-3.5 h-3.5 sm:w-4 sm:h-4 flex-shrink-0 text-zinc-500 group-hover/unused:text-zinc-900 dark:text-zinc-400 dark:group-hover/unused:text-zinc-100 group-hover/unused:-rotate-45 transition-all duration-200" />
+              <RotateCcw className="w-4 h-4 sm:w-[18px] sm:h-[18px] flex-shrink-0 stroke-[2] text-zinc-500 group-hover/unused:text-zinc-900 dark:text-zinc-400 dark:group-hover/unused:text-zinc-100 group-hover/unused:-rotate-45 transition-all duration-200" />
               <span className={`text-[11px] sm:text-xs leading-tight ${isAr ? "font-arabic" : ""}`}>{t.keyCard.markUnused}</span>
             </motion.button>
           )}
@@ -503,9 +509,9 @@ const KeyCardComponent: React.FC<KeyCardProps> = ({
           >
             <span className={`text-[11px] sm:text-xs leading-tight ${isAr ? "font-arabic" : ""}`}>{t.keyCard.openNusuk}</span>
             {openingNusuk ? (
-              <span className="w-3.5 h-3.5 sm:w-4 sm:h-4 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin inline-block flex-shrink-0" />
+              <span className="w-4 h-4 sm:w-[18px] sm:h-[18px] border-2 border-emerald-500 border-t-transparent rounded-full animate-spin inline-block flex-shrink-0" />
             ) : (
-              <ExternalLink className="w-3.5 h-3.5 sm:w-4 sm:h-4 flex-shrink-0 text-zinc-500 group-hover/link:text-emerald-600 dark:text-zinc-400 dark:group-hover/link:text-emerald-400 group-hover/link:translate-x-0.5 group-hover/link:-translate-y-0.5 transition-all duration-200" />
+              <ExternalLink className="w-4 h-4 sm:w-[18px] sm:h-[18px] flex-shrink-0 stroke-[2] text-zinc-500 group-hover/link:text-emerald-600 dark:text-zinc-400 dark:group-hover/link:text-emerald-400 group-hover/link:translate-x-0.5 group-hover/link:-translate-y-0.5 transition-all duration-200" />
             )}
           </motion.a>
         </div>

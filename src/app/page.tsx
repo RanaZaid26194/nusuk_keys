@@ -244,12 +244,38 @@ export default function Home()
 
           // If database has more than 500 keys, progressively hydrate Stages 2, 3, and 4 quietly in background
           if (totalCount > STAGE_1_SIZE) {
-            const deferSync = async () => {
-              try {
+            const deferSync = async () =>
+            {
+              try
+              {
                 let accumulated: any[] = [...stage1Data];
 
+                // safe merge helper to prevent overwriting optimistic votes or newly submitted keys
+                const mergeIncoming = (prev: ChallengeKey[], incomingList: any[]) =>
+                {
+                  const currentVotes = getUserVotes();
+                  const incomingIds = new Set(incomingList.map((d: any) => d.id));
+                  const localOnly = prev.filter(k => !incomingIds.has(k.id));
+                  const prevMap = new Map(prev.map(p => [p.id, p]));
+
+                  const merged = incomingList.map((d: any) =>
+                  {
+                    const existing = prevMap.get(d.id);
+                    return {
+                      ...d,
+                      userVoted: existing?.userVoted ?? currentVotes[d.id] ?? null,
+                      copies_count: Math.max(d.copies_count || 0, existing?.copies_count || 0),
+                      upvotes: Math.max(d.upvotes || 0, existing?.upvotes || 0),
+                      downvotes: Math.max(d.downvotes || 0, existing?.downvotes || 0),
+                    };
+                  });
+
+                  return [...localOnly, ...merged];
+                };
+
                 // ⭐ STAGE 2 (Background Sync): Next 500 keys (500 - 999)
-                if (totalCount > 500) {
+                if (totalCount > 500)
+                {
                   const { data: stage2Data } = await client
                     .from("challenge_keys")
                     .select("*")
@@ -257,13 +283,10 @@ export default function Home()
                     .order("created_at", { ascending: false })
                     .range(500, Math.min(999, totalCount - 1));
 
-                  if (stage2Data && stage2Data.length > 0) {
+                  if (stage2Data && stage2Data.length > 0)
+                  {
                     accumulated = accumulated.concat(stage2Data);
-                    const stage2Mapped = accumulated.map((d: any) => ({
-                      ...d,
-                      userVoted: userVotes[d.id] || null,
-                    }));
-                    setKeys((prev) => (prev.length > stage2Mapped.length ? prev : stage2Mapped));
+                    setKeys((prev) => mergeIncoming(prev, accumulated));
                   }
                 }
 
@@ -271,7 +294,8 @@ export default function Home()
                 await new Promise((r) => setTimeout(r, 350));
 
                 // ⭐ STAGE 3 (Background Sync): Next 500 keys (1,000 - 1,499)
-                if (totalCount > 1000) {
+                if (totalCount > 1000)
+                {
                   const { data: stage3Data } = await client
                     .from("challenge_keys")
                     .select("*")
@@ -279,13 +303,10 @@ export default function Home()
                     .order("created_at", { ascending: false })
                     .range(1000, Math.min(1499, totalCount - 1));
 
-                  if (stage3Data && stage3Data.length > 0) {
+                  if (stage3Data && stage3Data.length > 0)
+                  {
                     accumulated = accumulated.concat(stage3Data);
-                    const stage3Mapped = accumulated.map((d: any) => ({
-                      ...d,
-                      userVoted: userVotes[d.id] || null,
-                    }));
-                    setKeys((prev) => (prev.length > stage3Mapped.length ? prev : stage3Mapped));
+                    setKeys((prev) => mergeIncoming(prev, accumulated));
                   }
                 }
 
@@ -293,9 +314,11 @@ export default function Home()
                 await new Promise((r) => setTimeout(r, 450));
 
                 // ⭐ STAGE 4 (Background Sync): All remaining keys (1,500 -> totalCount) in parallel
-                if (totalCount > 1500) {
+                if (totalCount > 1500)
+                {
                   const remainingPromises = [];
-                  for (let from = 1500; from < totalCount; from += 1000) {
+                  for (let from = 1500; from < totalCount; from += 1000)
+                  {
                     const to = Math.min(from + 999, totalCount - 1);
                     remainingPromises.push(
                       client
@@ -308,27 +331,33 @@ export default function Home()
                   }
 
                   const remainingResults = await Promise.all(remainingPromises);
-                  for (const res of remainingResults) {
-                    if (res.data && res.data.length > 0) {
+                  for (const res of remainingResults)
+                  {
+                    if (res.data && res.data.length > 0)
                       accumulated = accumulated.concat(res.data);
+                  }
+
+                  setKeys((prev) =>
+                  {
+                    const allMerged = mergeIncoming(prev, accumulated);
+                    try
+                    {
+                      localStorage.setItem(LOCAL_STORAGE_CACHE, JSON.stringify(allMerged));
                     }
-                  }
-
-                  const allMapped = accumulated.map((d: any) => ({
-                    ...d,
-                    userVoted: userVotes[d.id] || null,
-                  }));
-                  setKeys(allMapped);
-
-                  try {
-                    localStorage.setItem(LOCAL_STORAGE_CACHE, JSON.stringify(allMapped));
-                  } catch {
-                    try {
-                      localStorage.setItem(LOCAL_STORAGE_CACHE, JSON.stringify(stage1Mapped));
-                    } catch {}
-                  }
+                    catch
+                    {
+                      try
+                      {
+                        localStorage.setItem(LOCAL_STORAGE_CACHE, JSON.stringify(stage1Data));
+                      }
+                      catch {}
+                    }
+                    return allMerged;
+                  });
                 }
-              } catch (e) {
+              }
+              catch (e)
+              {
                 console.warn("Background hydration warning:", e);
               }
             };
@@ -411,7 +440,7 @@ export default function Home()
   };
 
   // Upvote / Downvote Handler
-  const handleVote = useCallback(async (keyId: string, type: 'UP' | 'DOWN') =>
+  const handleVote = useCallback(async (keyId: string, type: 'UP' | 'DOWN', codeParam?: string) =>
   {
     const userVotes = getUserVotes();
     if (userVotes[keyId])
@@ -420,11 +449,26 @@ export default function Home()
     userVotes[keyId] = type;
     localStorage.setItem(LOCAL_STORAGE_VOTES, JSON.stringify(userVotes));
 
-    const targetKey = keys.find(k => k.id === keyId);
-    if (targetKey?.code)
+    let votedCode = codeParam || "";
+
+    // mark as used in local history safely
+    if (votedCode)
     {
-      const nextUsed = markUsed(targetKey.code);
+      const nextUsed = markUsed(votedCode);
       setUsedMap(nextUsed);
+    }
+    else
+    {
+      setKeys((prevKeys) =>
+      {
+        const target = prevKeys.find(k => k.id === keyId);
+        if (target?.code)
+        {
+          const nextUsed = markUsed(target.code);
+          setUsedMap(nextUsed);
+        }
+        return prevKeys;
+      });
     }
 
     // Optimistic UI update
@@ -470,16 +514,28 @@ export default function Home()
   }, [getUserVotes]);
 
   // Copy Count Increment with Soft Anti-Spam
-  const handleCopy = useCallback(async (keyId: string) =>
+  const handleCopy = useCallback(async (keyId: string, codeParam?: string) =>
   {
-    const targetKey = keys.find(k => k.id === keyId);
-    const targetCode = targetKey?.code || "";
+    let targetCode = codeParam || "";
 
-    // Always mark as used in local history
+    // Always mark as used in local history safely
     if (targetCode)
     {
       const nextUsed = markUsed(targetCode);
       setUsedMap(nextUsed);
+    }
+    else
+    {
+      setKeys((prevKeys) =>
+      {
+        const target = prevKeys.find(k => k.id === keyId);
+        if (target?.code)
+        {
+          const nextUsed = markUsed(target.code);
+          setUsedMap(nextUsed);
+        }
+        return prevKeys;
+      });
     }
 
     // Soft anti-spam: count only once per key per 24 hours per browser
@@ -592,7 +648,7 @@ export default function Home()
       };
 
     // 1. Instant local duplicate rejection (case-insensitive)
-    const isLocalDuplicate = keys.some(k => k.code.trim().toUpperCase() === cleanCode.toUpperCase());
+    const isLocalDuplicate = keys.some(k => Boolean(k?.code && k.code.trim().toUpperCase() === cleanCode.toUpperCase()));
     if (isLocalDuplicate)
       return {
         success: false,
@@ -669,8 +725,7 @@ export default function Home()
           userVoted: 'UP',
         };
 
-        const updated = [newKey, ...keys];
-        setKeys(updated);
+        setKeys((prev) => [newKey, ...prev]);
 
         const userVotes = getUserVotes();
         userVotes[newKey.id] = 'UP';
@@ -701,9 +756,12 @@ export default function Home()
       userVoted: 'UP',
     };
 
-    const updated = [newKey, ...keys];
-    setKeys(updated);
-    persistOfflineKeys(updated);
+    setKeys((prev) =>
+    {
+      const updated = [newKey, ...prev];
+      persistOfflineKeys(updated);
+      return updated;
+    });
 
     const userVotes = getUserVotes();
     userVotes[newKey.id] = 'UP';
@@ -761,7 +819,7 @@ export default function Home()
 
     // Tabs
     if (activeTab === "verified")
-      list = list.filter(k => calculateSuccessRate(k.upvotes, k.downvotes) >= 70 && (k.upvotes || 0) >= 2);
+      list = list.filter(k => calculateSuccessRate(k.upvotes, k.downvotes) >= 75 && (k.upvotes || 0) >= 2);
 
     // Apply active SortOption across all standard tabs
     list.sort((a, b) =>
