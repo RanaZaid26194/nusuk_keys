@@ -52,7 +52,7 @@ export const NumberCounter: React.FC<NumberCounterProps> = ({
   }, [value, duration]);
 
   return (
-    <span className={`inline-flex items-baseline font-mono tracking-tight ${className}`}>
+    <span className={`inline-flex items-baseline font-mono tracking-tight tabular-nums ${className}`}>
       <span>{displayValue.toLocaleString()}</span>
       {suffix && <span className="text-emerald-600 dark:text-emerald-400 ml-0.5">{suffix}</span>}
     </span>

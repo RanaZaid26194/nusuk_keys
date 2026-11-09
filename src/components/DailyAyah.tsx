@@ -156,17 +156,17 @@ export const DailyAyah: React.FC<DailyAyahProps> = ({ lang, onOpenInfo, mockFrid
       transition={{ duration: 0.45, delay: 0.28, ease: "easeOut" }}
       onClick={handleClick}
       onKeyDown={handleKeyDown}
-      whileHover={{ y: -2 }}
+      whileHover={{ y: -3, scale: 1.006 }}
       whileTap={{ scale: 0.98 }}
       className={`mt-6 relative overflow-hidden flex flex-col items-center justify-center px-4 sm:px-6 py-3.5 sm:py-4 rounded-2xl bg-white/90 dark:bg-zinc-900/80 hover:bg-white dark:hover:bg-zinc-900 border ${
         isFriday
           ? "border-gold-accent/40 dark:border-gold-accent/35 hover:border-gold-accent/60 dark:hover:border-gold-accent/50 shadow-[0_0_20px_rgba(212,175,55,0.12)] dark:shadow-[0_0_20px_rgba(212,175,55,0.06)]"
-          : "border-gold-accent/30 dark:border-gold-accent/20 hover:border-gold-accent/45 dark:hover:border-gold-accent/35 shadow-xs"
-      } cursor-pointer transition-all max-w-xl mx-auto group text-center min-h-[160px] sm:min-h-[176px]`}
+          : "border-gold-accent/30 dark:border-gold-accent/20 hover:border-gold-accent/45 dark:hover:border-gold-accent/35 shadow-xs hover:shadow-md"
+      } cursor-pointer transition-all duration-200 max-w-xl mx-auto group text-center min-h-[160px] sm:min-h-[176px]`}
     >
       {/* 3. Soft gold ambient radial glow at the top */}
       <div
-        className="absolute inset-x-0 top-0 h-28 pointer-events-none -z-0"
+        className="absolute inset-x-0 top-0 h-28 pointer-events-none -z-0 group-hover:opacity-100 transition-opacity"
         style={{
           background:
             "radial-gradient(50% 100% at 50% 0%, rgba(212, 175, 55, 0.08) 0%, rgba(212, 175, 55, 0.02) 50%, transparent 100%)"
@@ -185,7 +185,7 @@ export const DailyAyah: React.FC<DailyAyahProps> = ({ lang, onOpenInfo, mockFrid
       />
 
       {/* Scripture Header Icon Circle */}
-      <div className="relative z-10 w-8 h-8 rounded-full bg-gold-accent/10 border border-gold-accent/20 flex items-center justify-center flex-shrink-0 group-hover:scale-105 transition-transform mb-1.5">
+      <div className="relative z-10 w-8 h-8 rounded-full bg-gold-accent/10 border border-gold-accent/20 flex items-center justify-center flex-shrink-0 group-hover:scale-110 group-hover:rotate-6 transition-transform duration-200 mb-1.5">
         <HeartHandshake className="w-4 h-4 text-gold-accent" />
       </div>
 

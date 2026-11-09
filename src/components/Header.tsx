@@ -21,7 +21,17 @@ export const Header: React.FC<HeaderProps> = ({
   onOpenSubmit,
   onOpenInfo,
 }) => {
+  const [scrolled, setScrolled] = React.useState(false);
   const t = translations[lang];
+
+  React.useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 12);
+    };
+    handleScroll();
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   const handleLang = (newLang: Language) => {
     playHapticSound('click');
@@ -39,7 +49,7 @@ export const Header: React.FC<HeaderProps> = ({
   };
 
   return (
-    <header className="sticky top-0 z-40 w-full bg-white/80 dark:bg-zinc-950/80 backdrop-blur-md border-b border-zinc-200/80 dark:border-zinc-800/80 transition-colors">
+    <header className={`sticky top-0 z-40 w-full bg-white/80 dark:bg-zinc-950/80 backdrop-blur-md border-b transition-all duration-200 ${scrolled ? 'border-zinc-200/90 dark:border-zinc-800/90 shadow-sm shadow-zinc-950/5 dark:shadow-black/25' : 'border-zinc-200/50 dark:border-zinc-800/50'}`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 sm:h-18 flex items-center justify-between">
         {/* Brand / Logo */}
         <motion.div
@@ -47,9 +57,13 @@ export const Header: React.FC<HeaderProps> = ({
           animate={{ opacity: 1, x: 0 }}
           className="flex items-center gap-2 sm:gap-3 select-none flex-shrink-0"
         >
-          <div className="flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-emerald-600 dark:text-emerald-400 shadow-sm transition-colors">
+          <motion.div
+            whileHover={{ rotate: 14, scale: 1.08 }}
+            transition={{ type: "spring", stiffness: 400, damping: 20 }}
+            className="flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-emerald-600 dark:text-emerald-400 shadow-sm transition-colors cursor-pointer"
+          >
             <KeyRound className="w-4 h-4 sm:w-5 sm:h-5" />
-          </div>
+          </motion.div>
 
           <div>
             <div className="flex items-center gap-2">
@@ -74,8 +88,10 @@ export const Header: React.FC<HeaderProps> = ({
 
           {/* Language Switcher */}
           <div className="flex items-center p-0.5 sm:p-1 rounded-xl bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-sm transition-colors" role="group" aria-label="Language selection">
-            <button
+            <motion.button
               onClick={() => handleLang("en")}
+              whileHover={{ scale: 1.03 }}
+              whileTap={{ scale: 0.95 }}
               aria-label="Switch to English"
               className={`relative px-2 sm:px-2.5 py-1 text-[11px] sm:text-xs font-medium rounded-lg transition-colors ${
                 lang === "en" ? "text-zinc-900 dark:text-white" : "text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200"
@@ -89,10 +105,12 @@ export const Header: React.FC<HeaderProps> = ({
                 />
               )}
               <span className="relative z-10">EN</span>
-            </button>
+            </motion.button>
 
-            <button
+            <motion.button
               onClick={() => handleLang("ar")}
+              whileHover={{ scale: 1.03 }}
+              whileTap={{ scale: 0.95 }}
               aria-label="التغيير إلى العربية"
               className={`relative px-2 sm:px-2.5 py-1 text-[11px] sm:text-xs font-medium rounded-lg transition-colors font-arabic ${
                 lang === "ar" ? "text-zinc-900 dark:text-white" : "text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200"
@@ -106,20 +124,20 @@ export const Header: React.FC<HeaderProps> = ({
                 />
               )}
               <span className="relative z-10">العربية</span>
-            </button>
+            </motion.button>
           </div>
 
           {/* Share Your Key Button with Apple-style corner (i) button */}
           <div className="relative inline-flex items-center">
             <motion.button
               onClick={handleOpenSubmit}
-              whileHover={{ scale: 1.03 }}
+              whileHover={{ scale: 1.03, y: -0.5 }}
               whileTap={{ scale: 0.96 }}
               aria-label={t.shareCodeBtn}
               title={t.shareCodeBtn}
-              className="flex items-center justify-center gap-1.5 p-2 sm:px-4 sm:py-2 rounded-full bg-emerald-600 hover:bg-emerald-500 text-white font-medium text-xs sm:text-sm transition-all shadow-sm"
+              className="group flex items-center justify-center gap-1.5 p-2 sm:px-4 sm:py-2 rounded-full bg-emerald-600 hover:bg-emerald-500 text-white font-medium text-xs sm:text-sm transition-all shadow-sm shadow-emerald-600/20 hover:shadow-emerald-600/35"
             >
-              <Plus className="w-4 h-4 stroke-[2.5]" />
+              <Plus className="w-4 h-4 stroke-[2.5] group-hover:rotate-90 transition-transform duration-300" />
               <span className={`hidden sm:inline ${lang === 'ar' ? 'font-arabic text-sm' : ''}`}>{t.shareCodeBtn}</span>
             </motion.button>
 

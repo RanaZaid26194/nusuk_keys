@@ -27,10 +27,10 @@ export const Footer: React.FC<FooterProps> = ({ lang }) => {
           href="https://services.nusuk.sa"
           target="_blank"
           rel="noopener noreferrer"
-          className="flex items-center gap-1.5 text-xs text-zinc-600 hover:text-emerald-600 dark:text-zinc-400 dark:hover:text-emerald-400 transition-colors"
+          className="group flex items-center gap-1.5 text-xs text-zinc-600 hover:text-emerald-600 dark:text-zinc-400 dark:hover:text-emerald-400 transition-colors"
         >
           <span>services.nusuk.sa</span>
-          <ExternalLink className="w-3 h-3" />
+          <ExternalLink className="w-3 h-3 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform duration-200" />
         </a>
       </div>
     </footer>

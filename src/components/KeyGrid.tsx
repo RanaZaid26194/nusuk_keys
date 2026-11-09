@@ -126,7 +126,7 @@ export const KeyGrid: React.FC<KeyGridProps> = ({
       >
         {/* Animated Search Bar with Keyboard Hint (RTL/LTR Adaptive) */}
         <div className="relative flex-1 max-w-md group" role="search">
-          <div className={`absolute inset-y-0 ${isAr ? "right-0 pr-3.5" : "left-0 pl-3.5"} flex items-center pointer-events-none text-zinc-400 dark:text-zinc-500 group-focus-within:text-zinc-600 dark:group-focus-within:text-zinc-300 transition-colors`}>
+          <div className={`absolute inset-y-0 ${isAr ? "right-0 pr-3.5" : "left-0 pl-3.5"} flex items-center pointer-events-none text-zinc-400 dark:text-zinc-500 group-focus-within:text-emerald-600 dark:group-focus-within:text-emerald-400 transition-colors duration-200`}>
             <Search className="w-4 h-4" />
           </div>
 
@@ -137,7 +137,7 @@ export const KeyGrid: React.FC<KeyGridProps> = ({
             onChange={(e) => onSearchChange(e.target.value)}
             placeholder={t.searchPlaceholder}
             aria-label={t.searchPlaceholder}
-            className={`w-full ${isAr ? "pr-10 pl-16 text-right font-arabic" : "pl-10 pr-16 text-left"} py-2.5 rounded-full bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-base sm:text-sm text-zinc-900 dark:text-white placeholder-zinc-400 dark:placeholder-zinc-500 focus:outline-none focus:border-zinc-400 dark:focus:border-zinc-600 focus:ring-1 focus:ring-zinc-400 dark:focus:ring-zinc-600 shadow-sm transition-all`}
+            className={`w-full ${isAr ? "pr-10 pl-16 text-right font-arabic" : "pl-10 pr-16 text-left"} py-2.5 rounded-full bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-base sm:text-sm text-zinc-900 dark:text-white placeholder-zinc-400 dark:placeholder-zinc-500 focus:outline-none focus:border-emerald-500/60 dark:focus:border-emerald-500/50 focus:ring-2 focus:ring-emerald-500/15 shadow-sm transition-all duration-200`}
           />
 
           <div className={`absolute inset-y-0 ${isAr ? "left-0 pl-3" : "right-0 pr-3"} flex items-center gap-1.5 pointer-events-none`}>
@@ -329,14 +329,14 @@ export const KeyGrid: React.FC<KeyGridProps> = ({
                 whileHover={{ scale: 1.03, y: -1 }}
                 whileTap={{ scale: 0.96 }}
                 aria-label={isAr ? "عرض المزيد من المفاتيح" : "Show more keys"}
-                className="flex items-center gap-2 px-6 py-2.5 rounded-full bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700/80 hover:bg-zinc-50 dark:hover:bg-zinc-800 text-xs sm:text-sm font-semibold text-zinc-800 dark:text-zinc-200 shadow-sm transition-all"
+                className="group flex items-center gap-2 px-6 py-2.5 rounded-full bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700/80 hover:bg-zinc-50 dark:hover:bg-zinc-800 text-xs sm:text-sm font-semibold text-zinc-800 dark:text-zinc-200 shadow-sm hover:shadow transition-all"
               >
                 <span>
                   {isAr
                     ? `عرض المزيد (يُعرض ${visibleItems.length.toLocaleString()} من ${items.length.toLocaleString()} مفتاح)`
                     : `Show More (${visibleItems.length.toLocaleString()} of ${items.length.toLocaleString()} keys)`}
                 </span>
-                <ChevronDown className="w-4 h-4 text-zinc-400 dark:text-zinc-400" />
+                <ChevronDown className="w-4 h-4 text-zinc-400 dark:text-zinc-400 group-hover:translate-y-0.5 transition-transform duration-200" />
               </motion.button>
             </div>
           )}

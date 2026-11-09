@@ -14,15 +14,18 @@
 :root {
   --foreground-rgb: 24, 24, 27;
   --background-rgb: 250, 250, 250;
+  --spotlight-glow: rgba(16, 185, 129, 0.12);
 }
 
 .dark {
   --foreground-rgb: 244, 244, 245;
   --background-rgb: 9, 9, 11;
+  --spotlight-glow: rgba(16, 185, 129, 0.08);
 }
 
 html {
   overflow-x: hidden;
+  scroll-behavior: smooth;
 }
 
 body {
@@ -33,6 +36,9 @@ body {
     radial-gradient(ellipse 60% 30% at 80% 10%, rgba(212, 175, 55, 0.03), transparent 60%);
   min-height: 100vh;
   font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
   overflow-x: hidden;
 }
 
