@@ -175,7 +175,11 @@ export const SubmitModal: React.FC<SubmitModalProps> = ({
                     placeholder={t.modal.placeholder}
                     maxLength={24}
                     autoFocus
-                    className="w-full px-3.5 py-3 rounded-xl bg-slate-950 border border-slate-700 font-mono text-base font-bold text-emerald-200 tracking-wider focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 shadow-inner"
+                    className={`w-full px-3.5 py-3 rounded-xl bg-slate-950 font-mono text-base font-bold tracking-wider focus:outline-none shadow-inner transition-colors ${
+                      errorMessage
+                        ? "border-2 border-rose-500 text-rose-200 focus:border-rose-400 focus:ring-1 focus:ring-rose-400"
+                        : "border border-slate-700 text-emerald-200 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
+                    }`}
                   />
                 </div>
 
@@ -192,12 +196,17 @@ export const SubmitModal: React.FC<SubmitModalProps> = ({
                   </div>
                 )}
 
-                {/* Error Banner */}
+                {/* Error Banner with Shake Animation */}
                 {errorMessage && (
-                  <div className="flex items-center gap-2 p-2.5 mb-4 rounded-lg bg-rose-500/10 border border-rose-500/20 text-rose-300 text-xs">
-                    <AlertCircle className="w-4 h-4 flex-shrink-0 text-rose-400" />
-                    <span>{errorMessage}</span>
-                  </div>
+                  <motion.div
+                    initial={{ opacity: 0, y: -4, x: -6 }}
+                    animate={{ opacity: 1, y: 0, x: [0, -6, 6, -4, 4, 0] }}
+                    transition={{ duration: 0.35 }}
+                    className="flex items-start gap-2.5 p-3 mb-4 rounded-xl bg-rose-950/40 border border-rose-600/40 text-rose-200 text-xs shadow-lg"
+                  >
+                    <AlertCircle className="w-4 h-4 flex-shrink-0 text-rose-400 mt-0.5" />
+                    <span className="leading-relaxed font-medium">{errorMessage}</span>
+                  </motion.div>
                 )}
 
                 {/* Action Buttons */}

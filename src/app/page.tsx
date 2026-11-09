@@ -200,16 +200,105 @@ export default function Home() {
     }
   };
 
-  // Submit New Key
+  // Submit New Key with Strict Duplicate Rejection
   const handleSubmitKey = async (code: string): Promise<{ success: boolean; error?: string }> => {
     const cleanCode = code.trim().toUpperCase();
 
-    // Duplicate check
-    const existing = keys.find(k => k.code.toUpperCase() === cleanCode);
-    if (existing) {
-      return { success: false, error: lang === 'ar' ? 'هذا الرمز تمت مشاركته مسبقاً' : 'This code has already been shared.' };
+    // 1. Instant local duplicate rejection
+    const isLocalDuplicate = keys.some(k => k.code.trim().toUpperCase() === cleanCode);
+    if (isLocalDuplicate) {
+      return {
+        success: false,
+        error: lang === 'ar'
+          ? 'هذا الرمز تمت إضافته مسبقاً وهو موجود بالفعل في القائمة!'
+          : 'This key has already been added and is already active in the list!'
+      };
     }
 
+    // 2. Supabase duplicate check & insertion
+    if (isSupabaseConfigured && supabase) {
+      try {
+        // Query Supabase directly in case another user added it from another device
+        const { data: existingInDb } = await supabase
+          .from("challenge_keys")
+          .select("id, code")
+          .ilike("code", cleanCode)
+          .maybeSingle();
+
+        if (existingInDb) {
+          return {
+            success: false,
+            error: lang === 'ar'
+              ? 'هذا الرمز تمت إضافته مسبقاً وهو موجود بالفعل في قاعدة البيانات!'
+              : 'This key has already been added and is already live in the database!'
+          };
+        }
+
+        // Insert into Supabase table
+        const { data: insertedData, error: insertError } = await supabase
+          .from("challenge_keys")
+          .insert([
+            {
+              code: cleanCode,
+              upvotes: 1,
+              downvotes: 0,
+              copies_count: 0,
+              is_active: true,
+            },
+          ])
+          .select()
+          .single();
+
+        if (insertError) {
+          if (
+            insertError.code === "23505" ||
+            insertError.message?.toLowerCase().includes("duplicate") ||
+            insertError.message?.toLowerCase().includes("unique")
+          ) {
+            return {
+              success: false,
+              error: lang === 'ar'
+                ? 'هذا الرمز تمت إضافته مسبقاً وهو موجود بالفعل!'
+                : 'This key has already been added and is already present!'
+            };
+          }
+          return {
+            success: false,
+            error: insertError.message || (lang === 'ar' ? 'فشل حفظ الرمز في قاعدة البيانات' : 'Failed to save key to database')
+          };
+        }
+
+        // Add to local state with Supabase ID
+        const newKey: ChallengeKey = {
+          id: insertedData?.id || ("key-" + Date.now()),
+          code: cleanCode,
+          upvotes: 1,
+          downvotes: 0,
+          copies_count: 0,
+          is_active: true,
+          created_at: insertedData?.created_at || new Date().toISOString(),
+          last_verified_at: new Date().toISOString(),
+          userVoted: 'UP',
+        };
+
+        const updated = [newKey, ...keys];
+        setKeys(updated);
+
+        const userVotes = getUserVotes();
+        userVotes[newKey.id] = 'UP';
+        localStorage.setItem(LOCAL_STORAGE_VOTES, JSON.stringify(userVotes));
+
+        return { success: true };
+      } catch (err: any) {
+        console.error("Supabase submission exception:", err);
+        return {
+          success: false,
+          error: err?.message || (lang === 'ar' ? 'حدث خطأ في الاتصال بقاعدة البيانات' : 'Database connection error')
+        };
+      }
+    }
+
+    // 3. Fallback for offline/local-only mode
     const newKey: ChallengeKey = {
       id: "key-" + Date.now(),
       code: cleanCode,
@@ -222,35 +311,13 @@ export default function Home() {
       userVoted: 'UP',
     };
 
-    // Optimistically prepend
     const updated = [newKey, ...keys];
     setKeys(updated);
     persistOfflineKeys(updated);
 
-    // Save user's own upvote
     const userVotes = getUserVotes();
     userVotes[newKey.id] = 'UP';
     localStorage.setItem(LOCAL_STORAGE_VOTES, JSON.stringify(userVotes));
-
-    // Push to Supabase if live
-    if (isSupabaseConfigured && supabase) {
-      try {
-        const { error } = await supabase.from("challenge_keys").insert([
-          {
-            code: cleanCode,
-            upvotes: 1,
-            downvotes: 0,
-            copies_count: 0,
-            is_active: true,
-          },
-        ]);
-        if (error) {
-          console.error("Supabase insert error:", error);
-        }
-      } catch (err) {
-        console.error("Supabase insert exception:", err);
-      }
-    }
 
     return { success: true };
   };
