@@ -213,7 +213,8 @@ export const DailyAyah: React.FC<DailyAyahProps> = ({ lang, onOpenInfo, mockFrid
                 variants={containerVariants}
                 initial="hidden"
                 animate="visible"
-                className="font-arabic font-normal text-gold-800 dark:text-gold-200 text-base sm:text-lg leading-[2.2] py-1 px-2 text-center group-hover:text-gold-950 dark:group-hover:text-gold-100 transition-colors overflow-visible select-text"
+                style={{ textAlign: "center" }}
+                className="font-arabic font-normal text-gold-800 dark:text-gold-200 text-base sm:text-lg leading-[2.2] py-1 px-2 text-center !text-center mx-auto group-hover:text-gold-950 dark:group-hover:text-gold-100 transition-colors overflow-visible select-text"
               >
                 «{arabicWords.map((word, idx) => (
                   <React.Fragment key={idx}>
@@ -239,10 +240,16 @@ export const DailyAyah: React.FC<DailyAyahProps> = ({ lang, onOpenInfo, mockFrid
               {/* 2. English translation and reference in muted zinc */}
               {!isAr && (
                 <>
-                  <div className="text-[11px] sm:text-xs text-zinc-600 dark:text-zinc-400 text-center transition-colors">
+                  <div
+                    style={{ textAlign: "center" }}
+                    className="text-[11px] sm:text-xs text-zinc-600 dark:text-zinc-400 text-center !text-center transition-colors mx-auto"
+                  >
                     “{ayah.english}” — [Surah {ayah.surahNameEn} ({ayah.surah}:{ayah.numberInSurah})]
                   </div>
-                  <div className="text-[10px] text-zinc-500 dark:text-zinc-500 mt-0.5 text-center">
+                  <div
+                    style={{ textAlign: "center" }}
+                    className="text-[10px] text-zinc-500 dark:text-zinc-500 mt-0.5 text-center !text-center mx-auto"
+                  >
                     Sahih International
                   </div>
                 </>
@@ -252,7 +259,8 @@ export const DailyAyah: React.FC<DailyAyahProps> = ({ lang, onOpenInfo, mockFrid
               {isAr && (
                 <div
                   dir="rtl"
-                  className="text-[11px] sm:text-xs text-zinc-600 dark:text-zinc-400 font-arabic mt-1 text-center transition-colors"
+                  style={{ textAlign: "center" }}
+                  className="text-[11px] sm:text-xs text-zinc-600 dark:text-zinc-400 font-arabic mt-1 text-center !text-center transition-colors mx-auto"
                 >
                   [{ayah.surahNameAr} ({ayah.numberInSurah})]
                 </div>
