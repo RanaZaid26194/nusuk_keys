@@ -50,7 +50,7 @@ export const Header: React.FC<HeaderProps> = ({
 
   return (
     <header className={`sticky top-0 z-40 w-full bg-white/80 dark:bg-zinc-950/80 backdrop-blur-md border-b transition-all duration-200 ${scrolled ? 'border-zinc-200/90 dark:border-zinc-800/90 shadow-sm shadow-zinc-950/5 dark:shadow-black/25' : 'border-zinc-200/50 dark:border-zinc-800/50'}`}>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 sm:h-18 flex items-center justify-between">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 sm:h-[72px] flex items-center justify-between">
         {/* Brand / Logo */}
         <motion.div
           initial={{ opacity: 0, x: -10 }}
@@ -153,7 +153,7 @@ export const Header: React.FC<HeaderProps> = ({
               transition={{ duration: 0.16, ease: "easeOut" }}
               aria-label={t.hook.infoButtonAria}
               title={t.hook.infoButtonAria}
-              className="absolute -top-0.5 right-0 rtl:left-0 rtl:right-auto sm:-top-1.5 sm:-right-1.5 sm:rtl:-left-1.5 sm:rtl:right-auto w-4.5 h-4.5 sm:w-5 sm:h-5 rounded-full bg-emerald-950 hover:bg-emerald-900 text-emerald-200 hover:text-white border border-emerald-400/50 shadow-md flex items-center justify-center transition-colors z-10"
+              className="absolute -top-0.5 right-0 rtl:left-0 rtl:right-auto sm:-top-1.5 sm:-right-1.5 sm:rtl:-left-1.5 sm:rtl:right-auto w-[18px] h-[18px] sm:w-5 sm:h-5 rounded-full bg-emerald-950 hover:bg-emerald-900 text-emerald-200 hover:text-white border border-emerald-400/50 shadow-md flex items-center justify-center transition-colors z-10"
             >
               <svg className="w-2.5 h-2.5 sm:w-3 sm:h-3" viewBox="0 0 12 12" fill="currentColor">
                 <circle cx="6" cy="2.5" r="1.1" />

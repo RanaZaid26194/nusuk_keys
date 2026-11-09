@@ -205,7 +205,7 @@ export const KeyGrid: React.FC<KeyGridProps> = ({
                   {tab === "used" && usedCount > 0 && (
                     <motion.span
                       animate={shouldPulseUsedBadge ? { scale: [1, 1.45, 1], transition: { duration: 0.6 } } : { scale: 1 }}
-                      className={`px-1.5 py-0.2 rounded-full text-[10px] font-mono font-bold leading-tight ${
+                      className={`px-1.5 py-0.5 rounded-full text-[10px] font-mono font-bold leading-tight ${
                         isActive
                           ? "bg-amber-500/20 text-amber-900 dark:text-amber-200"
                           : "bg-zinc-200 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300"

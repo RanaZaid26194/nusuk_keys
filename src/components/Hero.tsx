@@ -121,7 +121,7 @@ export const Hero: React.FC<HeroProps> = ({
               transition={{ duration: 0.16, ease: "easeOut" }}
               aria-label={t.hook.infoButtonAria}
               title={t.hook.infoButtonAria}
-              className="absolute -top-0.5 right-0 rtl:left-0 rtl:right-auto sm:-top-1.5 sm:-right-2 sm:rtl:-left-2 sm:rtl:right-auto w-5.5 h-5.5 sm:w-6 sm:h-6 rounded-full bg-emerald-950 hover:bg-emerald-900 text-emerald-200 hover:text-white border border-emerald-400/50 shadow-md flex items-center justify-center transition-colors z-10"
+              className="absolute -top-0.5 right-0 rtl:left-0 rtl:right-auto sm:-top-1.5 sm:-right-2 sm:rtl:-left-2 sm:rtl:right-auto w-[22px] h-[22px] sm:w-6 sm:h-6 rounded-full bg-emerald-950 hover:bg-emerald-900 text-emerald-200 hover:text-white border border-emerald-400/50 shadow-md flex items-center justify-center transition-colors z-10"
             >
               <svg className="w-3 h-3 sm:w-3.5 sm:h-3.5" viewBox="0 0 12 12" fill="currentColor">
                 <circle cx="6" cy="2.5" r="1.1" />

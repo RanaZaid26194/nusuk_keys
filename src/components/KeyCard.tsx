@@ -33,6 +33,7 @@ export const KeyCard: React.FC<KeyCardProps> = ({
 }) =>
 {
   const [copied, setCopied] = useState(false);
+  const [copyFailed, setCopyFailed] = useState(false);
   const cardRef = useRef<HTMLDivElement>(null);
   const spotlightRef = useRef<HTMLDivElement>(null);
 
@@ -64,15 +65,29 @@ export const KeyCard: React.FC<KeyCardProps> = ({
   const handleCopy = async (e: React.MouseEvent) =>
   {
     e.stopPropagation();
-    await copyToClipboard(item.code);
-    setCopied(true);
-    onCopy(item.id);
-    playHapticSound('success');
-
-    setTimeout(() =>
+    const success = await copyToClipboard(item.code);
+    if (success)
     {
-      setCopied(false);
-    }, 2000);
+      setCopied(true);
+      setCopyFailed(false);
+      onCopy(item.id);
+      playHapticSound('success');
+
+      setTimeout(() =>
+      {
+        setCopied(false);
+      }, 2000);
+    }
+    else
+    {
+      setCopyFailed(true);
+      playHapticSound('click');
+
+      setTimeout(() =>
+      {
+        setCopyFailed(false);
+      }, 3500);
+    }
   };
 
   const handleVoteClick = (type: 'UP' | 'DOWN') =>
@@ -174,9 +189,11 @@ export const KeyCard: React.FC<KeyCardProps> = ({
         className={`relative z-10 flex items-center justify-between p-3 sm:p-3.5 rounded-xl border transition-colors duration-150 cursor-pointer select-none mb-3.5 shadow-xs group ${
           copied
             ? "bg-emerald-500/10 dark:bg-emerald-500/15 border-emerald-500/60 ring-1 ring-emerald-500/30"
+            : copyFailed
+            ? "bg-amber-500/10 dark:bg-amber-500/15 border-amber-500/60 ring-1 ring-amber-500/30"
             : "bg-zinc-50 dark:bg-zinc-950 border-zinc-200 dark:border-zinc-800/80 hover:border-emerald-500/40 dark:hover:border-emerald-500/40 hover:bg-emerald-500/[0.02]"
         }`}
-        title={t.keyCard.copyKey}
+        title={copyFailed ? (t.keyCard.copyFailed || (isAr ? "اضغط مطولاً للنسخ" : "Press & hold to copy")) : t.keyCard.copyKey}
       >
         <div className="font-mono text-sm sm:text-base md:text-lg font-bold tracking-wider sm:tracking-widest text-zinc-900 dark:text-zinc-100 group-hover:text-emerald-700 dark:group-hover:text-emerald-300 transition-colors truncate">
           {renderHighlightedCode()}
@@ -187,11 +204,13 @@ export const KeyCard: React.FC<KeyCardProps> = ({
           onClick={handleCopy}
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.94 }}
-          title={t.keyCard.copyKey}
+          title={copyFailed ? (t.keyCard.copyFailed || (isAr ? "اضغط مطولاً للنسخ" : "Press & hold to copy")) : t.keyCard.copyKey}
           aria-label={t.keyCard.copyKey}
           className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold transition-colors duration-150 shadow-xs ${
             copied
               ? "bg-emerald-600 text-white shadow-emerald-600/25 dark:shadow-emerald-950/60"
+              : copyFailed
+              ? "bg-amber-500/15 text-amber-800 dark:text-amber-200 border border-amber-500/50"
               : "bg-white hover:bg-zinc-100 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-200 border border-zinc-200 dark:border-zinc-700/80"
           }`}
         >
@@ -207,6 +226,18 @@ export const KeyCard: React.FC<KeyCardProps> = ({
               >
                 <Check className="w-3 h-3 stroke-[2.5]" />
                 <span className={isAr ? "font-arabic" : ""}>{t.keyCard.copied}</span>
+              </motion.span>
+            ) : copyFailed ? (
+              <motion.span
+                key="failed"
+                initial={{ scale: 0.7, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.7, opacity: 0 }}
+                transition={{ type: "spring", stiffness: 500, damping: 25 }}
+                className="flex items-center gap-1 text-amber-700 dark:text-amber-300"
+              >
+                <AlertCircle className="w-3 h-3 text-amber-600 dark:text-amber-400" />
+                <span className={isAr ? "font-arabic" : ""}>{t.keyCard.copyFailed || (isAr ? "اضغط مطولاً للنسخ" : "Press & hold to copy")}</span>
               </motion.span>
             ) : (
               <motion.span
