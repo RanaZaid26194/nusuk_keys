@@ -66,6 +66,8 @@ export const SubmitModal: React.FC<SubmitModalProps> = ({
   const handleSubmit = async (e: React.FormEvent) =>
   {
     e.preventDefault();
+    if (submitting)
+      return;
 
     // 1. check rate limit
     const rateCheck = checkSubmissionRateLimit();
@@ -89,21 +91,31 @@ export const SubmitModal: React.FC<SubmitModalProps> = ({
     setSubmitting(true);
     setErrorMessage(null);
 
-    const res = await onSubmit(code);
-    setSubmitting(false);
-
-    if (res.success)
+    try
     {
-      recordSubmissionRateLimit();
-      setIsSuccess(true);
-      playHapticSound('click');
-      setTimeout(() =>
+      const res = await onSubmit(code);
+
+      if (res.success)
       {
-        onClose();
-      }, 1800);
+        recordSubmissionRateLimit();
+        setIsSuccess(true);
+        playHapticSound('click');
+        setTimeout(() =>
+        {
+          onClose();
+        }, 1800);
+      }
+      else
+        setErrorMessage(res.error || t.modal.errorGeneric);
     }
-    else
-      setErrorMessage(res.error || t.modal.errorGeneric);
+    catch (err: any)
+    {
+      setErrorMessage(err?.message || t.modal.errorGeneric);
+    }
+    finally
+    {
+      setSubmitting(false);
+    }
   };
 
   return (

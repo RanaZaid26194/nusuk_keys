@@ -2,7 +2,8 @@
 
 import React, { useEffect, useState, useRef } from "react";
 
-interface NumberCounterProps {
+interface NumberCounterProps
+{
   value: number;
   suffix?: string;
   className?: string;
@@ -14,40 +15,46 @@ export const NumberCounter: React.FC<NumberCounterProps> = ({
   suffix = "",
   className = "",
   duration = 1100,
-}) => {
+}) =>
+{
   const [displayValue, setDisplayValue] = useState(0);
   const startValRef = useRef(0);
   const startTimeRef = useRef<number | null>(null);
 
-  useEffect(() => {
+  useEffect(() =>
+  {
     let animId: number;
-    const startVal = startValRef.current;
-    const endVal = value;
+    const startVal = typeof startValRef.current === "number" && !isNaN(startValRef.current) ? startValRef.current : 0;
+    const endVal = typeof value === "number" && !isNaN(value) ? value : 0;
     startTimeRef.current = null;
 
-    const easeOutExpo = (x: number): number => {
+    const easeOutExpo = (x: number): number =>
+    {
       return x === 1 ? 1 : 1 - Math.pow(2, -10 * x);
     };
 
-    const step = (timestamp: number) => {
-      if (!startTimeRef.current) startTimeRef.current = timestamp;
+    const step = (timestamp: number) =>
+    {
+      if (!startTimeRef.current)
+        startTimeRef.current = timestamp;
       const progress = Math.min((timestamp - startTimeRef.current) / duration, 1);
       const easedProgress = easeOutExpo(progress);
 
       const current = Math.round(startVal + (endVal - startVal) * easedProgress);
-      setDisplayValue(current);
+      setDisplayValue(isNaN(current) ? 0 : current);
 
-      if (progress < 1) {
+      if (progress < 1)
         animId = requestAnimationFrame(step);
-      } else {
+      else
         startValRef.current = endVal;
-      }
     };
 
     animId = requestAnimationFrame(step);
 
-    return () => {
-      if (animId) cancelAnimationFrame(animId);
+    return () =>
+    {
+      if (animId)
+        cancelAnimationFrame(animId);
     };
   }, [value, duration]);
 

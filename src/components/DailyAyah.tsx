@@ -16,10 +16,20 @@ interface DailyAyahProps
 }
 
 // helper to convert ascii digits to arabic-indic digits for mushaf ayah marker
-function toArabicIndic(num: number): string
+function toArabicIndic(num?: number | null): string
 {
+  if (typeof num !== "number" || isNaN(num) || num <= 0)
+    return "";
   const digits = ["٠", "١", "٢", "٣", "٤", "٥", "٦", "٧", "٨", "٩"];
   return String(num).replace(/[0-9]/g, (d) => digits[Number(d)]);
+}
+
+// helper to clean quotation marks safely
+function cleanEnglishAyah(text?: string | null): string
+{
+  if (!text || typeof text !== "string")
+    return "";
+  return text.trim().replace(/^["“'”]+|["“'”]+$/g, "");
 }
 
 // helper to calculate exact word stagger and total reveal time in ms
@@ -108,7 +118,7 @@ export const DailyAyah: React.FC<DailyAyahProps> = ({ lang, onOpenInfo, mockFrid
   }, [mockFriday]);
 
   // split into whole words so arabic cursive ligatures never break
-  const arabicWords = ayah ? ayah.arabic.trim().split(/\s+/) : [];
+  const arabicWords = ayah && typeof ayah.arabic === "string" ? ayah.arabic.trim().split(/\s+/) : [];
   const revealMetrics = computeRevealTimeMs(arabicWords.length, Boolean(shouldReduceMotion));
   const staggerStep = revealMetrics.staggerMs / 1000;
   const wordFadeSec = revealMetrics.fadeMs / 1000;
@@ -290,7 +300,7 @@ export const DailyAyah: React.FC<DailyAyahProps> = ({ lang, onOpenInfo, mockFrid
                     style={{ textAlign: "center" }}
                     className="text-[11px] sm:text-xs text-zinc-600 dark:text-zinc-400 text-center !text-center transition-colors mx-auto"
                   >
-                    “{ayah.english.replace(/["“”]+$/, "").trim()}” — [Surah {ayah.surahNameEn} ({ayah.surah}:{ayah.numberInSurah})]
+                    “{cleanEnglishAyah(ayah.english)}” — [Surah {ayah.surahNameEn} ({ayah.surah}:{ayah.numberInSurah})]
                   </div>
                   <div
                     style={{ textAlign: "center" }}

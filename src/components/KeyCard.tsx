@@ -60,10 +60,49 @@ export const KeyCard: React.FC<KeyCardProps> = ({
       spotlightRef.current.style.opacity = "0";
   };
 
-  const handleCopy = (e: React.MouseEvent) =>
+  const copyToClipboard = async (text: string): Promise<boolean> =>
+  {
+    try
+    {
+      if (typeof navigator !== "undefined" && navigator?.clipboard?.writeText)
+      {
+        await navigator.clipboard.writeText(text);
+        return true;
+      }
+    }
+    catch
+    {
+      // fallback to execCommand below
+    }
+
+    try
+    {
+      if (typeof document !== "undefined")
+      {
+        const textArea = document.createElement("textarea");
+        textArea.value = text;
+        textArea.style.position = "fixed";
+        textArea.style.opacity = "0";
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+        const success = document.execCommand("copy");
+        document.body.removeChild(textArea);
+        return success;
+      }
+    }
+    catch
+    {
+      // copy failed
+    }
+
+    return false;
+  };
+
+  const handleCopy = async (e: React.MouseEvent) =>
   {
     e.stopPropagation();
-    navigator.clipboard.writeText(item.code);
+    await copyToClipboard(item.code);
     setCopied(true);
     onCopy(item.id);
     playHapticSound('success');

@@ -22,32 +22,47 @@ export function getNusukDeepLink(code: string): string {
   return `https://services.nusuk.sa/app?p=27&id=${encodeURIComponent(cleanCode)}`;
 }
 
-export function calculateSuccessRate(upvotes: number, downvotes: number): number {
-  const total = upvotes + downvotes;
-  if (total === 0) return 100;
-  return Math.round((upvotes / total) * 100);
+export function calculateSuccessRate(upvotes?: number | null, downvotes?: number | null): number
+{
+  const safeUp = Math.max(0, Number(upvotes) || 0);
+  const safeDown = Math.max(0, Number(downvotes) || 0);
+  const total = safeUp + safeDown;
+  if (total <= 0)
+    return 100;
+  return Math.round((safeUp / total) * 100);
 }
 
-export function formatTimeAgo(dateString: string, lang: Language): string {
-  try {
+export function formatTimeAgo(dateString?: string | null, lang?: Language): string
+{
+  if (!dateString)
+    return lang === 'ar' ? 'الآن' : 'Just now';
+
+  try
+  {
     const date = new Date(dateString);
+    if (isNaN(date.getTime()))
+      return lang === 'ar' ? 'الآن' : 'Just now';
+
     const now = new Date();
     const diffSec = Math.floor((now.getTime() - date.getTime()) / 1000);
 
-    if (diffSec < 60) {
+    // handles future clock skews gracefully
+    if (diffSec < 60)
       return lang === 'ar' ? 'الآن' : 'Just now';
-    }
+
     const diffMin = Math.floor(diffSec / 60);
-    if (diffMin < 60) {
+    if (diffMin < 60)
       return lang === 'ar' ? `منذ ${diffMin} دقيقة` : `${diffMin}m ago`;
-    }
+
     const diffHours = Math.floor(diffMin / 60);
-    if (diffHours < 24) {
+    if (diffHours < 24)
       return lang === 'ar' ? `منذ ${diffHours} ساعة` : `${diffHours}h ago`;
-    }
+
     const diffDays = Math.floor(diffHours / 24);
     return lang === 'ar' ? `منذ ${diffDays} يوم` : `${diffDays}d ago`;
-  } catch {
+  }
+  catch
+  {
     return lang === 'ar' ? 'حديثاً' : 'Recently';
   }
 }

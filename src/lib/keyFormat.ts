@@ -4,13 +4,25 @@ export const KEY_BODY_LENGTH = 8;
 export const KEY_TOTAL_LENGTH = KEY_PREFIX.length + KEY_BODY_LENGTH; // 11
 export const KEY_REGEX = new RegExp(`^${KEY_PREFIX}[A-Za-z0-9]{${KEY_BODY_LENGTH}}$`);
 
+// convert Eastern Arabic & Persian numerals (٠-٩ and ۰-۹) to standard 0-9 digits
+export function normalizeNumerals(str?: string | null): string
+{
+  if (!str || typeof str !== "string")
+    return "";
+
+  return str
+    .replace(/[\u0660-\u0669]/g, d => String(d.charCodeAt(0) - 0x0660))
+    .replace(/[\u06F0-\u06F9]/g, d => String(d.charCodeAt(0) - 0x06F0));
+}
+
 // check if a code matches NG- followed by exactly 8 alphanumeric characters
 export function isValidKey(code?: string | null): boolean
 {
   if (!code || typeof code !== "string")
     return false;
 
-  return KEY_REGEX.test(code.trim());
+  const normalized = normalizeNumerals(code.trim());
+  return KEY_REGEX.test(normalized);
 }
 
 // sanitize input: keep NG- prefix, strip non-alphanumeric body characters, cap at 8, preserve case
@@ -19,13 +31,26 @@ export function sanitizeKeyInput(raw?: string | null): string
   if (!raw || typeof raw !== "string")
     return KEY_PREFIX;
 
-  // strip zero width chars, invisible unicode, newlines and outer whitespace
+  // 1. strip zero width chars, invisible unicode, newlines and outer whitespace
   const clean = raw.replace(/[\u200B-\u200D\uFEFF\u00AD]/g, "").trim();
 
-  // strip any existing ng- or ng prefix case-insensitively
-  const bodyOnly = clean.replace(/^ng-?/i, "");
+  // 2. convert Arabic-Indic and Persian numerals to ASCII digits
+  const withAsciiDigits = normalizeNumerals(clean);
 
-  // keep only letters and numbers, cap at exactly 8 chars, preserving case
+  // 3. if user pasted a link or message containing NG-XXXXXX, extract the code part
+  let bodyOnly = withAsciiDigits;
+  if (/^ng-?/i.test(withAsciiDigits))
+    bodyOnly = withAsciiDigits.replace(/^ng-?/i, "");
+  else
+  {
+    const matchWithPrefix = withAsciiDigits.match(/ng-([A-Za-z0-9]{1,8})/i);
+    if (matchWithPrefix)
+      bodyOnly = matchWithPrefix[1];
+    else
+      bodyOnly = withAsciiDigits;
+  }
+
+  // 4. keep only letters and numbers, cap at exactly 8 chars, preserving case
   const sanitizedBody = bodyOnly.replace(/[^A-Za-z0-9]/g, "").slice(0, KEY_BODY_LENGTH);
 
   return KEY_PREFIX + sanitizedBody;

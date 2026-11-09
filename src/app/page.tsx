@@ -11,7 +11,7 @@ import { Footer } from "@/components/Footer";
 import { supabase, isSupabaseConfigured, INITIAL_DEMO_KEYS } from "@/lib/supabase";
 import { calculateSuccessRate } from "@/lib/utils";
 import { loadUsedKeys, markUsed, unmarkUsed, clearUsedKeys, normalizeCode, STORAGE_KEY_USED } from "@/lib/usedKeys";
-import { isValidKey } from "@/lib/keyFormat";
+import { isValidKey, normalizeNumerals } from "@/lib/keyFormat";
 import { translations } from "@/lib/translations";
 
 const LOCAL_STORAGE_KEYS = "nusuk_keys_data_v1";
@@ -326,16 +326,23 @@ export default function Home()
       }
     }
 
-    // Local / Offline fallback
-    try {
+    // local / offline fallback
+    try
+    {
       const saved = localStorage.getItem(LOCAL_STORAGE_CACHE) || localStorage.getItem(LOCAL_STORAGE_KEYS);
-      if (saved) {
-        const parsed: ChallengeKey[] = JSON.parse(saved);
-        setKeys(parsed.map(k => ({ ...k, userVoted: userVotes[k.id] || null })));
-        setIsLoading(false);
-        return;
+      if (saved)
+      {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed))
+        {
+          setKeys(parsed.map((k: any) => ({ ...k, userVoted: userVotes[k?.id] || null })));
+          setIsLoading(false);
+          return;
+        }
       }
-    } catch {
+    }
+    catch
+    {
       // ignore
     }
 
@@ -680,21 +687,21 @@ export default function Home()
   {
     let list = [...keys];
     const hasSearch = searchQuery.trim().length > 0;
-    const q = searchQuery.toLowerCase().trim();
+    const q = normalizeNumerals(searchQuery.toLowerCase().trim());
 
     if (activeTab === "used")
     {
       // Show all keys that are in usedMap
-      list = list.filter(k => Boolean(usedMap[normalizeCode(k.code)]));
+      list = list.filter(k => Boolean(k?.code && usedMap[normalizeCode(k.code)]));
 
       if (hasSearch)
-        list = list.filter(k => k.code.toLowerCase().includes(q));
+        list = list.filter(k => Boolean(k?.code && k.code.toLowerCase().includes(q)));
 
       // Sort: most recently used first
       list.sort((a, b) =>
       {
-        const timeA = usedMap[normalizeCode(a.code)] || 0;
-        const timeB = usedMap[normalizeCode(b.code)] || 0;
+        const timeA = (a?.code && usedMap[normalizeCode(a.code)]) || 0;
+        const timeB = (b?.code && usedMap[normalizeCode(b.code)]) || 0;
         return timeB - timeA;
       });
 
@@ -704,24 +711,29 @@ export default function Home()
     // In the 4 main tabs:
     // If NO search query, filter out keys present in usedSnapshot
     if (!hasSearch)
-      list = list.filter(k => !usedSnapshot.has(normalizeCode(k.code)));
+      list = list.filter(k => Boolean(k?.code && !usedSnapshot.has(normalizeCode(k.code))));
     else
-      list = list.filter(k => k.code.toLowerCase().includes(q));
+      list = list.filter(k => Boolean(k?.code && k.code.toLowerCase().includes(q)));
 
     // Tabs
     switch (activeTab)
     {
       case "verified":
-        list = list.filter(k => calculateSuccessRate(k.upvotes, k.downvotes) >= 70 && k.upvotes >= 2);
+        list = list.filter(k => calculateSuccessRate(k.upvotes, k.downvotes) >= 70 && (k.upvotes || 0) >= 2);
         break;
       case "popular":
-        list.sort((a, b) => b.copies_count - a.copies_count || b.upvotes - a.upvotes);
+        list.sort((a, b) => (b.copies_count || 0) - (a.copies_count || 0) || (b.upvotes || 0) - (a.upvotes || 0));
         break;
       case "latest":
       case "all":
       default:
-        // Default ranking: strictly newest to oldest
-        list.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+        // Default ranking: strictly newest to oldest (safe timestamp math)
+        list.sort((a, b) =>
+        {
+          const timeA = a?.created_at ? new Date(a.created_at).getTime() || 0 : 0;
+          const timeB = b?.created_at ? new Date(b.created_at).getTime() || 0 : 0;
+          return timeB - timeA;
+        });
         break;
     }
 
