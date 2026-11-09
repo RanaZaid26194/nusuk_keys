@@ -374,7 +374,7 @@ export default function Home() {
   if (!isMounted) return null;
 
   return (
-    <div className="flex flex-col min-h-screen bg-[#07130f] text-slate-100">
+    <div className="flex flex-col min-h-screen bg-[#09090b] text-zinc-100 selection:bg-emerald-500/20 selection:text-emerald-200">
       {/* Top Navbar */}
       <Header
         lang={lang}

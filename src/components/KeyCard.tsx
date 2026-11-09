@@ -50,7 +50,7 @@ export const KeyCard: React.FC<KeyCardProps> = ({
     onVote(item.id, type);
   };
 
-  // Highlight search term in code without gradients
+  // Highlight search term in code cleanly
   const renderHighlightedCode = () => {
     const code = item.code;
     const query = searchQuery.trim().toUpperCase();
@@ -67,7 +67,7 @@ export const KeyCard: React.FC<KeyCardProps> = ({
     return (
       <span>
         {before}
-        <span className="bg-emerald-500/20 text-emerald-300 px-0.5 rounded font-bold">{match}</span>
+        <span className="bg-amber-500/20 text-amber-200 px-0.5 rounded font-bold">{match}</span>
         {after}
       </span>
     );
@@ -75,10 +75,10 @@ export const KeyCard: React.FC<KeyCardProps> = ({
 
   return (
     <div
-      className={`rounded-2xl bg-slate-900/60 p-5 border transition-all ${
+      className={`rounded-2xl bg-zinc-900/70 p-5 border transition-all shadow-sm ${
         isVerified
-          ? "border-emerald-800/60 hover:border-emerald-500/60"
-          : "border-slate-800 hover:border-slate-700"
+          ? "border-zinc-800/80 hover:border-zinc-700"
+          : "border-zinc-800/60 hover:border-zinc-700"
       }`}
     >
       {/* Header: Badge & Time */}
@@ -101,7 +101,7 @@ export const KeyCard: React.FC<KeyCardProps> = ({
         )}
 
         {/* Time Ago */}
-        <span className={`text-xs text-slate-400 flex items-center gap-1 ${isAr ? "font-arabic" : ""}`}>
+        <span className={`text-[11px] text-zinc-500 flex items-center gap-1 ${isAr ? "font-arabic" : ""}`}>
           <Clock className="w-3 h-3 opacity-60" />
           {formatTimeAgo(item.created_at, lang)}
         </span>
@@ -110,10 +110,10 @@ export const KeyCard: React.FC<KeyCardProps> = ({
       {/* Main Key Box (Click to copy) */}
       <div
         onClick={handleCopy}
-        className="flex items-center justify-between p-3 rounded-xl bg-slate-950/80 border border-emerald-950 hover:border-emerald-700/60 transition-colors cursor-pointer select-none mb-3.5"
+        className="flex items-center justify-between p-3.5 rounded-xl bg-zinc-950 border border-zinc-800/80 hover:border-zinc-700 transition-colors cursor-pointer select-none mb-3.5 shadow-inner"
         title={t.keyCard.copyKey}
       >
-        <div className="font-mono text-base sm:text-lg font-bold tracking-wider text-emerald-200 truncate">
+        <div className="font-mono text-base sm:text-lg font-bold tracking-widest text-zinc-100 truncate">
           {renderHighlightedCode()}
         </div>
 
@@ -124,7 +124,7 @@ export const KeyCard: React.FC<KeyCardProps> = ({
           className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium transition-colors ${
             copied
               ? "bg-emerald-600 text-white"
-              : "bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700"
+              : "bg-zinc-800 hover:bg-zinc-700 text-zinc-200 border border-zinc-700/60"
           }`}
         >
           <AnimatePresence mode="wait" initial={false}>
@@ -144,16 +144,16 @@ export const KeyCard: React.FC<KeyCardProps> = ({
       </div>
 
       {/* Trust & Usage Bar */}
-      <div className="space-y-1 mb-4">
-        <div className="flex justify-between items-center text-xs text-slate-400">
+      <div className="space-y-1.5 mb-4">
+        <div className="flex justify-between items-center text-xs text-zinc-400">
           <span className={isAr ? "font-arabic" : ""}>
-            <span className="font-mono text-slate-300 font-medium">{item.copies_count}</span> {t.keyCard.copiedTimes}
+            <span className="font-mono text-zinc-300 font-medium">{item.copies_count}</span> {t.keyCard.copiedTimes}
           </span>
-          <span className="font-mono text-emerald-400">
+          <span className="font-mono text-zinc-300 text-[11px]">
             {successRate}% {t.keyCard.successRate}
           </span>
         </div>
-        <div className="w-full h-1 bg-slate-800 rounded-full overflow-hidden">
+        <div className="w-full h-1 bg-zinc-800 rounded-full overflow-hidden">
           <div
             style={{ width: `${successRate}%` }}
             className={`h-full rounded-full ${
@@ -164,7 +164,7 @@ export const KeyCard: React.FC<KeyCardProps> = ({
       </div>
 
       {/* Footer Actions: Vote & Deep Link */}
-      <div className="flex items-center justify-between gap-2 pt-3 border-t border-slate-800/80">
+      <div className="flex items-center justify-between gap-2 pt-3 border-t border-zinc-800/80">
         {/* Voting */}
         <div className="flex items-center gap-1.5">
           <button
@@ -173,7 +173,7 @@ export const KeyCard: React.FC<KeyCardProps> = ({
             className={`flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium transition-colors ${
               item.userVoted === 'UP'
                 ? "bg-emerald-500/20 text-emerald-300 border border-emerald-500/40"
-                : "bg-slate-800/80 hover:bg-slate-800 text-slate-300 border border-slate-700"
+                : "bg-zinc-800/70 hover:bg-zinc-800 text-zinc-300 border border-zinc-700/60"
             }`}
           >
             <ThumbsUp className={`w-3.5 h-3.5 ${item.userVoted === 'UP' ? 'fill-emerald-400 text-emerald-400' : ''}`} />
@@ -186,7 +186,7 @@ export const KeyCard: React.FC<KeyCardProps> = ({
             className={`flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium transition-colors ${
               item.userVoted === 'DOWN'
                 ? "bg-rose-500/20 text-rose-300 border border-rose-500/40"
-                : "bg-slate-800/80 hover:bg-slate-800 text-slate-400 border border-slate-700"
+                : "bg-zinc-800/70 hover:bg-zinc-800 text-zinc-400 border border-zinc-700/60"
             }`}
           >
             <ThumbsDown className={`w-3.5 h-3.5 ${item.userVoted === 'DOWN' ? 'fill-rose-400 text-rose-400' : ''}`} />
@@ -194,15 +194,16 @@ export const KeyCard: React.FC<KeyCardProps> = ({
           </button>
         </div>
 
-        {/* Deep Link to Official Nusuk App */}
+        {/* Deep Link to Nusuk App */}
         <a
           href={getNusukDeepLink(item.code)}
           target="_blank"
           rel="noopener noreferrer"
-          className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-emerald-950/80 hover:bg-emerald-900 text-emerald-300 text-xs font-medium border border-emerald-800/50 transition-colors"
+          className="flex items-center gap-1 text-[11px] text-zinc-400 hover:text-zinc-200 transition-colors"
+          title={t.keyCard.openNusuk}
         >
           <span className={isAr ? "font-arabic" : ""}>{t.keyCard.openNusuk}</span>
-          <ExternalLink className="w-3.5 h-3.5 stroke-[2]" />
+          <ExternalLink className="w-3 h-3 opacity-70" />
         </a>
       </div>
     </div>

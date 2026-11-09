@@ -60,12 +60,12 @@ export const KeyGrid: React.FC<KeyGridProps> = ({
   };
 
   return (
-    <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-24">
+    <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-24">
       {/* Controls Container: Search & Tabs */}
       <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4 mb-8">
         {/* Animated Search Bar with Keyboard Hint */}
         <div className="relative flex-1 max-w-md group">
-          <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400 group-focus-within:text-emerald-400 transition-colors">
+          <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-zinc-500 group-focus-within:text-zinc-300 transition-colors">
             <Search className="w-4 h-4" />
           </div>
 
@@ -75,7 +75,7 @@ export const KeyGrid: React.FC<KeyGridProps> = ({
             value={searchQuery}
             onChange={(e) => onSearchChange(e.target.value)}
             placeholder={t.searchPlaceholder}
-            className={`w-full pl-10 pr-16 py-3 rounded-2xl bg-slate-900/90 border border-emerald-900/60 text-sm sm:text-base text-white placeholder-slate-400 focus:outline-none focus:border-emerald-400 focus:ring-2 focus:ring-emerald-500/20 shadow-inner transition-all ${
+            className={`w-full pl-10 pr-16 py-2.5 rounded-xl bg-zinc-900 border border-zinc-800 text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-zinc-600 focus:ring-1 focus:ring-zinc-600 shadow-sm transition-all ${
               isAr ? "font-arabic" : ""
             }`}
           />
@@ -93,12 +93,12 @@ export const KeyGrid: React.FC<KeyGridProps> = ({
                     onSearchChange("");
                     searchInputRef.current?.focus();
                   }}
-                  className="pointer-events-auto p-1 rounded-full bg-slate-800 text-slate-400 hover:text-white hover:bg-slate-700 transition-colors"
+                  className="pointer-events-auto p-1 rounded-full bg-zinc-800 text-zinc-400 hover:text-white hover:bg-zinc-700 transition-colors"
                 >
                   <X className="w-3.5 h-3.5" />
                 </motion.button>
               ) : (
-                <span className="hidden sm:inline-flex items-center gap-0.5 px-2 py-0.5 rounded-md bg-slate-800/80 border border-slate-700/60 text-[10px] font-mono text-slate-400">
+                <span className="hidden sm:inline-flex items-center gap-0.5 px-2 py-0.5 rounded-md bg-zinc-800 border border-zinc-700/60 text-[10px] font-mono text-zinc-400">
                   <Command className="w-2.5 h-2.5" />K
                 </span>
               )}
@@ -106,8 +106,8 @@ export const KeyGrid: React.FC<KeyGridProps> = ({
           </div>
         </div>
 
-        {/* Sliding Filter Tabs */}
-        <div className="flex items-center gap-1.5 p-1.5 rounded-2xl bg-slate-900/80 border border-emerald-900/50 overflow-x-auto no-scrollbar shadow-inner">
+        {/* Sliding Filter Tabs (Clean Segmented Control) */}
+        <div className="flex items-center gap-1 p-1 rounded-xl bg-zinc-900 border border-zinc-800 overflow-x-auto no-scrollbar shadow-sm">
           {(["all", "verified", "popular", "latest"] as FilterTab[]).map((tab) => {
             const Icon = tabIcons[tab];
             const isActive = activeTab === tab;
@@ -116,19 +116,19 @@ export const KeyGrid: React.FC<KeyGridProps> = ({
               <button
                 key={tab}
                 onClick={() => handleTabClick(tab)}
-                className={`relative flex items-center gap-1.5 px-3.5 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-medium whitespace-nowrap transition-colors select-none ${
-                  isActive ? "text-white" : "text-slate-400 hover:text-slate-200"
+                className={`relative flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs sm:text-sm font-medium whitespace-nowrap transition-colors select-none ${
+                  isActive ? "text-white" : "text-zinc-400 hover:text-zinc-200"
                 } ${isAr ? "font-arabic" : ""}`}
               >
                 {isActive && (
                   <motion.div
                     layoutId="activeFilterTab"
-                    className="absolute inset-0 bg-emerald-800/80 rounded-xl border border-emerald-500/40 shadow-md shadow-emerald-950/70"
+                    className="absolute inset-0 bg-zinc-800 rounded-lg border border-zinc-700/60 shadow-sm"
                     transition={{ type: "spring", stiffness: 450, damping: 35 }}
                   />
                 )}
                 <span className="relative z-10 flex items-center gap-1.5">
-                  <Icon className={`w-3.5 h-3.5 ${isActive ? "text-gold-300" : "text-slate-400"}`} />
+                  <Icon className={`w-3.5 h-3.5 ${isActive ? "text-amber-400" : "text-zinc-500"}`} />
                   {t.tabs[tab]}
                 </span>
               </button>
@@ -141,7 +141,7 @@ export const KeyGrid: React.FC<KeyGridProps> = ({
       {items.length > 0 ? (
         <motion.div
           layout
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6"
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-5"
         >
           <AnimatePresence mode="popLayout">
             {items.map((item) => (
@@ -161,30 +161,30 @@ export const KeyGrid: React.FC<KeyGridProps> = ({
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="text-center py-16 px-4 rounded-3xl glass-panel border border-dashed border-slate-800 max-w-lg mx-auto"
+          className="text-center py-16 px-4 rounded-2xl bg-zinc-900/60 border border-dashed border-zinc-800 max-w-lg mx-auto"
         >
-          <div className="w-14 h-14 rounded-2xl bg-emerald-950/60 text-emerald-400 flex items-center justify-center mx-auto mb-4 border border-emerald-800/40">
-            <Inbox className="w-7 h-7" />
+          <div className="w-12 h-12 rounded-xl bg-zinc-800 text-zinc-400 flex items-center justify-center mx-auto mb-4 border border-zinc-700/60">
+            <Inbox className="w-6 h-6" />
           </div>
-          <h3 className={`text-lg sm:text-xl font-bold text-white mb-2 ${isAr ? "font-arabic" : ""}`}>
+          <h3 className={`text-base sm:text-lg font-bold text-white mb-1.5 ${isAr ? "font-arabic" : ""}`}>
             {t.empty.title}
           </h3>
-          <p className={`text-sm text-slate-400 mb-6 ${isAr ? "font-arabic" : ""}`}>
+          <p className={`text-xs sm:text-sm text-zinc-400 mb-6 ${isAr ? "font-arabic" : ""}`}>
             {t.empty.description}
           </p>
 
-          <div className="flex flex-wrap items-center justify-center gap-3">
+          <div className="flex flex-wrap items-center justify-center gap-2.5">
             {searchQuery && (
               <button
                 onClick={() => onSearchChange("")}
-                className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs sm:text-sm text-white font-medium transition-colors"
+                className="px-4 py-2 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-xs sm:text-sm text-white font-medium transition-colors"
               >
                 {t.empty.clearFilters}
               </button>
             )}
             <button
               onClick={onOpenSubmit}
-              className="px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-xs sm:text-sm text-white font-semibold shadow-lg shadow-emerald-900/40 transition-colors"
+              className="px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-xs sm:text-sm text-white font-semibold shadow-sm transition-colors"
             >
               {t.shareCodeBtn}
             </button>
