@@ -22,7 +22,7 @@ interface KeyCardProps
   onToggleUsed?: (code: string) => void;
 }
 
-export const KeyCard: React.FC<KeyCardProps> = ({
+const KeyCardComponent: React.FC<KeyCardProps> = ({
   item,
   lang,
   searchQuery = "",
@@ -435,3 +435,6 @@ export const KeyCard: React.FC<KeyCardProps> = ({
     </motion.div>
   );
 };
+
+export const KeyCard = React.memo(KeyCardComponent);
+KeyCard.displayName = "KeyCard";

@@ -402,7 +402,7 @@ export default function Home()
   };
 
   // Upvote / Downvote Handler
-  const handleVote = async (keyId: string, type: 'UP' | 'DOWN') =>
+  const handleVote = useCallback(async (keyId: string, type: 'UP' | 'DOWN') =>
   {
     const userVotes = getUserVotes();
     if (userVotes[keyId])
@@ -412,30 +412,33 @@ export default function Home()
     localStorage.setItem(LOCAL_STORAGE_VOTES, JSON.stringify(userVotes));
 
     // Optimistic UI update
-    const updated = keys.map((k) =>
+    let targetCode = "";
+    setKeys((prevKeys) =>
     {
-      if (k.id === keyId)
+      const updated = prevKeys.map((k) =>
       {
-        const newUpvotes = type === 'UP' ? k.upvotes + 1 : k.upvotes;
-        const newDownvotes = type === 'DOWN' ? k.downvotes + 1 : k.downvotes;
-        return {
-          ...k,
-          upvotes: newUpvotes,
-          downvotes: newDownvotes,
-          userVoted: type,
-        };
-      }
-      return k;
+        if (k.id === keyId)
+        {
+          targetCode = k.code;
+          const newUpvotes = type === 'UP' ? k.upvotes + 1 : k.upvotes;
+          const newDownvotes = type === 'DOWN' ? k.downvotes + 1 : k.downvotes;
+          return {
+            ...k,
+            upvotes: newUpvotes,
+            downvotes: newDownvotes,
+            userVoted: type,
+          };
+        }
+        return k;
+      });
+      persistOfflineKeys(updated);
+      return updated;
     });
 
-    setKeys(updated);
-    persistOfflineKeys(updated);
-
     // mark as used
-    const targetKey = keys.find(k => k.id === keyId);
-    if (targetKey)
+    if (targetCode)
     {
-      const nextUsed = markUsed(targetKey.code);
+      const nextUsed = markUsed(targetCode);
       setUsedMap(nextUsed);
     }
 
@@ -457,22 +460,30 @@ export default function Home()
         console.error("Supabase cast_vote exception:", err);
       }
     }
-  };
+  }, [getUserVotes]);
 
   // Copy Count Increment with Soft Anti-Spam
-  const handleCopy = async (keyId: string) =>
+  const handleCopy = useCallback(async (keyId: string) =>
   {
-    // Always mark as used in local history
-    const targetKey = keys.find(k => k.id === keyId);
-    if (targetKey)
+    let targetCode = "";
+    setKeys((prevKeys) =>
     {
-      const nextUsed = markUsed(targetKey.code);
+      const targetKey = prevKeys.find(k => k.id === keyId);
+      if (targetKey)
+        targetCode = targetKey.code;
+      return prevKeys;
+    });
+
+    // Always mark as used in local history
+    if (targetCode)
+    {
+      const nextUsed = markUsed(targetCode);
       setUsedMap(nextUsed);
     }
 
     // Soft anti-spam: count only once per key per 24 hours per browser
     let shouldCount = true;
-    const cleanCode = targetKey ? normalizeCode(targetKey.code) : "";
+    const cleanCode = targetCode ? normalizeCode(targetCode) : "";
     if (cleanCode)
     {
       try
@@ -507,15 +518,17 @@ export default function Home()
       return;
 
     // Optimistic UI update
-    const updated = keys.map((k) =>
+    setKeys((prevKeys) =>
     {
-      if (k.id === keyId)
-        return { ...k, copies_count: (k.copies_count || 0) + 1 };
-      return k;
+      const updated = prevKeys.map((k) =>
+      {
+        if (k.id === keyId)
+          return { ...k, copies_count: (k.copies_count || 0) + 1 };
+        return k;
+      });
+      persistOfflineKeys(updated);
+      return updated;
     });
-
-    setKeys(updated);
-    persistOfflineKeys(updated);
 
     // Atomic server-side counter increment
     if (isSupabaseConfigured && supabase)
@@ -534,17 +547,17 @@ export default function Home()
         console.error("Supabase increment_copy exception:", err);
       }
     }
-  };
+  }, []);
 
   // Open in Nusuk counts as used
-  const handleOpenNusuk = (code: string) =>
+  const handleOpenNusuk = useCallback((code: string) =>
   {
     const nextUsed = markUsed(code);
     setUsedMap(nextUsed);
-  };
+  }, []);
 
   // Mark as unused sends key back to main tabs immediately
-  const handleToggleUsed = (code: string) =>
+  const handleToggleUsed = useCallback((code: string) =>
   {
     const nextUsed = unmarkUsed(code);
     setUsedMap(nextUsed);
@@ -555,15 +568,15 @@ export default function Home()
       next.delete(norm);
       return next;
     });
-  };
+  }, []);
 
   // Clear all used keys history
-  const handleClearUsed = () =>
+  const handleClearUsed = useCallback(() =>
   {
     clearUsedKeys();
     setUsedMap({});
     setUsedSnapshot(new Set());
-  };
+  }, []);
 
   // Submit New Key with strict format check and case-insensitive duplicate rejection
   const handleSubmitKey = async (code: string): Promise<{ success: boolean; error?: string }> =>
