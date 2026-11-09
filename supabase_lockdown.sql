@@ -1,14 +1,25 @@
--- ============================================================
--- Supabase Lockdown Migration (File B - Run AFTER Client Deploy)
--- Drops the broad public UPDATE policy so clients cannot directly
--- overwrite upvotes, downvotes, or copies_count.
--- Atomic RPC functions (SECURITY DEFINER) continue working seamlessly.
--- ============================================================
+-- drops every UPDATE or ALL policy on challenge_keys so anon can never overwrite counters directly.
+-- all writes go through increment_copy and cast_vote. safe to run multiple times.
 
--- Drop broad update policy
-DROP POLICY IF EXISTS "Allow public update voting and copies" ON challenge_keys;
+alter table public.challenge_keys enable row level security;
 
--- Note:
--- "Allow public read active keys" (SELECT) and
--- "Allow public submit new keys" (INSERT)
--- remain active and untouched.
+do $$
+declare
+  r record;
+begin
+  for r in (
+    select policyname
+    from pg_policies
+    where schemaname = 'public'
+      and tablename = 'challenge_keys'
+      and cmd in ('UPDATE', 'ALL')
+  ) loop
+    execute format('drop policy if exists %I on public.challenge_keys', r.policyname);
+  end loop;
+end $$;
+
+-- show remaining policies (should only be select and insert)
+select policyname, cmd
+from pg_policies
+where schemaname = 'public'
+  and tablename = 'challenge_keys';

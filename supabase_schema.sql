@@ -1,7 +1,6 @@
--- ============================================================
--- Nusuk Keys Database Schema for Supabase
--- Paste and run this in Supabase Dashboard -> SQL Editor
--- ============================================================
+-- fresh database setup for nusuk keys.
+-- all counter updates (copies, upvotes, downvotes) go strictly through the two security definer rpcs below.
+-- never grant UPDATE or ALL to anon here.
 
 -- 1. Create table for challenge keys
 CREATE TABLE IF NOT EXISTS challenge_keys (
@@ -22,7 +21,7 @@ ON challenge_keys (is_active, created_at DESC);
 -- 3. Enable Row Level Security (RLS)
 ALTER TABLE challenge_keys ENABLE ROW LEVEL SECURITY;
 
--- 4. Set RLS Policies (Read and Insert only; Updates go through atomic RPCs)
+-- 4. Set RLS Policies (select and insert only, no update policies)
 DROP POLICY IF EXISTS "Allow public read active keys" ON challenge_keys;
 CREATE POLICY "Allow public read active keys" 
 ON challenge_keys FOR SELECT USING (is_active = true);
@@ -30,9 +29,6 @@ ON challenge_keys FOR SELECT USING (is_active = true);
 DROP POLICY IF EXISTS "Allow public submit new keys" ON challenge_keys;
 CREATE POLICY "Allow public submit new keys" 
 ON challenge_keys FOR INSERT WITH CHECK (code ~ '^NG-[A-Za-z0-9_-]+$');
-
--- Ensure direct public updates are blocked
-DROP POLICY IF EXISTS "Allow public update voting and copies" ON challenge_keys;
 
 -- 5. Atomic RPC Server-Side Functions (SECURITY DEFINER)
 CREATE OR REPLACE FUNCTION increment_copy(p_key_id UUID)
