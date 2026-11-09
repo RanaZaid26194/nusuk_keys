@@ -437,10 +437,10 @@ const KeyCardComponent: React.FC<KeyCardProps> = ({
               whileTap={{ scale: 0.95 }}
               title={t.keyCard.markUnused}
               aria-label={t.keyCard.markUnused}
-              className="flex items-center gap-1 text-[11px] text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-200 transition-colors"
+              className="group/unused flex items-center gap-1.5 text-xs text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-200 transition-colors"
             >
-              <RotateCcw className="w-3 h-3 opacity-70" />
-              <span className={isAr ? "font-arabic leading-none" : ""}>{t.keyCard.markUnused}</span>
+              <RotateCcw className="w-3.5 h-3.5 sm:w-4 sm:h-4 flex-shrink-0 text-zinc-500 group-hover/unused:text-zinc-900 dark:text-zinc-400 dark:group-hover/unused:text-zinc-100 group-hover/unused:-rotate-45 transition-all duration-200" />
+              <span className={`text-[11px] sm:text-xs leading-tight ${isAr ? "font-arabic" : ""}`}>{t.keyCard.markUnused}</span>
             </motion.button>
           )}
 
@@ -458,15 +458,15 @@ const KeyCardComponent: React.FC<KeyCardProps> = ({
               onOpenNusuk?.(item.code);
             }}
             whileHover={{ x: isAr ? -3 : 3 }}
-            className="group/link flex items-center gap-1 text-[11px] text-zinc-600 hover:text-emerald-600 dark:text-zinc-400 dark:hover:text-emerald-400 transition-colors"
+            className="group/link flex items-center gap-1.5 text-xs text-zinc-600 hover:text-emerald-600 dark:text-zinc-400 dark:hover:text-emerald-400 transition-colors"
             title={t.keyCard.openNusuk}
             aria-label={t.keyCard.openNusuk}
           >
-            <span className={isAr ? "font-arabic leading-none" : ""}>{t.keyCard.openNusuk}</span>
+            <span className={`text-[11px] sm:text-xs leading-tight ${isAr ? "font-arabic" : ""}`}>{t.keyCard.openNusuk}</span>
             {openingNusuk ? (
-              <span className="w-3 h-3 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin inline-block" />
+              <span className="w-3.5 h-3.5 sm:w-4 sm:h-4 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin inline-block flex-shrink-0" />
             ) : (
-              <ExternalLink className="w-3 h-3 opacity-70 group-hover/link:opacity-100 group-hover/link:translate-x-0.5 group-hover/link:-translate-y-0.5 transition-all duration-200" />
+              <ExternalLink className="w-3.5 h-3.5 sm:w-4 sm:h-4 flex-shrink-0 text-zinc-500 group-hover/link:text-emerald-600 dark:text-zinc-400 dark:group-hover/link:text-emerald-400 group-hover/link:translate-x-0.5 group-hover/link:-translate-y-0.5 transition-all duration-200" />
             )}
           </motion.a>
         </div>
