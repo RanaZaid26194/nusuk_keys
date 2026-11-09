@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { KeyRound, ShieldCheck, Copy, Activity, ArrowRight, ArrowLeft } from "lucide-react";
+import { KeyRound, ShieldCheck, Copy, Activity, ArrowRight, ArrowLeft, Info, HeartHandshake } from "lucide-react";
 import { Language, Stats } from "@/lib/types";
 import { translations } from "@/lib/translations";
 import { NumberCounter } from "./NumberCounter";
@@ -11,6 +11,7 @@ interface HeroProps {
   stats: Stats;
   isConnectedToSupabase?: boolean;
   onOpenSubmit: () => void;
+  onOpenInfo: () => void;
 }
 
 export const Hero: React.FC<HeroProps> = ({
@@ -18,6 +19,7 @@ export const Hero: React.FC<HeroProps> = ({
   stats,
   isConnectedToSupabase = false,
   onOpenSubmit,
+  onOpenInfo,
 }) => {
   const t = translations[lang];
   const isAr = lang === "ar";
@@ -32,7 +34,7 @@ export const Hero: React.FC<HeroProps> = ({
           <span>{isAr ? "مفاتيح نسك" : "Nusuk Keys"}</span>
         </div>
 
-        {/* Heading - Solid typography, NO text gradients */}
+        {/* Heading */}
         <h1
           className={`text-3xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-white max-w-3xl mx-auto leading-tight ${
             isAr ? "font-arabic leading-[1.3] sm:leading-[1.3]" : ""
@@ -58,16 +60,38 @@ export const Hero: React.FC<HeroProps> = ({
           {t.heroDescription}
         </p>
 
-        {/* Share Button */}
-        <div className="mt-7 flex justify-center">
+        {/* Share Button & Info Trigger */}
+        <div className="mt-7 flex items-center justify-center gap-2">
           <button
             onClick={onOpenSubmit}
-            className="flex items-center gap-2.5 px-6 sm:px-7 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-sm shadow-md transition-colors"
+            className="flex items-center gap-2.5 px-6 sm:px-8 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-sm shadow-md transition-colors"
           >
             <KeyRound className="w-4 h-4" />
-            <span className={isAr ? "font-arabic" : ""}>{t.shareCodeBtn}</span>
+            <span className={isAr ? "font-arabic text-base" : ""}>{t.shareCodeBtn}</span>
             <ArrowIcon className="w-4 h-4" />
           </button>
+
+          {/* Noble motivation info button */}
+          <button
+            onClick={onOpenInfo}
+            aria-label={t.hook.infoButtonAria}
+            title={t.hook.infoButtonAria}
+            className="p-3 rounded-xl bg-slate-900/90 hover:bg-slate-800 text-slate-300 hover:text-emerald-300 border border-emerald-950 transition-colors"
+          >
+            <Info className="w-4 h-4" />
+          </button>
+        </div>
+
+        {/* Spiritual Hook Callout: Ayah Banner */}
+        <div
+          onClick={onOpenInfo}
+          className="mt-4 inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-emerald-950/40 hover:bg-emerald-950/70 border border-emerald-900/50 cursor-pointer transition-colors max-w-lg mx-auto"
+        >
+          <HeartHandshake className="w-4 h-4 text-emerald-400 flex-shrink-0" />
+          <p className="text-xs text-slate-300 truncate">
+            <span className="font-arabic font-semibold text-emerald-300">{t.hook.ayahArabic}</span>
+            {!isAr && <span className="opacity-80 ml-1.5 text-[11px]">— {t.hook.ayahTranslation}</span>}
+          </p>
         </div>
 
         {/* Exact, Clean Stats Grid */}

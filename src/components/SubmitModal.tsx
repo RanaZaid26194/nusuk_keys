@@ -2,10 +2,10 @@
 
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, KeyRound, CheckCircle2, AlertCircle, Send } from "lucide-react";
+import { X, KeyRound, CheckCircle2, AlertCircle, Send, HeartHandshake } from "lucide-react";
 import { Language } from "@/lib/types";
 import { translations } from "@/lib/translations";
-import { validateNusukCode } from "@/lib/utils";
+import { sanitizeAndValidateCode, checkSubmissionRateLimit, recordSubmissionRateLimit } from "@/lib/security";
 import { playHapticSound } from "@/lib/audio";
 
 interface SubmitModalProps {
@@ -52,30 +52,46 @@ export const SubmitModal: React.FC<SubmitModalProps> = ({
     if (!val.startsWith("NG-")) {
       val = "NG-" + val.replace(/^NG-?/i, "");
     }
+    // Prevent invalid characters right as user types
+    val = val.replace(/[^A-Z0-9_-]/g, "");
     setCode(val);
     setErrorMessage(null);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const validation = validateNusukCode(code);
-    if (!validation.isValid) {
-      setErrorMessage(validation.errorKey ? t.modal[validation.errorKey] : t.modal.errorGeneric);
+
+    // 1. Check Rate Limit
+    const rateCheck = checkSubmissionRateLimit();
+    if (!rateCheck.allowed) {
+      setErrorMessage(
+        isAr
+          ? `يرجى الانتظار ${rateCheck.waitSeconds} ثانية قبل مشاركة رمز آخر لمنع التكرار.`
+          : `Please wait ${rateCheck.waitSeconds}s before submitting another key (anti-spam protection).`
+      );
+      return;
+    }
+
+    // 2. Strict Input Sanitization & Format Validation
+    const validation = sanitizeAndValidateCode(code);
+    if (!validation.isValid || !validation.sanitizedCode) {
+      setErrorMessage(validation.errorMessage || t.modal.errorGeneric);
       return;
     }
 
     setSubmitting(true);
     setErrorMessage(null);
 
-    const res = await onSubmit(code.trim());
+    const res = await onSubmit(validation.sanitizedCode);
     setSubmitting(false);
 
     if (res.success) {
+      recordSubmissionRateLimit();
       setIsSuccess(true);
       playHapticSound('click');
       setTimeout(() => {
         onClose();
-      }, 1600);
+      }, 1800);
     } else {
       setErrorMessage(res.error || t.modal.errorGeneric);
     }
@@ -134,8 +150,21 @@ export const SubmitModal: React.FC<SubmitModalProps> = ({
                   </div>
                 </div>
 
+                {/* Noble Spiritual Hook Reminder Card */}
+                <div className="p-3 rounded-xl bg-emerald-950/40 border border-emerald-900/60 mb-4 flex items-start gap-2.5">
+                  <HeartHandshake className="w-4 h-4 text-emerald-400 flex-shrink-0 mt-0.5" />
+                  <div className="text-xs text-slate-300 leading-relaxed">
+                    <span className="font-arabic font-semibold text-emerald-300 block mb-0.5">
+                      {t.hook.hadithArabic}
+                    </span>
+                    <span className="text-[11px] opacity-90 block">
+                      {t.hook.rewardMessage}
+                    </span>
+                  </div>
+                </div>
+
                 {/* Input Field */}
-                <div className="mt-5 mb-4">
+                <div className="mb-4">
                   <label className={`block text-xs font-medium text-slate-300 mb-1.5 ${isAr ? "font-arabic" : ""}`}>
                     {t.modal.inputLabel}
                   </label>

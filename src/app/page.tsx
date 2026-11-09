@@ -6,6 +6,7 @@ import { Header } from "@/components/Header";
 import { Hero } from "@/components/Hero";
 import { KeyGrid } from "@/components/KeyGrid";
 import { SubmitModal } from "@/components/SubmitModal";
+import { InfoModal } from "@/components/InfoModal";
 import { Footer } from "@/components/Footer";
 import { supabase, isSupabaseConfigured, INITIAL_DEMO_KEYS } from "@/lib/supabase";
 import { calculateSuccessRate } from "@/lib/utils";
@@ -20,6 +21,7 @@ export default function Home() {
   const [searchQuery, setSearchQuery] = useState("");
   const [activeTab, setActiveTab] = useState<FilterTab>("latest");
   const [isSubmitModalOpen, setIsSubmitModalOpen] = useState(false);
+  const [isInfoModalOpen, setIsInfoModalOpen] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
 
   // Initialize Language & Direction
@@ -311,6 +313,7 @@ export default function Home() {
         lang={lang}
         onLanguageChange={handleLanguageChange}
         onOpenSubmit={() => setIsSubmitModalOpen(true)}
+        onOpenInfo={() => setIsInfoModalOpen(true)}
       />
 
       {/* Main Content Area */}
@@ -320,6 +323,7 @@ export default function Home() {
           stats={stats}
           isConnectedToSupabase={isSupabaseConfigured}
           onOpenSubmit={() => setIsSubmitModalOpen(true)}
+          onOpenInfo={() => setIsInfoModalOpen(true)}
         />
 
         <KeyGrid
@@ -341,6 +345,14 @@ export default function Home() {
         lang={lang}
         onClose={() => setIsSubmitModalOpen(false)}
         onSubmit={handleSubmitKey}
+      />
+
+      {/* Noble Motivation (i) Modal */}
+      <InfoModal
+        isOpen={isInfoModalOpen}
+        lang={lang}
+        onClose={() => setIsInfoModalOpen(false)}
+        onOpenSubmit={() => setIsSubmitModalOpen(true)}
       />
 
       {/* Footer */}
