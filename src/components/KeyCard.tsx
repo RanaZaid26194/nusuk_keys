@@ -151,16 +151,16 @@ export const KeyCard: React.FC<KeyCardProps> = ({
           {renderHighlightedCode()}
         </div>
 
-        {/* Tactile Copy Button */}
+        {/* Tactile Copy Button (Small Apple-style pill with 'Copy' and icon) */}
         <motion.button
           onClick={handleCopy}
-          whileHover={{ scale: 1.06 }}
-          whileTap={{ scale: 0.92 }}
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.94 }}
           title={t.keyCard.copyKey}
-          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all shadow-sm ${
+          className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold transition-all shadow-sm ${
             copied
-              ? "bg-emerald-600 text-white shadow-emerald-900/50"
-              : "bg-zinc-800 hover:bg-zinc-700 text-zinc-200 border border-zinc-700/60"
+              ? "bg-emerald-600 text-white shadow-emerald-950/60"
+              : "bg-zinc-800 hover:bg-zinc-700 text-zinc-200 border border-zinc-700/80"
           }`}
         >
           <AnimatePresence mode="wait" initial={false}>
@@ -173,7 +173,7 @@ export const KeyCard: React.FC<KeyCardProps> = ({
                 transition={{ type: "spring", stiffness: 500, damping: 25 }}
                 className="flex items-center gap-1 text-white"
               >
-                <Check className="w-3.5 h-3.5 stroke-[2.5]" />
+                <Check className="w-3 h-3 stroke-[2.5]" />
                 <span className={isAr ? "font-arabic" : ""}>{t.keyCard.copied}</span>
               </motion.span>
             ) : (
@@ -185,7 +185,7 @@ export const KeyCard: React.FC<KeyCardProps> = ({
                 transition={{ type: "spring", stiffness: 500, damping: 25 }}
                 className="flex items-center gap-1"
               >
-                <Copy className="w-3.5 h-3.5" />
+                <Copy className="w-3 h-3" />
                 <span className={isAr ? "font-arabic" : ""}>{t.keyCard.copyKey}</span>
               </motion.span>
             )}
@@ -217,16 +217,16 @@ export const KeyCard: React.FC<KeyCardProps> = ({
 
       {/* Footer Actions: Vote & Deep Link */}
       <div className="relative z-10 flex items-center justify-between gap-2 pt-3 border-t border-zinc-800/80">
-        {/* Voting Buttons with Spring Bounces */}
+        {/* Voting Buttons with Apple-style rounded-full pills */}
         <div className="flex items-center gap-1.5">
           <motion.button
             onClick={() => handleVoteClick('UP')}
             whileHover={{ scale: 1.08 }}
             whileTap={{ scale: 0.90 }}
             disabled={item.userVoted === 'UP'}
-            className={`flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+            className={`flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium transition-colors ${
               item.userVoted === 'UP'
-                ? "bg-emerald-500/20 text-emerald-300 border border-emerald-500/40"
+                ? "bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 shadow-sm"
                 : "bg-zinc-800/70 hover:bg-zinc-800 text-zinc-300 border border-zinc-700/60"
             }`}
           >
@@ -244,9 +244,9 @@ export const KeyCard: React.FC<KeyCardProps> = ({
             whileHover={{ scale: 1.08 }}
             whileTap={{ scale: 0.90 }}
             disabled={item.userVoted === 'DOWN'}
-            className={`flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+            className={`flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium transition-colors ${
               item.userVoted === 'DOWN'
-                ? "bg-rose-500/20 text-rose-300 border border-rose-500/40"
+                ? "bg-rose-500/20 text-rose-300 border border-rose-500/40 shadow-sm"
                 : "bg-zinc-800/70 hover:bg-zinc-800 text-zinc-400 border border-zinc-700/60"
             }`}
           >

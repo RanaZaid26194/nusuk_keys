@@ -89,35 +89,40 @@ export const Hero: React.FC<HeroProps> = ({
           {t.heroDescription}
         </motion.p>
 
-        {/* Share Button & Info Trigger with Spring Physics */}
+        {/* Share Button with Apple-style Corner (i) Button */}
         <motion.div
           initial={{ opacity: 0, y: 14 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.45, delay: 0.22, ease: "easeOut" }}
-          className="mt-7 flex items-center justify-center gap-2.5"
+          className="mt-7 flex items-center justify-center"
         >
-          <motion.button
-            onClick={handleOpenSubmit}
-            whileHover={{ scale: 1.04, y: -2 }}
-            whileTap={{ scale: 0.96 }}
-            className="flex items-center gap-2 px-6 sm:px-8 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-sm shadow-lg shadow-emerald-950/60 transition-colors"
-          >
-            <KeyRound className="w-4 h-4" />
-            <span className={isAr ? "font-arabic text-base" : ""}>{t.shareCodeBtn}</span>
-            <ArrowIcon className="w-4 h-4" />
-          </motion.button>
+          <div className="relative inline-flex items-center">
+            <motion.button
+              onClick={handleOpenSubmit}
+              whileHover={{ scale: 1.03 }}
+              whileTap={{ scale: 0.96 }}
+              className="flex items-center gap-2.5 px-7 sm:px-9 py-3 rounded-full bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-sm sm:text-base shadow-lg shadow-emerald-950/60 transition-all"
+            >
+              <KeyRound className="w-4 h-4 sm:w-5 sm:h-5" />
+              <span className={isAr ? "font-arabic text-base sm:text-lg" : ""}>{t.shareCodeBtn}</span>
+              <ArrowIcon className="w-4 h-4" />
+            </motion.button>
 
-          {/* Noble motivation info button with subtle bounce */}
-          <motion.button
-            onClick={handleOpenInfo}
-            whileHover={{ scale: 1.08, rotate: 6 }}
-            whileTap={{ scale: 0.92 }}
-            aria-label={t.hook.infoButtonAria}
-            title={t.hook.infoButtonAria}
-            className="p-3 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-zinc-300 hover:text-amber-300 border border-zinc-800 transition-colors shadow-sm"
-          >
-            <Info className="w-4 h-4" />
-          </motion.button>
+            {/* Noble motivation info button (top right corner of the share button) */}
+            <motion.button
+              onClick={(e) => {
+                e.stopPropagation();
+                handleOpenInfo();
+              }}
+              whileHover={{ scale: 1.18 }}
+              whileTap={{ scale: 0.9 }}
+              aria-label={t.hook.infoButtonAria}
+              title={t.hook.infoButtonAria}
+              className="absolute -top-1.5 -right-2 sm:-top-2 sm:-right-2.5 w-6 h-6 rounded-full bg-zinc-950 border border-amber-500/60 hover:border-amber-400 text-amber-400 hover:text-amber-300 flex items-center justify-center text-xs font-bold shadow-md transition-all z-10"
+            >
+              <Info className="w-3 h-3" />
+            </motion.button>
+          </div>
         </motion.div>
 
         {/* Spiritual Hook Callout: Interactive Refined Ayah Banner */}

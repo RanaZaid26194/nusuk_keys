@@ -103,28 +103,31 @@ export const Header: React.FC<HeaderProps> = ({
             </button>
           </div>
 
-          {/* Share Your Key CTA Group */}
-          <div className="flex items-center gap-1.5">
+          {/* Share Your Key Button with Apple-style corner (i) button */}
+          <div className="relative inline-flex items-center">
             <motion.button
               onClick={handleOpenSubmit}
-              whileHover={{ scale: 1.04 }}
-              whileTap={{ scale: 0.95 }}
-              className="flex items-center gap-1.5 px-3.5 sm:px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-medium text-xs sm:text-sm transition-colors shadow-sm"
+              whileHover={{ scale: 1.03 }}
+              whileTap={{ scale: 0.96 }}
+              className="flex items-center gap-1.5 px-3.5 sm:px-4 py-2 rounded-full bg-emerald-600 hover:bg-emerald-500 text-white font-medium text-xs sm:text-sm transition-all shadow-sm"
             >
-              <Plus className="w-4 h-4 stroke-[2.5]" />
+              <Plus className="w-3.5 h-3.5 stroke-[2.5]" />
               <span className={lang === 'ar' ? 'font-arabic text-sm' : ''}>{t.shareCodeBtn}</span>
             </motion.button>
 
-            {/* Noble Motivation (i) Info Button */}
+            {/* Apple-style corner accessory (i) button */}
             <motion.button
-              onClick={handleOpenInfo}
-              whileHover={{ scale: 1.08, rotate: 6 }}
-              whileTap={{ scale: 0.92 }}
+              onClick={(e) => {
+                e.stopPropagation();
+                handleOpenInfo();
+              }}
+              whileHover={{ scale: 1.18 }}
+              whileTap={{ scale: 0.9 }}
               aria-label={t.hook.infoButtonAria}
               title={t.hook.infoButtonAria}
-              className="p-2 sm:p-2.5 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-zinc-400 hover:text-amber-300 border border-zinc-800 transition-colors shadow-sm"
+              className="absolute -top-1 -right-1 sm:-top-1.5 sm:-right-1.5 w-5 h-5 rounded-full bg-zinc-950 border border-amber-500/60 hover:border-amber-400 text-amber-400 hover:text-amber-300 flex items-center justify-center text-[10px] font-bold shadow-md transition-all z-10"
             >
-              <Info className="w-4 h-4" />
+              <Info className="w-2.5 h-2.5" />
             </motion.button>
           </div>
         </motion.div>

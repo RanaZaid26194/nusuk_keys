@@ -1,8 +1,8 @@
 "use client";
 
-import React, { useRef, useEffect } from "react";
+import React, { useRef, useEffect, useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Search, X, Layers, ShieldCheck, Flame, Clock, Inbox, Command } from "lucide-react";
+import { Search, X, Layers, ShieldCheck, Flame, Clock, Inbox, Command, ChevronDown } from "lucide-react";
 import { ChallengeKey, FilterTab, Language } from "@/lib/types";
 import { translations } from "@/lib/translations";
 import { KeyCard } from "./KeyCard";
@@ -32,6 +32,7 @@ export const KeyGrid: React.FC<KeyGridProps> = ({
   onOpenSubmit,
 }) => {
   const searchInputRef = useRef<HTMLInputElement>(null);
+  const [displayLimit, setDisplayLimit] = useState(60);
   const t = translations[lang];
   const isAr = lang === "ar";
 
@@ -41,6 +42,11 @@ export const KeyGrid: React.FC<KeyGridProps> = ({
     popular: Flame,
     latest: Clock,
   };
+
+  // Reset pagination when filter or search changes
+  useEffect(() => {
+    setDisplayLimit(60);
+  }, [activeTab, searchQuery]);
 
   // Quick / or Ctrl+K focus shortcut
   useEffect(() => {
@@ -59,24 +65,33 @@ export const KeyGrid: React.FC<KeyGridProps> = ({
     onTabChange(tab);
   };
 
+  const handleLoadMore = () => {
+    playHapticSound('click');
+    setDisplayLimit((prev) => Math.min(prev + 60, items.length));
+  };
+
+  const visibleItems = useMemo(() => {
+    return items.slice(0, displayLimit);
+  }, [items, displayLimit]);
+
   const containerVariants = {
     hidden: { opacity: 0 },
     show: {
       opacity: 1,
       transition: {
-        staggerChildren: 0.05,
+        staggerChildren: 0.04,
       },
     },
   };
 
   const itemVariants = {
     hidden: { opacity: 0, y: 15 },
-    show: { opacity: 1, y: 0, transition: { duration: 0.35, ease: "easeOut" } },
+    show: { opacity: 1, y: 0, transition: { duration: 0.3, ease: "easeOut" } },
   };
 
   return (
     <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-24">
-      {/* Controls Container: Search & Tabs */}
+      {/* Controls Container: Search & Tabs (Apple-style Segmented Control) */}
       <motion.div
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
@@ -95,7 +110,7 @@ export const KeyGrid: React.FC<KeyGridProps> = ({
             value={searchQuery}
             onChange={(e) => onSearchChange(e.target.value)}
             placeholder={t.searchPlaceholder}
-            className={`w-full pl-10 pr-16 py-2.5 rounded-xl bg-zinc-900 border border-zinc-800 text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-zinc-600 focus:ring-1 focus:ring-zinc-600 shadow-sm transition-all ${
+            className={`w-full pl-10 pr-16 py-2.5 rounded-full bg-zinc-900 border border-zinc-800 text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-zinc-600 focus:ring-1 focus:ring-zinc-600 shadow-sm transition-all ${
               isAr ? "font-arabic" : ""
             }`}
           />
@@ -126,8 +141,8 @@ export const KeyGrid: React.FC<KeyGridProps> = ({
           </div>
         </div>
 
-        {/* Sliding Filter Tabs (Clean Segmented Control with spring slider) */}
-        <div className="flex items-center gap-1 p-1 rounded-xl bg-zinc-900 border border-zinc-800 overflow-x-auto no-scrollbar shadow-sm">
+        {/* Sliding Filter Tabs (Clean Apple-style Segmented Control) */}
+        <div className="flex items-center gap-1 p-1 rounded-full bg-zinc-900 border border-zinc-800 overflow-x-auto no-scrollbar shadow-sm">
           {(["all", "verified", "popular", "latest"] as FilterTab[]).map((tab) => {
             const Icon = tabIcons[tab];
             const isActive = activeTab === tab;
@@ -138,14 +153,14 @@ export const KeyGrid: React.FC<KeyGridProps> = ({
                 onClick={() => handleTabClick(tab)}
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.96 }}
-                className={`relative flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs sm:text-sm font-medium whitespace-nowrap transition-colors select-none ${
+                className={`relative flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs sm:text-sm font-medium whitespace-nowrap transition-colors select-none ${
                   isActive ? "text-white" : "text-zinc-400 hover:text-zinc-200"
                 } ${isAr ? "font-arabic" : ""}`}
               >
                 {isActive && (
                   <motion.div
                     layoutId="activeFilterTab"
-                    className="absolute inset-0 bg-zinc-800 rounded-lg border border-zinc-700/60 shadow-sm"
+                    className="absolute inset-0 bg-zinc-800 rounded-full border border-zinc-700/60 shadow-sm"
                     transition={{ type: "spring", stiffness: 500, damping: 32 }}
                   />
                 )}
@@ -161,41 +176,62 @@ export const KeyGrid: React.FC<KeyGridProps> = ({
 
       {/* Grid of Cards with Staggered Cascading Reveal */}
       {items.length > 0 ? (
-        <motion.div
-          layout
-          variants={containerVariants}
-          initial="hidden"
-          animate="show"
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-5"
-        >
-          <AnimatePresence mode="popLayout">
-            {items.map((item) => (
-              <motion.div
-                key={item.id}
-                layout
-                variants={itemVariants}
-                exit={{ opacity: 0, scale: 0.9 }}
-                transition={{ duration: 0.25 }}
+        <>
+          <motion.div
+            layout
+            variants={containerVariants}
+            initial="hidden"
+            animate="show"
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-5"
+          >
+            <AnimatePresence mode="popLayout">
+              {visibleItems.map((item) => (
+                <motion.div
+                  key={item.id}
+                  layout
+                  variants={itemVariants}
+                  exit={{ opacity: 0, scale: 0.9 }}
+                  transition={{ duration: 0.25 }}
+                >
+                  <KeyCard
+                    item={item}
+                    lang={lang}
+                    searchQuery={searchQuery}
+                    onVote={onVote}
+                    onCopy={onCopy}
+                  />
+                </motion.div>
+              ))}
+            </AnimatePresence>
+          </motion.div>
+
+          {/* Apple-style Progressive Pagination ("Show More") */}
+          {items.length > displayLimit && (
+            <div className="flex flex-col items-center justify-center mt-12 gap-2">
+              <motion.button
+                onClick={handleLoadMore}
+                whileHover={{ scale: 1.03, y: -1 }}
+                whileTap={{ scale: 0.96 }}
+                className="flex items-center gap-2 px-6 py-2.5 rounded-full bg-zinc-900 border border-zinc-700/80 hover:bg-zinc-800 text-xs sm:text-sm font-semibold text-zinc-200 shadow-md transition-all"
               >
-                <KeyCard
-                  item={item}
-                  lang={lang}
-                  searchQuery={searchQuery}
-                  onVote={onVote}
-                  onCopy={onCopy}
-                />
-              </motion.div>
-            ))}
-          </AnimatePresence>
-        </motion.div>
+                <span>
+                  {isAr
+                    ? `عرض المزيد (يُعرض ${visibleItems.length.toLocaleString()} من ${items.length.toLocaleString()} مفتاح)`
+                    : `Show More (${visibleItems.length.toLocaleString()} of ${items.length.toLocaleString()} keys)`}
+                </span>
+                <ChevronDown className="w-4 h-4 text-zinc-400" />
+              </motion.button>
+            </div>
+          )}
+        </>
       ) : (
         /* Empty State */
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="text-center py-16 px-4 rounded-2xl bg-zinc-900/60 border border-dashed border-zinc-800 max-w-lg mx-auto"
+          className="text-center py-16 px-4 rounded-3xl bg-zinc-900/60 border border-dashed border-zinc-800 max-w-lg mx-auto"
         >
-          <div className="w-12 h-12 rounded-xl bg-zinc-800 text-zinc-400 flex items-center justify-center mx-auto mb-4 border border-zinc-700/60">
+          <div className="w-12 h-12 rounded-2xl bg-zinc-800 text-zinc-400 flex items-center justify-center mx-auto mb-4 border border-zinc-700/60">
             <Inbox className="w-6 h-6" />
           </div>
           <h3 className={`text-base sm:text-lg font-bold text-white mb-1.5 ${isAr ? "font-arabic" : ""}`}>
@@ -211,7 +247,7 @@ export const KeyGrid: React.FC<KeyGridProps> = ({
                 onClick={() => onSearchChange("")}
                 whileHover={{ scale: 1.04 }}
                 whileTap={{ scale: 0.96 }}
-                className="px-4 py-2 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-xs sm:text-sm text-white font-medium transition-colors"
+                className="px-4 py-2 rounded-full bg-zinc-800 hover:bg-zinc-700 text-xs sm:text-sm text-white font-medium transition-colors"
               >
                 {t.empty.clearFilters}
               </motion.button>
@@ -220,7 +256,7 @@ export const KeyGrid: React.FC<KeyGridProps> = ({
               onClick={onOpenSubmit}
               whileHover={{ scale: 1.04 }}
               whileTap={{ scale: 0.96 }}
-              className="px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-xs sm:text-sm text-white font-semibold shadow-sm transition-colors"
+              className="px-5 py-2 rounded-full bg-emerald-600 hover:bg-emerald-500 text-xs sm:text-sm text-white font-semibold shadow-sm transition-colors"
             >
               {t.shareCodeBtn}
             </motion.button>

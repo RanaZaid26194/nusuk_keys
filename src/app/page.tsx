@@ -52,20 +52,52 @@ export default function Home() {
     }
   }, []);
 
-  // Fetch initial keys
+  // Fetch initial keys with multi-page batching (to fetch all 6,000+ keys beyond 1,000 PostgREST limit)
   const loadKeys = useCallback(async () => {
     const userVotes = getUserVotes();
 
     if (isSupabaseConfigured && supabase) {
       try {
-        const { data, error } = await supabase
-          .from("challenge_keys")
-          .select("*")
-          .eq("is_active", true)
-          .order("created_at", { ascending: false });
+        const BATCH_SIZE = 1000;
 
-        if (!error && data && data.length > 0) {
-          const mapped: ChallengeKey[] = data.map((d: any) => ({
+        // 1. Fetch first batch with exact count from Postgres
+        const { data: firstBatch, count, error } = await supabase
+          .from("challenge_keys")
+          .select("*", { count: "exact" })
+          .eq("is_active", true)
+          .order("created_at", { ascending: false })
+          .range(0, BATCH_SIZE - 1);
+
+        if (error) {
+          console.error("Supabase loadKeys error:", error);
+        } else if (firstBatch) {
+          const totalCount = count || firstBatch.length;
+          let combinedData: any[] = [...firstBatch];
+
+          // 2. If there are more than 1,000 keys (e.g. ~6,000 keys), fetch all remaining batches in parallel
+          if (totalCount > BATCH_SIZE) {
+            const batchPromises = [];
+            for (let from = BATCH_SIZE; from < totalCount; from += BATCH_SIZE) {
+              const to = Math.min(from + BATCH_SIZE - 1, totalCount - 1);
+              batchPromises.push(
+                supabase
+                  .from("challenge_keys")
+                  .select("*")
+                  .eq("is_active", true)
+                  .order("created_at", { ascending: false })
+                  .range(from, to)
+              );
+            }
+
+            const results = await Promise.all(batchPromises);
+            for (const res of results) {
+              if (res.data && res.data.length > 0) {
+                combinedData = combinedData.concat(res.data);
+              }
+            }
+          }
+
+          const mapped: ChallengeKey[] = combinedData.map((d: any) => ({
             ...d,
             userVoted: userVotes[d.id] || null,
           }));
