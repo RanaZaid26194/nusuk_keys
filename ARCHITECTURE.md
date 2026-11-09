@@ -25,7 +25,7 @@ sequenceDiagram
         LS-->>Browser: Return cached keys
         Browser-->>User: 0ms Instant UI Paint
     else Cache Empty
-        Browser-->>User: Render Apple Glass Skeleton Shimmer
+        Browser-->>User: Render Glass Skeleton Shimmer
     end
 
     Note over Browser,PostgREST: Stage 1 (<100ms)
@@ -71,9 +71,9 @@ When a user revisits the site, waiting even 100ms is unnecessary. We utilize a S
 
 ---
 
-## 3. 🎨 Apple Glassmorphic Design System
+## 3. 🎨 Minimalist Glassmorphic Design System
 
-The visual language follows the Human Interface Guidelines from Apple:
+The visual language adheres to modern dark-mode aesthetic principles:
 - **Surface Hierarchy**:
   - Background: Ultra-deep zinc `#09090b`.
   - Glass Containers: Semi-transparent zinc `rgba(24, 24, 27, 0.6)` with backdrop blur `backdrop-blur-xl` and 1px border `border-zinc-800/80`.

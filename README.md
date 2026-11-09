@@ -14,9 +14,9 @@
 
 <br />
 
-An ultra-responsive, Apple-inspired progressive web application designed to help pilgrims worldwide discover, verify, and share referral keys (`NG-...`) for challenges in the official **Nusuk (نسك)** mobile app. Built with Next.js 14, Supabase, Tailwind CSS, and Framer Motion.
+A high-performance, modern progressive web application designed to help pilgrims worldwide discover, verify, and share referral keys (`NG-...`) for challenges in the official **Nusuk (نسك)** mobile app. Built with Next.js 14, Supabase, Tailwind CSS, and Framer Motion.
 
-[Explore Live App](https://keys-nusuk.vercel.app) · [View Architecture](ARCHITECTURE.md) · [Security Model](SECURITY.md) · [Report Issue](https://github.com/RanaZaid26194/nusuk_keys/issues)
+[Explore Live App](https://keys-nusuk.vercel.app) · [View Architecture](ARCHITECTURE.md) · [Security Model](SECURITY.md) · [Contributing Guide](CONTRIBUTING.md) · [Report Issue](https://github.com/RanaZaid26194/nusuk_keys/issues)
 
 </div>
 
@@ -30,13 +30,14 @@ An ultra-responsive, Apple-inspired progressive web application designed to help
   - **Stage 3 (Background Sync)**: Expands the list to 1,500 keys.
   - **Stage 4 (Parallel Streaming)**: Hydrates the full catalog of **5,996+ keys** without ever locking the UI thread.
 - **💾 Zero-Latency Local Caching (SWR)**: Utilizes `localStorage` with versioned cache busting (`nusuk_keys_cache_v2`). Return visits render in **0ms** from local storage while syncing fresh changes in the background.
-- **🍎 Apple Design Language**:
+- **🎨 Modern Minimalist Glassmorphic Design**:
   - Dark zinc glassmorphic surfaces (`bg-zinc-900/60`, `backdrop-blur-xl`).
-  - Native iOS-style squircles and rounded corner micro-badges.
+  - Smooth rounded squircles and micro-badges.
   - Fluid spring physics powered by `framer-motion` (stiffness: 400, damping: 30).
-  - Web Audio API haptic synthesizers generating zero-latency mechanical clicks and soft chime tones on user interactions.
+  - Web Audio API procedural sound synthesizers generating zero-latency mechanical clicks and soft chime tones on user interactions.
 - **🕌 Native Bi-directional RTL & Sacred Calligraphy**:
   - Instant one-tap switcher between **English (LTR)** and **العربية (RTL)** with mirrored layouts.
+  - Daily Quranic Ayah banner rotating automatically with live API integration and verified offline fallback.
   - Handcrafted **Nasta'liq** calligraphy style typography for Quranic Ayahs (*Surah Al-Ma'idah 5:2*) and Hadith (*Sahih Muslim 2699*), rendered with vertical breathing room.
 - **🛡️ Multi-Tier Security & Anti-Abuse**:
   - Client & database level Regex sanitization: `^NG-[A-Za-z0-9_-]+$`.
@@ -61,7 +62,7 @@ graph TD
     
     subgraph Browser Storage
         Browser -->|Read Cache| LS[(LocalStorage SWR Cache)]
-        LS -->|0ms Instant Paint| UI[Apple Glassmorphic UI]
+        LS -->|0ms Instant Paint| UI[Minimalist Glassmorphic UI]
     end
 
     subgraph 4-Stage Hydration Pipeline
@@ -194,16 +195,21 @@ nusuk_keys/
 │   │   ├── robots.ts             # Dynamic robots.txt generator
 │   │   └── sitemap.ts            # Dynamic XML sitemap generator
 │   ├── components/
-│   │   ├── Header.tsx            # Apple glass header, language switch, CTA
-│   │   ├── Hero.tsx              # Value proposition, live statistics, sacred banner
-│   │   ├── KeyGrid.tsx           # Search, filters, Apple glass shimmer & card grid
+│   │   ├── Header.tsx            # Glassmorphic header, language switch, CTA
+│   │   ├── Hero.tsx              # Value proposition, live statistics, daily ayah banner
+│   │   ├── DailyAyah.tsx         # Daily rotating Quranic banner with live API & fallback
+│   │   ├── KeyGrid.tsx           # Search, filters, glass shimmer & card grid
 │   │   ├── KeyCard.tsx           # Interactive key card, copy action, up/down voting
 │   │   ├── SubmitModal.tsx       # Share key dialog with live validation & haptics
 │   │   ├── InfoModal.tsx         # "Why Share?" modal with Nastaliq sacred quotes
 │   │   ├── NumberCounter.tsx     # Animated rolling counter for key totals
 │   │   └── Footer.tsx            # Sadaqah Jariyah footer & navigation links
+│   ├── data/
+│   │   ├── ayahs.json            # Curated verified offline fallback ayahs
+│   │   └── ayahLimits.json       # Character bounds for daily ayah validation
 │   └── lib/
 │       ├── audio.ts              # Web Audio API procedural sound synthesizer
+│       ├── dailyAyah.ts          # Deterministic daily ayah resolver & cache
 │       ├── security.ts           # Code sanitization, validation & rate limiting
 │       ├── supabase.ts           # Supabase client instantiation
 │       ├── translations.ts       # Bilingual English & Arabic dictionaries
@@ -215,6 +221,26 @@ nusuk_keys/
 ├── CHANGELOG.md                  # Release notes & version changelog
 └── LICENSE                       # MIT License
 ```
+
+---
+
+## 🤝 Contributing & Community Support
+
+Contributions, feedback, and feature suggestions are warmly welcomed! As a community-driven project, help from developers and pilgrims worldwide makes this service better for everyone.
+
+Ways you can contribute:
+- **Translations**: Help translate the interface into languages spoken by pilgrims worldwide (Urdu, Indonesian, Turkish, Malay, French, etc.).
+- **Feature Enhancements**: UI polish, accessibility improvements, and performance optimizations.
+- **Reporting Issues**: Found a bug or an edge case? Please open an issue on GitHub.
+
+To get started:
+1. **Fork** the repository.
+2. Create a branch (`git checkout -b feature/your-feature`).
+3. Commit your work (`git commit -m 'feat: describe your feature'`).
+4. Push to the branch (`git push origin feature/your-feature`).
+5. Open a **Pull Request**.
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for full development guidelines.
 
 ---
 
