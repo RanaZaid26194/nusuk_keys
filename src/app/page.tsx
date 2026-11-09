@@ -507,7 +507,7 @@ export default function Home() {
   }, [keys]);
 
   return (
-    <div className="flex flex-col min-h-screen bg-[#09090b] text-zinc-100 selection:bg-emerald-500/20 selection:text-emerald-200">
+    <div className="flex flex-col min-h-screen bg-zinc-50 dark:bg-[#09090b] text-zinc-900 dark:text-zinc-100 selection:bg-emerald-500/20 selection:text-emerald-900 dark:selection:text-emerald-200 transition-colors">
       {/* Top Navbar */}
       <Header
         lang={lang}

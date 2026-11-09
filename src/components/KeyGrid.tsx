@@ -102,7 +102,7 @@ export const KeyGrid: React.FC<KeyGridProps> = ({
       >
         {/* Animated Search Bar with Keyboard Hint (RTL/LTR Adaptive) */}
         <div className="relative flex-1 max-w-md group">
-          <div className={`absolute inset-y-0 ${isAr ? "right-0 pr-3.5" : "left-0 pl-3.5"} flex items-center pointer-events-none text-zinc-500 group-focus-within:text-zinc-300 transition-colors`}>
+          <div className={`absolute inset-y-0 ${isAr ? "right-0 pr-3.5" : "left-0 pl-3.5"} flex items-center pointer-events-none text-zinc-400 dark:text-zinc-500 group-focus-within:text-zinc-600 dark:group-focus-within:text-zinc-300 transition-colors`}>
             <Search className="w-4 h-4" />
           </div>
 
@@ -112,7 +112,7 @@ export const KeyGrid: React.FC<KeyGridProps> = ({
             value={searchQuery}
             onChange={(e) => onSearchChange(e.target.value)}
             placeholder={t.searchPlaceholder}
-            className={`w-full ${isAr ? "pr-10 pl-16 text-right font-arabic" : "pl-10 pr-16 text-left"} py-2.5 rounded-full bg-zinc-900 border border-zinc-800 text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-zinc-600 focus:ring-1 focus:ring-zinc-600 shadow-sm transition-all`}
+            className={`w-full ${isAr ? "pr-10 pl-16 text-right font-arabic" : "pl-10 pr-16 text-left"} py-2.5 rounded-full bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-sm text-zinc-900 dark:text-white placeholder-zinc-400 dark:placeholder-zinc-500 focus:outline-none focus:border-zinc-400 dark:focus:border-zinc-600 focus:ring-1 focus:ring-zinc-400 dark:focus:ring-zinc-600 shadow-sm transition-all`}
           />
 
           <div className={`absolute inset-y-0 ${isAr ? "left-0 pl-3" : "right-0 pr-3"} flex items-center gap-1.5 pointer-events-none`}>
@@ -128,12 +128,12 @@ export const KeyGrid: React.FC<KeyGridProps> = ({
                     onSearchChange("");
                     searchInputRef.current?.focus();
                   }}
-                  className="pointer-events-auto p-1 rounded-full bg-zinc-800 text-zinc-400 hover:text-white hover:bg-zinc-700 transition-colors"
+                  className="pointer-events-auto p-1 rounded-full bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white transition-colors"
                 >
                   <X className="w-3.5 h-3.5" />
                 </motion.button>
               ) : (
-                <span className="hidden sm:inline-flex items-center gap-0.5 px-2 py-0.5 rounded-md bg-zinc-800 border border-zinc-700/60 text-[10px] font-mono text-zinc-400">
+                <span className="hidden sm:inline-flex items-center gap-0.5 px-2 py-0.5 rounded-md bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700/60 text-[10px] font-mono text-zinc-500 dark:text-zinc-400">
                   <Command className="w-2.5 h-2.5" />K
                 </span>
               )}
@@ -142,7 +142,7 @@ export const KeyGrid: React.FC<KeyGridProps> = ({
         </div>
 
         {/* Sliding Filter Tabs (Clean Apple-style Segmented Control) */}
-        <div className="flex items-center gap-1 p-1 rounded-full bg-zinc-900 border border-zinc-800 overflow-x-auto no-scrollbar shadow-sm">
+        <div className="flex items-center gap-1 p-1 rounded-full bg-zinc-100/90 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 overflow-x-auto no-scrollbar shadow-sm">
           {(["all", "verified", "popular", "latest"] as FilterTab[]).map((tab) => {
             const Icon = tabIcons[tab];
             const isActive = activeTab === tab;
@@ -154,18 +154,18 @@ export const KeyGrid: React.FC<KeyGridProps> = ({
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.96 }}
                 className={`relative flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs sm:text-sm font-medium whitespace-nowrap transition-colors select-none ${
-                  isActive ? "text-white" : "text-zinc-400 hover:text-zinc-200"
+                  isActive ? "text-zinc-900 dark:text-white font-semibold" : "text-zinc-500 dark:text-zinc-400 hover:text-zinc-800 dark:hover:text-zinc-200"
                 } ${isAr ? "font-arabic" : ""}`}
               >
                 {isActive && (
                   <motion.div
                     layoutId="activeFilterTab"
-                    className="absolute inset-0 bg-zinc-800 rounded-full border border-zinc-700/60 shadow-sm"
+                    className="absolute inset-0 bg-white dark:bg-zinc-800 rounded-full border border-zinc-200 dark:border-zinc-700/60 shadow-xs"
                     transition={{ type: "spring", stiffness: 500, damping: 32 }}
                   />
                 )}
                 <span className="relative z-10 flex items-center gap-1.5">
-                  <Icon className={`w-3.5 h-3.5 ${isActive ? "text-amber-400" : "text-zinc-500"}`} />
+                  <Icon className={`w-3.5 h-3.5 ${isActive ? "text-amber-500 dark:text-amber-400" : "text-zinc-400 dark:text-zinc-500"}`} />
                   {t.tabs[tab]}
                 </span>
               </motion.button>
@@ -212,14 +212,14 @@ export const KeyGrid: React.FC<KeyGridProps> = ({
                 onClick={handleLoadMore}
                 whileHover={{ scale: 1.03, y: -1 }}
                 whileTap={{ scale: 0.96 }}
-                className="flex items-center gap-2 px-6 py-2.5 rounded-full bg-zinc-900 border border-zinc-700/80 hover:bg-zinc-800 text-xs sm:text-sm font-semibold text-zinc-200 shadow-md transition-all"
+                className="flex items-center gap-2 px-6 py-2.5 rounded-full bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700/80 hover:bg-zinc-50 dark:hover:bg-zinc-800 text-xs sm:text-sm font-semibold text-zinc-800 dark:text-zinc-200 shadow-sm transition-all"
               >
                 <span>
                   {isAr
                     ? `عرض المزيد (يُعرض ${visibleItems.length.toLocaleString()} من ${items.length.toLocaleString()} مفتاح)`
                     : `Show More (${visibleItems.length.toLocaleString()} of ${items.length.toLocaleString()} keys)`}
                 </span>
-                <ChevronDown className="w-4 h-4 text-zinc-400" />
+                <ChevronDown className="w-4 h-4 text-zinc-400 dark:text-zinc-400" />
               </motion.button>
             </div>
           )}
@@ -230,26 +230,26 @@ export const KeyGrid: React.FC<KeyGridProps> = ({
           {Array.from({ length: 8 }).map((_, idx) => (
             <div
               key={idx}
-              className="relative p-5 rounded-2xl bg-zinc-900/60 border border-zinc-800/80 flex flex-col justify-between h-44 overflow-hidden animate-pulse"
+              className="relative p-5 rounded-2xl bg-white/80 dark:bg-zinc-900/60 border border-zinc-200/80 dark:border-zinc-800/80 flex flex-col justify-between h-44 overflow-hidden animate-pulse shadow-xs"
             >
               {/* Top row: badge + time shimmer */}
               <div className="flex items-center justify-between">
-                <div className="h-5 w-24 bg-zinc-800/80 rounded-full" />
-                <div className="h-4 w-12 bg-zinc-800/60 rounded" />
+                <div className="h-5 w-24 bg-zinc-200 dark:bg-zinc-800/80 rounded-full" />
+                <div className="h-4 w-12 bg-zinc-200 dark:bg-zinc-800/60 rounded" />
               </div>
 
               {/* Middle row: code display box shimmer */}
-              <div className="my-3 py-3 px-3.5 rounded-xl bg-zinc-950/80 border border-zinc-800/60 flex items-center justify-between">
-                <div className="h-5 w-28 bg-zinc-800 rounded" />
-                <div className="h-6 w-14 bg-zinc-800/80 rounded-lg" />
+              <div className="my-3 py-3 px-3.5 rounded-xl bg-zinc-100 dark:bg-zinc-950/80 border border-zinc-200 dark:border-zinc-800/60 flex items-center justify-between">
+                <div className="h-5 w-28 bg-zinc-200 dark:bg-zinc-800 rounded" />
+                <div className="h-6 w-14 bg-zinc-200 dark:bg-zinc-800/80 rounded-lg" />
               </div>
 
               {/* Bottom row: votes & stats shimmer */}
-              <div className="flex items-center justify-between pt-2 border-t border-zinc-800/50">
-                <div className="h-4 w-20 bg-zinc-800/70 rounded" />
+              <div className="flex items-center justify-between pt-2 border-t border-zinc-200/70 dark:border-zinc-800/50">
+                <div className="h-4 w-20 bg-zinc-200 dark:bg-zinc-800/70 rounded" />
                 <div className="flex gap-1.5">
-                  <div className="h-6 w-10 bg-zinc-800 rounded-lg" />
-                  <div className="h-6 w-10 bg-zinc-800 rounded-lg" />
+                  <div className="h-6 w-10 bg-zinc-200 dark:bg-zinc-800 rounded-lg" />
+                  <div className="h-6 w-10 bg-zinc-200 dark:bg-zinc-800 rounded-lg" />
                 </div>
               </div>
             </div>
@@ -260,15 +260,15 @@ export const KeyGrid: React.FC<KeyGridProps> = ({
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="text-center py-16 px-4 rounded-3xl bg-zinc-900/60 border border-dashed border-zinc-800 max-w-lg mx-auto"
+          className="text-center py-16 px-4 rounded-3xl bg-white/80 dark:bg-zinc-900/60 border border-dashed border-zinc-200 dark:border-zinc-800 max-w-lg mx-auto shadow-xs"
         >
-          <div className="w-12 h-12 rounded-2xl bg-zinc-800 text-zinc-400 flex items-center justify-center mx-auto mb-4 border border-zinc-700/60">
+          <div className="w-12 h-12 rounded-2xl bg-zinc-100 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400 flex items-center justify-center mx-auto mb-4 border border-zinc-200 dark:border-zinc-700/60">
             <Inbox className="w-6 h-6" />
           </div>
-          <h3 className={`text-base sm:text-lg font-bold text-white mb-1.5 ${isAr ? "font-arabic" : ""}`}>
+          <h3 className={`text-base sm:text-lg font-bold text-zinc-900 dark:text-white mb-1.5 ${isAr ? "font-arabic" : ""}`}>
             {t.empty.title}
           </h3>
-          <p className={`text-xs sm:text-sm text-zinc-400 mb-6 ${isAr ? "font-arabic" : ""}`}>
+          <p className={`text-xs sm:text-sm text-zinc-600 dark:text-zinc-400 mb-6 ${isAr ? "font-arabic" : ""}`}>
             {t.empty.description}
           </p>
 
@@ -278,7 +278,7 @@ export const KeyGrid: React.FC<KeyGridProps> = ({
                 onClick={() => onSearchChange("")}
                 whileHover={{ scale: 1.04 }}
                 whileTap={{ scale: 0.96 }}
-                className="px-4 py-2 rounded-full bg-zinc-800 hover:bg-zinc-700 text-xs sm:text-sm text-white font-medium transition-colors"
+                className="px-4 py-2 rounded-full bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-xs sm:text-sm text-zinc-800 dark:text-white font-medium transition-colors"
               >
                 {t.empty.clearFilters}
               </motion.button>

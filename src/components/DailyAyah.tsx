@@ -151,11 +151,11 @@ export const DailyAyah: React.FC<DailyAyahProps> = ({ lang, onOpenInfo, mockFrid
       onKeyDown={handleKeyDown}
       whileHover={{ y: -2 }}
       whileTap={{ scale: 0.98 }}
-      className={`mt-6 relative overflow-hidden flex flex-col items-center justify-center px-6 py-4 rounded-2xl bg-zinc-900/80 hover:bg-zinc-900 border ${
+      className={`mt-6 relative overflow-hidden flex flex-col items-center justify-center px-6 py-4 rounded-2xl bg-white/90 dark:bg-zinc-900/80 hover:bg-white dark:hover:bg-zinc-900 border ${
         isFriday
-          ? "border-gold-accent/35 hover:border-gold-accent/50 shadow-[0_0_20px_rgba(212,175,55,0.06)]"
-          : "border-gold-accent/20 hover:border-gold-accent/35"
-      } cursor-pointer transition-all max-w-xl mx-auto shadow-sm group text-center min-h-[176px]`}
+          ? "border-gold-accent/40 dark:border-gold-accent/35 hover:border-gold-accent/60 dark:hover:border-gold-accent/50 shadow-[0_0_20px_rgba(212,175,55,0.12)] dark:shadow-[0_0_20px_rgba(212,175,55,0.06)]"
+          : "border-gold-accent/30 dark:border-gold-accent/20 hover:border-gold-accent/45 dark:hover:border-gold-accent/35 shadow-xs"
+      } cursor-pointer transition-all max-w-xl mx-auto group text-center min-h-[176px]`}
     >
       {/* 3. Soft gold ambient radial glow at the top */}
       <div
@@ -198,22 +198,22 @@ export const DailyAyah: React.FC<DailyAyahProps> = ({ lang, onOpenInfo, mockFrid
                 <span
                   className={
                     isAr
-                      ? "font-arabic text-xs text-gold-accent/90 font-medium tracking-normal select-none"
-                      : "text-[10px] uppercase tracking-widest text-gold-accent/90 font-semibold font-mono select-none"
+                      ? "font-arabic text-xs text-gold-700 dark:text-gold-accent/90 font-medium tracking-normal select-none"
+                      : "text-[10px] uppercase tracking-widest text-gold-700 dark:text-gold-accent/90 font-semibold font-mono select-none"
                   }
                 >
                   {labelText}
                 </span>
               </div>
 
-              {/* 1 & 2. Arabic ayah: gold-200, Amiri font, whole word stagger, lang='ar' */}
+              {/* 1 & 2. Arabic ayah: gold-800 in light, gold-200 in dark, Amiri font, whole word stagger, lang='ar' */}
               <motion.div
                 dir="rtl"
                 lang="ar"
                 variants={containerVariants}
                 initial="hidden"
                 animate="visible"
-                className="font-arabic font-normal text-gold-200 text-base sm:text-lg leading-[2.2] py-1 px-2 text-center group-hover:text-gold-100 transition-colors overflow-visible select-text"
+                className="font-arabic font-normal text-gold-800 dark:text-gold-200 text-base sm:text-lg leading-[2.2] py-1 px-2 text-center group-hover:text-gold-950 dark:group-hover:text-gold-100 transition-colors overflow-visible select-text"
               >
                 «{arabicWords.map((word, idx) => (
                   <React.Fragment key={idx}>
@@ -228,21 +228,21 @@ export const DailyAyah: React.FC<DailyAyahProps> = ({ lang, onOpenInfo, mockFrid
               {/* 5. Ayah End Marker ۝ (U+06DD) in dim gold as divider (EN mode only) */}
               {!isAr && (
                 <div className="flex items-center justify-center gap-2.5 my-1.5 max-w-[200px] mx-auto opacity-70 select-none">
-                  <div className="flex-1 h-[1px] bg-gradient-to-r from-transparent via-gold-accent/20 to-gold-accent/35" />
-                  <span className="font-arabic text-gold-accent/80 text-sm leading-none" aria-hidden="true">
+                  <div className="flex-1 h-[1px] bg-gradient-to-r from-transparent via-gold-accent/30 dark:via-gold-accent/20 to-gold-accent/40 dark:to-gold-accent/35" />
+                  <span className="font-arabic text-gold-700/80 dark:text-gold-accent/80 text-sm leading-none" aria-hidden="true">
                     &#x06DD;
                   </span>
-                  <div className="flex-1 h-[1px] bg-gradient-to-l from-transparent via-gold-accent/20 to-gold-accent/35" />
+                  <div className="flex-1 h-[1px] bg-gradient-to-l from-transparent via-gold-accent/30 dark:via-gold-accent/20 to-gold-accent/40 dark:to-gold-accent/35" />
                 </div>
               )}
 
               {/* 2. English translation and reference in muted zinc */}
               {!isAr && (
                 <>
-                  <div className="text-[11px] sm:text-xs text-zinc-400 text-center">
+                  <div className="text-[11px] sm:text-xs text-zinc-600 dark:text-zinc-400 text-center transition-colors">
                     “{ayah.english}” — [Surah {ayah.surahNameEn} ({ayah.surah}:{ayah.numberInSurah})]
                   </div>
-                  <div className="text-[10px] text-zinc-500 mt-0.5 text-center">
+                  <div className="text-[10px] text-zinc-500 dark:text-zinc-500 mt-0.5 text-center">
                     Sahih International
                   </div>
                 </>
@@ -252,7 +252,7 @@ export const DailyAyah: React.FC<DailyAyahProps> = ({ lang, onOpenInfo, mockFrid
               {isAr && (
                 <div
                   dir="rtl"
-                  className="text-[11px] sm:text-xs text-zinc-400 font-arabic mt-1 text-center"
+                  className="text-[11px] sm:text-xs text-zinc-600 dark:text-zinc-400 font-arabic mt-1 text-center transition-colors"
                 >
                   [{ayah.surahNameAr} ({ayah.numberInSurah})]
                 </div>

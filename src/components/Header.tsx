@@ -2,10 +2,11 @@
 
 import React from "react";
 import { motion } from "framer-motion";
-import { KeyRound, Plus, Info } from "lucide-react";
+import { KeyRound, Plus } from "lucide-react";
 import { Language } from "@/lib/types";
 import { translations } from "@/lib/translations";
 import { playHapticSound } from "@/lib/audio";
+import { ThemeToggle } from "./ThemeToggle";
 
 interface HeaderProps {
   lang: Language;
@@ -38,7 +39,7 @@ export const Header: React.FC<HeaderProps> = ({
   };
 
   return (
-    <header className="sticky top-0 z-40 w-full bg-zinc-950/80 backdrop-blur-md border-b border-zinc-800/80">
+    <header className="sticky top-0 z-40 w-full bg-white/80 dark:bg-zinc-950/80 backdrop-blur-md border-b border-zinc-200/80 dark:border-zinc-800/80 transition-colors">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 sm:h-18 flex items-center justify-between">
         {/* Brand / Logo */}
         <motion.div
@@ -46,17 +47,17 @@ export const Header: React.FC<HeaderProps> = ({
           animate={{ opacity: 1, x: 0 }}
           className="flex items-center gap-3 select-none"
         >
-          <div className="flex items-center justify-center w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-zinc-900 border border-zinc-800 text-emerald-400 shadow-sm">
+          <div className="flex items-center justify-center w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-emerald-600 dark:text-emerald-400 shadow-sm transition-colors">
             <KeyRound className="w-4 h-4 sm:w-5 sm:h-5" />
           </div>
 
           <div>
             <div className="flex items-center gap-2">
-              <span className={`text-base sm:text-lg font-bold tracking-tight text-white ${lang === 'ar' ? 'font-arabic text-xl' : ''}`}>
+              <span className={`text-base sm:text-lg font-bold tracking-tight text-zinc-900 dark:text-white ${lang === 'ar' ? 'font-arabic text-xl' : ''}`}>
                 {t.siteTitle}
               </span>
             </div>
-            <p className="text-[11px] text-zinc-400 hidden sm:block">
+            <p className="text-[11px] text-zinc-500 dark:text-zinc-400 hidden sm:block">
               {t.siteSubtitle}
             </p>
           </div>
@@ -68,18 +69,21 @@ export const Header: React.FC<HeaderProps> = ({
           animate={{ opacity: 1, x: 0 }}
           className="flex items-center gap-2 sm:gap-3"
         >
+          {/* Theme Switcher (Light / Dark) */}
+          <ThemeToggle isAr={lang === 'ar'} />
+
           {/* Language Switcher */}
-          <div className="flex items-center p-1 rounded-xl bg-zinc-900 border border-zinc-800 shadow-sm">
+          <div className="flex items-center p-1 rounded-xl bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-sm transition-colors">
             <button
               onClick={() => handleLang("en")}
               className={`relative px-2.5 py-1 text-xs font-medium rounded-lg transition-colors ${
-                lang === "en" ? "text-white" : "text-zinc-400 hover:text-zinc-200"
+                lang === "en" ? "text-zinc-900 dark:text-white" : "text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200"
               }`}
             >
               {lang === "en" && (
                 <motion.div
                   layoutId="activeLangPill"
-                  className="absolute inset-0 bg-zinc-800 rounded-lg shadow-sm border border-zinc-700/60"
+                  className="absolute inset-0 bg-white dark:bg-zinc-800 rounded-lg shadow-sm border border-zinc-200 dark:border-zinc-700/60"
                   transition={{ type: "spring", stiffness: 450, damping: 35 }}
                 />
               )}
@@ -89,13 +93,13 @@ export const Header: React.FC<HeaderProps> = ({
             <button
               onClick={() => handleLang("ar")}
               className={`relative px-2.5 py-1 text-xs font-medium rounded-lg transition-colors font-arabic ${
-                lang === "ar" ? "text-white" : "text-zinc-400 hover:text-zinc-200"
+                lang === "ar" ? "text-zinc-900 dark:text-white" : "text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200"
               }`}
             >
               {lang === "ar" && (
                 <motion.div
                   layoutId="activeLangPill"
-                  className="absolute inset-0 bg-zinc-800 rounded-lg shadow-sm border border-zinc-700/60"
+                  className="absolute inset-0 bg-white dark:bg-zinc-800 rounded-lg shadow-sm border border-zinc-200 dark:border-zinc-700/60"
                   transition={{ type: "spring", stiffness: 450, damping: 35 }}
                 />
               )}

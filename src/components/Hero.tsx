@@ -39,7 +39,7 @@ export const Hero: React.FC<HeroProps> = ({
   };
 
   return (
-    <section className="relative pt-10 pb-12 sm:pt-14 sm:pb-16 border-b border-zinc-800/80 bg-[#09090b] overflow-hidden">
+    <section className="relative pt-10 pb-12 sm:pt-14 sm:pb-16 border-b border-zinc-200/80 dark:border-zinc-800/80 bg-zinc-50 dark:bg-[#09090b] transition-colors overflow-hidden">
       {/* Background Ambient Radial Light */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[700px] h-[300px] bg-emerald-500/5 blur-[120px] pointer-events-none -z-10" />
 
@@ -49,7 +49,7 @@ export const Hero: React.FC<HeroProps> = ({
           initial={{ opacity: 0, y: -12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4, ease: "easeOut" }}
-          className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-zinc-900 border border-zinc-800 text-zinc-300 text-xs sm:text-sm font-medium mb-5 shadow-sm"
+          className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-700 dark:text-zinc-300 text-xs sm:text-sm font-medium mb-5 shadow-sm transition-colors"
         >
           <span className="relative flex h-2 w-2">
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
@@ -63,17 +63,17 @@ export const Hero: React.FC<HeroProps> = ({
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.45, delay: 0.08, ease: "easeOut" }}
-          className={`text-3xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-white max-w-3xl mx-auto leading-tight ${
+          className={`text-3xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-zinc-900 dark:text-white max-w-3xl mx-auto leading-tight transition-colors ${
             isAr ? "font-arabic leading-[1.3] sm:leading-[1.3]" : ""
           }`}
         >
           {isAr ? (
             <>
-              استكشف وشارك <span className="text-zinc-100">مفاتيح تحدي نسك</span>
+              استكشف وشارك <span className="text-zinc-700 dark:text-zinc-100">مفاتيح تحدي نسك</span>
             </>
           ) : (
             <>
-              Discover & Share <span className="text-zinc-100">Nusuk Challenge Keys</span>
+              Discover & Share <span className="text-zinc-700 dark:text-zinc-100">Nusuk Challenge Keys</span>
             </>
           )}
         </motion.h1>
@@ -83,7 +83,7 @@ export const Hero: React.FC<HeroProps> = ({
           initial={{ opacity: 0, y: 14 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.45, delay: 0.16, ease: "easeOut" }}
-          className={`mt-4 text-sm sm:text-base text-zinc-400 max-w-2xl mx-auto leading-relaxed ${
+          className={`mt-4 text-sm sm:text-base text-zinc-600 dark:text-zinc-400 max-w-2xl mx-auto leading-relaxed transition-colors ${
             isAr ? "font-arabic text-base sm:text-lg" : ""
           }`}
         >
@@ -140,15 +140,15 @@ export const Hero: React.FC<HeroProps> = ({
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, delay: 0.32 }}
             whileHover={{ y: -4 }}
-            className="p-4 rounded-2xl bg-zinc-900/50 border border-zinc-800/80 hover:border-zinc-700/80 text-center transition-all shadow-sm"
+            className="p-4 rounded-2xl bg-white/70 dark:bg-zinc-900/50 border border-zinc-200/80 dark:border-zinc-800/80 hover:border-zinc-300 dark:hover:border-zinc-700/80 text-center transition-all shadow-sm"
           >
-            <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-zinc-800 text-zinc-300 mx-auto mb-2">
-              <KeyRound className="w-4 h-4 text-emerald-400" />
+            <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 mx-auto mb-2 transition-colors">
+              <KeyRound className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
             </div>
-            <div className="text-2xl sm:text-3xl font-bold text-white tracking-tight font-mono">
+            <div className="text-2xl sm:text-3xl font-bold text-zinc-900 dark:text-white tracking-tight font-mono transition-colors">
               <NumberCounter value={stats.totalKeys} />
             </div>
-            <div className={`text-xs text-zinc-400 mt-1 ${isAr ? "font-arabic" : ""}`}>
+            <div className={`text-xs text-zinc-500 dark:text-zinc-400 mt-1 ${isAr ? "font-arabic" : ""}`}>
               {t.stats.totalKeys}
             </div>
           </motion.div>
@@ -159,15 +159,15 @@ export const Hero: React.FC<HeroProps> = ({
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, delay: 0.38 }}
             whileHover={{ y: -4 }}
-            className="p-4 rounded-2xl bg-zinc-900/50 border border-zinc-800/80 hover:border-zinc-700/80 text-center transition-all shadow-sm"
+            className="p-4 rounded-2xl bg-white/70 dark:bg-zinc-900/50 border border-zinc-200/80 dark:border-zinc-800/80 hover:border-zinc-300 dark:hover:border-zinc-700/80 text-center transition-all shadow-sm"
           >
-            <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-zinc-800 text-zinc-300 mx-auto mb-2">
-              <ShieldCheck className="w-4 h-4 text-emerald-400" />
+            <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 mx-auto mb-2 transition-colors">
+              <ShieldCheck className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
             </div>
-            <div className="text-2xl sm:text-3xl font-bold text-white tracking-tight font-mono">
+            <div className="text-2xl sm:text-3xl font-bold text-zinc-900 dark:text-white tracking-tight font-mono transition-colors">
               <NumberCounter value={stats.successRate} suffix="%" />
             </div>
-            <div className={`text-xs text-zinc-400 mt-1 ${isAr ? "font-arabic" : ""}`}>
+            <div className={`text-xs text-zinc-500 dark:text-zinc-400 mt-1 ${isAr ? "font-arabic" : ""}`}>
               {t.stats.activeRate}
             </div>
           </motion.div>
@@ -178,15 +178,15 @@ export const Hero: React.FC<HeroProps> = ({
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, delay: 0.44 }}
             whileHover={{ y: -4 }}
-            className="p-4 rounded-2xl bg-zinc-900/50 border border-zinc-800/80 hover:border-zinc-700/80 text-center transition-all shadow-sm"
+            className="p-4 rounded-2xl bg-white/70 dark:bg-zinc-900/50 border border-zinc-200/80 dark:border-zinc-800/80 hover:border-zinc-300 dark:hover:border-zinc-700/80 text-center transition-all shadow-sm"
           >
-            <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-zinc-800 text-zinc-300 mx-auto mb-2">
-              <Copy className="w-4 h-4 text-emerald-400" />
+            <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 mx-auto mb-2 transition-colors">
+              <Copy className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
             </div>
-            <div className="text-2xl sm:text-3xl font-bold text-white tracking-tight font-mono">
+            <div className="text-2xl sm:text-3xl font-bold text-zinc-900 dark:text-white tracking-tight font-mono transition-colors">
               <NumberCounter value={stats.totalCopies} />
             </div>
-            <div className={`text-xs text-zinc-400 mt-1 ${isAr ? "font-arabic" : ""}`}>
+            <div className={`text-xs text-zinc-500 dark:text-zinc-400 mt-1 ${isAr ? "font-arabic" : ""}`}>
               {t.stats.totalCopies}
             </div>
           </motion.div>
@@ -197,19 +197,19 @@ export const Hero: React.FC<HeroProps> = ({
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, delay: 0.50 }}
             whileHover={{ y: -4 }}
-            className="p-4 rounded-2xl bg-zinc-900/50 border border-zinc-800/80 hover:border-zinc-700/80 text-center transition-all shadow-sm"
+            className="p-4 rounded-2xl bg-white/70 dark:bg-zinc-900/50 border border-zinc-200/80 dark:border-zinc-800/80 hover:border-zinc-300 dark:hover:border-zinc-700/80 text-center transition-all shadow-sm"
           >
-            <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-zinc-800 text-zinc-300 mx-auto mb-2">
-              <Activity className="w-4 h-4 text-emerald-400" />
+            <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 mx-auto mb-2 transition-colors">
+              <Activity className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
             </div>
-            <div className="flex items-center justify-center gap-2 text-2xl sm:text-3xl font-bold text-white tracking-tight">
+            <div className="flex items-center justify-center gap-2 text-2xl sm:text-3xl font-bold text-zinc-900 dark:text-white tracking-tight transition-colors">
               <span className="relative flex h-3 w-3">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-                <span className="relative inline-flex rounded-full h-3 w-3 bg-emerald-400" />
+                <span className="relative inline-flex rounded-full h-3 w-3 bg-emerald-500" />
               </span>
               <span>{isConnectedToSupabase ? "Sync" : "Active"}</span>
             </div>
-            <div className={`text-xs text-zinc-400 mt-1 ${isAr ? "font-arabic" : ""}`}>
+            <div className={`text-xs text-zinc-500 dark:text-zinc-400 mt-1 ${isAr ? "font-arabic" : ""}`}>
               {t.stats.liveStatus}
             </div>
           </motion.div>

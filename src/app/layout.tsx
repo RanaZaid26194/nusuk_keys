@@ -21,7 +21,10 @@ const amiri = Amiri({
 const siteUrl = "https://keys-nusuk.vercel.app";
 
 export const viewport: Viewport = {
-  themeColor: "#09090b",
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#fafafa" },
+    { media: "(prefers-color-scheme: dark)", color: "#09090b" },
+  ],
   width: "device-width",
   initialScale: 1,
   maximumScale: 5,
@@ -175,8 +178,31 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="dark">
+    <html lang="en" suppressHydrationWarning>
       <head>
+        {/* Synchronous inline script to prevent theme flash (FOUT) */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                try {
+                  var mode = localStorage.getItem('nusuk_theme_mode');
+                  var isDark = mode === 'dark' || (!mode && window.matchMedia('(prefers-color-scheme: dark)').matches);
+                  if (isDark) {
+                    document.documentElement.classList.add('dark');
+                    document.documentElement.classList.remove('light');
+                    document.documentElement.style.colorScheme = 'dark';
+                  } else {
+                    document.documentElement.classList.remove('dark');
+                    document.documentElement.classList.add('light');
+                    document.documentElement.style.colorScheme = 'light';
+                  }
+                } catch (e) {}
+              })();
+            `,
+          }}
+        />
+
         {/* Schema.org Structured Data */}
         <script
           type="application/ld+json"
@@ -184,7 +210,7 @@ export default function RootLayout({
         />
       </head>
       <body
-        className={`${inter.variable} ${amiri.variable} font-sans antialiased bg-[#09090b] text-zinc-100 min-h-screen selection:bg-emerald-500/20 selection:text-emerald-200`}
+        className={`${inter.variable} ${amiri.variable} font-sans antialiased bg-zinc-50 dark:bg-[#09090b] text-zinc-900 dark:text-zinc-100 min-h-screen selection:bg-emerald-500/20 selection:text-emerald-900 dark:selection:text-emerald-200 transition-colors duration-200`}
       >
         {children}
 
