@@ -1,0 +1,45 @@
+# Nusuk Keys (مفاتيح نسك) — Full Specification & Architecture
+
+## System Summary
+Nusuk Keys is an open, high-performance web directory built to facilitate peer sharing of Nusuk Umrah Challenge keys. It provides one-tap copying, live verification feedback (upvotes/downvotes), dynamic recalculation of verification rates, and direct deep-linking into the official Nusuk application.
+
+- **Canonical Production URL**: https://keys-nusuk.vercel.app/
+- **Google Search Console**: Verified property
+- **License**: MIT / Open Community
+
+## Challenge Key Format & Rules
+1. **Prefix**: Must start with `NG-` (case-insensitive on submission, normalized to uppercase).
+2. **Character Set**: `[A-Z0-9_-]` only.
+3. **Length**: Between 6 and 24 characters total (e.g. `NG-SBs90X`, `NG-948271`).
+4. **Duplicate Protection**:
+   - Client-side pre-flight check rejects keys already present in the active list.
+   - Database-level unique constraint (`code VARCHAR(50) UNIQUE NOT NULL`) and pre-insert query prevents duplicate entries across distributed clients.
+5. **Rate Limiting**:
+   - Maximum 3 key submissions per 10 minutes per client.
+   - 15-second mandatory cooldown between submissions.
+
+## Deep Link Specification
+- Base URL: `https://services.nusuk.sa/app`
+- Parameter `p`: `27` (Nusuk Umrah challenge screen ID)
+- Parameter `id`: Clean sanitized key string
+- Full URL example: `https://services.nusuk.sa/app?p=27&id=NG-SBs90X`
+
+## Database Schema (Supabase PostgreSQL)
+```sql
+CREATE TABLE challenge_keys (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    code VARCHAR(50) UNIQUE NOT NULL,
+    upvotes INT DEFAULT 1,
+    downvotes INT DEFAULT 0,
+    copies_count INT DEFAULT 0,
+    is_active BOOLEAN DEFAULT TRUE,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    last_verified_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+CREATE INDEX idx_challenge_keys_active ON challenge_keys (is_active, created_at DESC);
+```
+
+## Security & Privacy
+- Zero telemetry tracking of sensitive pilgrim data.
+- Strict CSP and modern HTTP security headers enforced (`X-Frame-Options: DENY`, `X-Content-Type-Options: nosniff`, `Referrer-Policy: strict-origin-when-cross-origin`).
+- Vercel Web Analytics and Speed Insights instrumented for real-world Core Web Vitals monitoring without cookies or personal tracking.

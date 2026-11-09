@@ -1,8 +1,15 @@
-@import url('https://fonts.googleapis.com/css2?family=Noto+Nastaliq+Urdu:wght@400;700&display=swap');
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Self-hosted Noto Nastaliq Urdu font (zero external requests) */
+@font-face {
+  font-family: 'Noto Nastaliq Urdu';
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url('/fonts/NotoNastaliqUrdu.woff2') format('woff2');
+}
 
 :root {
   --foreground-rgb: 244, 244, 245;
@@ -23,7 +30,7 @@ body {
 /* Nastaliq Calligraphy Class */
 .font-nastaliq {
   font-family: 'Noto Nastaliq Urdu', 'Amiri', serif;
-  line-height: 2.1;
+  line-height: 2.2;
   letter-spacing: 0.02em;
 }
 
