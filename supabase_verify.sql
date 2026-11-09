@@ -19,3 +19,8 @@ from pg_proc p
 join pg_namespace n on n.oid = p.pronamespace
 where n.nspname = 'public'
   and p.proname in ('increment_copy', 'cast_vote');
+
+-- 4. check that challenge_keys_code_format constraint exists and is validated (expected: 1 row with convalidated = true)
+select conname, convalidated, pg_get_constraintdef(oid) as definition
+from pg_constraint
+where conname = 'challenge_keys_code_format';

@@ -5,10 +5,12 @@ import { motion, AnimatePresence } from "framer-motion";
 import { X, KeyRound, CheckCircle2, AlertCircle, Send, HeartHandshake } from "lucide-react";
 import { Language } from "@/lib/types";
 import { translations } from "@/lib/translations";
-import { sanitizeAndValidateCode, checkSubmissionRateLimit, recordSubmissionRateLimit } from "@/lib/security";
+import { checkSubmissionRateLimit, recordSubmissionRateLimit } from "@/lib/security";
+import { isValidKey, sanitizeKeyInput, getBodyCharCount, KEY_PREFIX, KEY_BODY_LENGTH, KEY_TOTAL_LENGTH } from "@/lib/keyFormat";
 import { playHapticSound } from "@/lib/audio";
 
-interface SubmitModalProps {
+interface SubmitModalProps
+{
   isOpen: boolean;
   lang: Language;
   onClose: () => void;
@@ -20,50 +22,55 @@ export const SubmitModal: React.FC<SubmitModalProps> = ({
   lang,
   onClose,
   onSubmit,
-}) => {
-  const [code, setCode] = useState("NG-");
+}) =>
+{
+  const [code, setCode] = useState<string>(KEY_PREFIX);
   const [submitting, setSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isSuccess, setIsSuccess] = useState(false);
 
   const t = translations[lang];
   const isAr = lang === "ar";
+  const bodyCount = getBodyCharCount(code);
+  const isComplete = bodyCount === KEY_BODY_LENGTH && isValidKey(code);
 
-  useEffect(() => {
-    if (isOpen) {
-      setCode("NG-");
+  useEffect(() =>
+  {
+    if (isOpen)
+    {
+      setCode(KEY_PREFIX);
       setErrorMessage(null);
       setIsSuccess(false);
     }
   }, [isOpen]);
 
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape" && isOpen) {
+  useEffect(() =>
+  {
+    const handleKeyDown = (e: KeyboardEvent) =>
+    {
+      if (e.key === "Escape" && isOpen)
         onClose();
-      }
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [isOpen, onClose]);
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    let val = e.target.value.toUpperCase();
-    if (!val.startsWith("NG-")) {
-      val = "NG-" + val.replace(/^NG-?/i, "");
-    }
-    // Prevent invalid characters right as user types
-    val = val.replace(/[^A-Z0-9_-]/g, "");
-    setCode(val);
+  // sanitize user input, strip non-alphanumeric chars, preserve case, lock prefix
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) =>
+  {
+    const sanitized = sanitizeKeyInput(e.target.value);
+    setCode(sanitized);
     setErrorMessage(null);
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) =>
+  {
     e.preventDefault();
 
-    // 1. Check Rate Limit
+    // 1. check rate limit
     const rateCheck = checkSubmissionRateLimit();
-    if (!rateCheck.allowed) {
+    if (!rateCheck.allowed)
+    {
       setErrorMessage(
         isAr
           ? `يرجى الانتظار ${rateCheck.waitSeconds} ثانية قبل مشاركة رمز آخر لمنع التكرار.`
@@ -72,29 +79,31 @@ export const SubmitModal: React.FC<SubmitModalProps> = ({
       return;
     }
 
-    // 2. Strict Input Sanitization & Format Validation
-    const validation = sanitizeAndValidateCode(code);
-    if (!validation.isValid || !validation.sanitizedCode) {
-      setErrorMessage(validation.errorMessage || t.modal.errorGeneric);
+    // 2. strict format validation
+    if (!isValidKey(code))
+    {
+      setErrorMessage(t.modal.errorFormat);
       return;
     }
 
     setSubmitting(true);
     setErrorMessage(null);
 
-    const res = await onSubmit(validation.sanitizedCode);
+    const res = await onSubmit(code);
     setSubmitting(false);
 
-    if (res.success) {
+    if (res.success)
+    {
       recordSubmissionRateLimit();
       setIsSuccess(true);
       playHapticSound('click');
-      setTimeout(() => {
+      setTimeout(() =>
+      {
         onClose();
       }, 1800);
-    } else {
-      setErrorMessage(res.error || t.modal.errorGeneric);
     }
+    else
+      setErrorMessage(res.error || t.modal.errorGeneric);
   };
 
   return (
@@ -166,18 +175,23 @@ export const SubmitModal: React.FC<SubmitModalProps> = ({
                   </div>
                 </div>
 
-                {/* Input Field (always LTR for alphanumeric code entry) */}
+                {/* Input Field with live counter */}
                 <div className="mb-4">
-                  <label className={`block text-xs font-medium text-zinc-700 dark:text-zinc-300 mb-1.5 ${isAr ? "font-arabic" : ""}`}>
-                    {t.modal.inputLabel}
-                  </label>
+                  <div className="flex items-center justify-between mb-1.5">
+                    <label className={`block text-xs font-medium text-zinc-700 dark:text-zinc-300 ${isAr ? "font-arabic" : ""}`}>
+                      {t.modal.inputLabel}
+                    </label>
+                    <span className={`text-[11px] font-mono font-medium transition-colors ${bodyCount === KEY_BODY_LENGTH ? "text-emerald-600 dark:text-emerald-400 font-bold" : "text-zinc-400 dark:text-zinc-500"}`}>
+                      {bodyCount}/{KEY_BODY_LENGTH}
+                    </span>
+                  </div>
                   <input
                     type="text"
                     dir="ltr"
                     value={code}
                     onChange={handleInputChange}
                     placeholder={t.modal.placeholder}
-                    maxLength={24}
+                    maxLength={KEY_TOTAL_LENGTH}
                     autoFocus
                     className={`w-full px-3.5 py-3 rounded-xl bg-zinc-50 dark:bg-zinc-950 font-mono text-base font-bold tracking-widest text-left focus:outline-none shadow-xs transition-colors ${
                       errorMessage
@@ -225,8 +239,8 @@ export const SubmitModal: React.FC<SubmitModalProps> = ({
 
                   <button
                     type="submit"
-                    disabled={submitting}
-                    className="flex items-center gap-1.5 px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs sm:text-sm font-semibold transition-colors disabled:opacity-50 shadow-sm"
+                    disabled={submitting || !isComplete}
+                    className="flex items-center gap-1.5 px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs sm:text-sm font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
                   >
                     <Send className="w-3.5 h-3.5" />
                     <span>{submitting ? t.modal.submitting : t.modal.submit}</span>

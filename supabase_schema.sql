@@ -11,7 +11,8 @@ CREATE TABLE IF NOT EXISTS challenge_keys (
     copies_count INT DEFAULT 0,
     is_active BOOLEAN DEFAULT TRUE,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-    last_verified_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+    last_verified_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    CONSTRAINT challenge_keys_code_format CHECK (code ~ '^NG-[A-Za-z0-9]{8}$')
 );
 
 -- 2. Create index for fast sorting
@@ -29,7 +30,7 @@ ON challenge_keys FOR SELECT USING (is_active = true);
 DROP POLICY IF EXISTS "Allow public submit new keys" ON challenge_keys;
 CREATE POLICY "Allow public submit new keys" 
 ON challenge_keys FOR INSERT WITH CHECK (
-  code ~ '^NG-[A-Za-z0-9_-]+$'
+  code ~ '^NG-[A-Za-z0-9]{8}$'
   AND upvotes = 1
   AND downvotes = 0
   AND copies_count = 0

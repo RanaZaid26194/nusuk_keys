@@ -11,6 +11,8 @@ import { Footer } from "@/components/Footer";
 import { supabase, isSupabaseConfigured, INITIAL_DEMO_KEYS } from "@/lib/supabase";
 import { calculateSuccessRate } from "@/lib/utils";
 import { loadUsedKeys, markUsed, unmarkUsed, clearUsedKeys, normalizeCode, STORAGE_KEY_USED } from "@/lib/usedKeys";
+import { isValidKey } from "@/lib/keyFormat";
+import { translations } from "@/lib/translations";
 
 const LOCAL_STORAGE_KEYS = "nusuk_keys_data_v1";
 const LOCAL_STORAGE_CACHE = "nusuk_keys_cache_v2";
@@ -540,24 +542,33 @@ export default function Home()
     setUsedSnapshot(new Set());
   };
 
-  // Submit New Key with Strict Duplicate Rejection
-  const handleSubmitKey = async (code: string): Promise<{ success: boolean; error?: string }> => {
-    const cleanCode = code.trim().toUpperCase();
+  // Submit New Key with strict format check and case-insensitive duplicate rejection
+  const handleSubmitKey = async (code: string): Promise<{ success: boolean; error?: string }> =>
+  {
+    const cleanCode = code.trim();
 
-    // 1. Instant local duplicate rejection
-    const isLocalDuplicate = keys.some(k => k.code.trim().toUpperCase() === cleanCode);
-    if (isLocalDuplicate) {
+    // 0. strict format validation first before any duplicate check or network call
+    if (!isValidKey(cleanCode))
+      return {
+        success: false,
+        error: translations[lang].modal.errorFormat
+      };
+
+    // 1. Instant local duplicate rejection (case-insensitive)
+    const isLocalDuplicate = keys.some(k => k.code.trim().toUpperCase() === cleanCode.toUpperCase());
+    if (isLocalDuplicate)
       return {
         success: false,
         error: lang === 'ar'
           ? 'هذا الرمز تمت إضافته مسبقاً وهو موجود بالفعل في القائمة!'
           : 'This key has already been added and is already active in the list!'
       };
-    }
 
     // 2. Supabase duplicate check & insertion
-    if (isSupabaseConfigured && supabase) {
-      try {
+    if (isSupabaseConfigured && supabase)
+    {
+      try
+      {
         // Query Supabase directly in case another user added it from another device
         const { data: existingInDb } = await supabase
           .from("challenge_keys")
@@ -565,16 +576,15 @@ export default function Home()
           .ilike("code", cleanCode)
           .maybeSingle();
 
-        if (existingInDb) {
+        if (existingInDb)
           return {
             success: false,
             error: lang === 'ar'
               ? 'هذا الرمز تمت إضافته مسبقاً وهو موجود بالفعل في قاعدة البيانات!'
               : 'This key has already been added and is already live in the database!'
           };
-        }
 
-        // Insert into Supabase table
+        // Insert into Supabase table preserving case
         const { data: insertedData, error: insertError } = await supabase
           .from("challenge_keys")
           .insert([
@@ -589,19 +599,20 @@ export default function Home()
           .select()
           .single();
 
-        if (insertError) {
+        if (insertError)
+        {
           if (
             insertError.code === "23505" ||
             insertError.message?.toLowerCase().includes("duplicate") ||
             insertError.message?.toLowerCase().includes("unique")
-          ) {
+          )
             return {
               success: false,
               error: lang === 'ar'
                 ? 'هذا الرمز تمت إضافته مسبقاً وهو موجود بالفعل!'
                 : 'This key has already been added and is already present!'
             };
-          }
+
           return {
             success: false,
             error: insertError.message || (lang === 'ar' ? 'فشل حفظ الرمز في قاعدة البيانات' : 'Failed to save key to database')
@@ -629,7 +640,9 @@ export default function Home()
         localStorage.setItem(LOCAL_STORAGE_VOTES, JSON.stringify(userVotes));
 
         return { success: true };
-      } catch (err: any) {
+      }
+      catch (err: any)
+      {
         console.error("Supabase submission exception:", err);
         return {
           success: false,
