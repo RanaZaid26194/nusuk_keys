@@ -38,6 +38,28 @@ export const InfoModal: React.FC<InfoModalProps> = ({
     }
   }, [isOpen]);
 
+  // Android back button / browser history navigation closes modal
+  useEffect(() =>
+  {
+    if (!isOpen)
+      return;
+
+    window.history.pushState({ modal: "info" }, "");
+
+    const handlePopState = () =>
+    {
+      onClose();
+    };
+
+    window.addEventListener("popstate", handlePopState);
+    return () =>
+    {
+      window.removeEventListener("popstate", handlePopState);
+      if (window.history.state?.modal === "info")
+        window.history.back();
+    };
+  }, [isOpen, onClose]);
+
   // lock page scroll while modal is open
   useEffect(() =>
   {
@@ -131,7 +153,7 @@ export const InfoModal: React.FC<InfoModalProps> = ({
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.94, y: 12 }}
             transition={{ type: "spring", stiffness: 400, damping: 30 }}
-            className="relative w-full max-w-lg max-h-[calc(100dvh-2rem)] overflow-y-auto my-auto rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 p-4 sm:p-7 shadow-2xl z-10 transition-colors"
+            className="relative w-full max-w-lg max-h-[calc(100dvh-2rem)] overflow-y-auto overscroll-contain my-auto rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 p-4 sm:p-7 shadow-2xl z-10 transition-colors"
           >
             {/* Close Button - positioned on left in RTL, right in LTR to avoid header overlap */}
             <motion.button
@@ -139,7 +161,7 @@ export const InfoModal: React.FC<InfoModalProps> = ({
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.9 }}
               aria-label={t.hook.close}
-              className={`absolute top-4 sm:top-5 ${isAr ? "left-4 sm:left-5" : "right-4 sm:right-5"} p-1.5 rounded-lg text-zinc-400 hover:text-zinc-700 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors z-20`}
+              className={`absolute top-4 sm:top-5 ${isAr ? "left-4 sm:left-5" : "right-4 sm:right-5"} p-2 min-w-[36px] min-h-[36px] flex items-center justify-center rounded-xl text-zinc-400 hover:text-zinc-700 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors z-20`}
             >
               <X className="w-4 h-4" />
             </motion.button>

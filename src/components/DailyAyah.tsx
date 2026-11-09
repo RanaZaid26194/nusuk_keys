@@ -6,7 +6,7 @@ import { HeartHandshake } from "lucide-react";
 import { Language } from "@/lib/types";
 import { translations } from "@/lib/translations";
 import { playHapticSound } from "@/lib/audio";
-import { DailyAyahData, getDayKey, resolveDailyAyah } from "@/lib/dailyAyah";
+import { DailyAyahData, getDayKey, resolveDailyAyah, getFallbackAyah } from "@/lib/dailyAyah";
 import { useCanHover } from "@/lib/useCanHover";
 
 interface DailyAyahProps
@@ -86,13 +86,18 @@ export const DailyAyah: React.FC<DailyAyahProps> = ({ lang, onOpenInfo, mockFrid
 
     // gate friday check strictly after mount to prevent hydration mismatch
     const now = new Date();
-    const isMockUrl = typeof window !== "undefined" && window.location.search.includes("friday=true");
-    setIsFriday(mockFriday || isMockUrl || now.getDay() === 5);
+    setIsFriday(mockFriday || now.getDay() === 5);
 
     const syncAyah = async () =>
     {
+      // 1. Instantly paint fallback or cached ayah so the card is never blank!
+      const initial = await getFallbackAyah(activeDayKey);
+      if (isMounted && initial)
+        setAyah(initial);
+
+      // 2. Resolve or upgrade quietly in background
       const res = await resolveDailyAyah();
-      if (isMounted)
+      if (isMounted && res.ayah)
         setAyah(res.ayah);
     };
 
@@ -100,6 +105,9 @@ export const DailyAyah: React.FC<DailyAyahProps> = ({ lang, onOpenInfo, mockFrid
 
     const handleVisibility = () =>
     {
+      const currentNow = new Date();
+      setIsFriday(mockFriday || currentNow.getDay() === 5);
+
       if (document.visibilityState === "visible")
       {
         const latestKey = getDayKey();
@@ -172,7 +180,11 @@ export const DailyAyah: React.FC<DailyAyahProps> = ({ lang, onOpenInfo, mockFrid
     <motion.div
       role="button"
       tabIndex={0}
-      aria-label={t.hook.infoButtonAria}
+      aria-label={
+        ayah
+          ? (isAr ? `آية اليوم: ${ayah.arabic} - ${ayah.surahNameAr}` : `Daily Ayah: ${ayah.english} - Surah ${ayah.surahNameEn}`)
+          : t.hook.infoButtonAria
+      }
       variants={ayahVariants}
       initial="hidden"
       animate="visible"
@@ -295,30 +307,30 @@ export const DailyAyah: React.FC<DailyAyahProps> = ({ lang, onOpenInfo, mockFrid
                 })}
               </motion.div>
 
-              {/* English translation and reference in muted zinc */}
+              {/* English translation and reference in high-contrast zinc */}
               {!isAr && (
-                <div className="mt-1">
+                <div className="mt-1.5">
                   <div
                     style={{ textAlign: "center" }}
-                    className="text-[11px] sm:text-xs text-zinc-600 dark:text-zinc-400 text-center !text-center transition-colors mx-auto"
+                    className="text-xs sm:text-sm text-zinc-700 dark:text-zinc-300 font-medium text-center !text-center transition-colors mx-auto leading-relaxed"
                   >
                     “{cleanEnglishAyah(ayah.english)}” — [Surah {ayah.surahNameEn} ({ayah.surah}:{ayah.numberInSurah})]
                   </div>
                   <div
                     style={{ textAlign: "center" }}
-                    className="text-[10px] text-zinc-500 dark:text-zinc-500 mt-0.5 text-center !text-center mx-auto"
+                    className="text-[11px] text-zinc-500 dark:text-zinc-400 mt-0.5 text-center !text-center mx-auto"
                   >
                     Sahih International
                   </div>
                 </div>
               )}
 
-              {/* 2. In Arabic mode: Arabic reference only, in muted zinc */}
+              {/* 2. In Arabic mode: Arabic reference only, in high-contrast zinc */}
               {isAr && (
                 <div
                   dir="rtl"
                   style={{ textAlign: "center" }}
-                  className="text-[11px] sm:text-xs text-zinc-600 dark:text-zinc-400 font-arabic mt-1 text-center !text-center transition-colors mx-auto"
+                  className="text-xs sm:text-sm text-zinc-700 dark:text-zinc-300 font-arabic font-medium mt-1.5 text-center !text-center transition-colors mx-auto"
                 >
                   [{ayah.surahNameAr} ({ayah.numberInSurah})]
                 </div>

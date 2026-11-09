@@ -38,7 +38,7 @@ export function sanitizeKeyInput(raw?: string | null): string
   const withAsciiDigits = normalizeNumerals(clean);
 
   // 3. check if string contains an explicit 8-character NG- key anywhere (e.g. inside a URL or WhatsApp message)
-  const ng8Match = withAsciiDigits.match(/ng-([A-Za-z0-9]{8})\b/i);
+  const ng8Match = withAsciiDigits.match(/\bng-([A-Za-z0-9]{8})\b/i);
   if (ng8Match)
     return KEY_PREFIX + ng8Match[1];
 
@@ -47,16 +47,21 @@ export function sanitizeKeyInput(raw?: string | null): string
   if (urlParamMatch)
     return KEY_PREFIX + urlParamMatch[1];
 
-  // 5. if input is a URL or full sentence, extract any ng- followed by alphanumeric characters
-  if (withAsciiDigits.includes("http") || withAsciiDigits.includes("://") || /\s/.test(withAsciiDigits))
+  // 5. if input is a URL or full sentence with multiple words, only accept if an explicit ng- is present
+  const isMultiWordOrUrl = withAsciiDigits.includes("http") || withAsciiDigits.includes("://") || /\s/.test(withAsciiDigits);
+  if (isMultiWordOrUrl)
   {
     const anyNgMatch = withAsciiDigits.match(/ng-([A-Za-z0-9]{1,8})/i);
     if (anyNgMatch)
       return KEY_PREFIX + anyNgMatch[1];
+    // Pasted random text without any NG- prefix: do not convert garbage into a fake key!
+    return KEY_PREFIX;
   }
 
-  // 6. standard typing: strip leading ng- prefix (supports double pasting like ng-ng-XXXX)
-  let bodyOnly = withAsciiDigits.replace(/^ng-?/i, "").replace(/^ng-?/i, "");
+  // 6. standard typing/paste: strip single leading ng- prefix only once so body starting with ng is preserved
+  let bodyOnly = withAsciiDigits;
+  if (/^ng-/i.test(bodyOnly))
+    bodyOnly = bodyOnly.slice(3);
 
   // 7. keep only letters and numbers, cap at exactly 8 chars, preserving case
   const sanitizedBody = bodyOnly.replace(/[^A-Za-z0-9]/g, "").slice(0, KEY_BODY_LENGTH);

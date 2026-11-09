@@ -394,9 +394,9 @@ const KeyCardComponent: React.FC<KeyCardProps> = ({
       </div>
 
       {/* Footer Actions: Vote & Deep Link */}
-      <div className="relative z-10 flex items-center justify-between gap-2 pt-3 border-t border-zinc-200 dark:border-zinc-800/80">
+      <div className="relative z-10 flex flex-wrap items-center justify-between gap-2 pt-3 border-t border-zinc-200 dark:border-zinc-800/80">
         {/* Voting Buttons with Flip Counter Roll & Personality Thumbs */}
-        <div className="flex items-center gap-1.5">
+        <div className="flex items-center gap-1.5 flex-shrink-0">
           <Tooltip
             content={isAr ? "يعمل بنجاح" : "Works for me"}
             position="top"
@@ -481,7 +481,7 @@ const KeyCardComponent: React.FC<KeyCardProps> = ({
         </div>
 
         {/* Right side: Mark as unused & Deep link */}
-        <div className="flex items-center gap-2 sm:gap-3">
+        <div className="flex items-center gap-2 sm:gap-3 flex-wrap sm:flex-nowrap">
           {isUsed && onToggleUsed && (
             <Tooltip
               content={t.keyCard.markUnused}
@@ -500,8 +500,8 @@ const KeyCardComponent: React.FC<KeyCardProps> = ({
                 aria-label={t.keyCard.markUnused}
                 className="group/unused flex items-center gap-1.5 text-xs text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-200 transition-colors"
               >
-                <RotateCcw className="w-4 h-4 sm:w-[18px] sm:h-[18px] flex-shrink-0 stroke-[2] text-zinc-500 group-hover/unused:text-zinc-900 dark:text-zinc-400 dark:group-hover/unused:text-zinc-100 group-hover/unused:-rotate-45 transition-all duration-200" />
-                <span className={`text-[11px] sm:text-xs leading-tight ${isAr ? "font-arabic" : ""}`}>{t.keyCard.markUnused}</span>
+                <RotateCcw className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0 stroke-[2.2] text-zinc-500 group-hover/unused:text-zinc-900 dark:text-zinc-400 dark:group-hover/unused:text-zinc-100 group-hover/unused:-rotate-45 transition-all duration-200" />
+                <span className={`text-[11px] sm:text-xs leading-tight whitespace-nowrap font-medium ${isAr ? "font-arabic" : ""}`}>{t.keyCard.markUnused}</span>
               </motion.button>
             </Tooltip>
           )}
@@ -529,11 +529,11 @@ const KeyCardComponent: React.FC<KeyCardProps> = ({
               className="group/link flex items-center gap-1.5 text-xs text-zinc-600 hover:text-emerald-600 dark:text-zinc-400 dark:hover:text-emerald-400 transition-colors"
               aria-label={t.keyCard.openNusuk}
             >
-              <span className={`text-[11px] sm:text-xs leading-tight ${isAr ? "font-arabic" : ""}`}>{t.keyCard.openNusuk}</span>
+              <span className={`text-[11px] sm:text-xs leading-tight whitespace-nowrap font-medium ${isAr ? "font-arabic" : ""}`}>{t.keyCard.openNusuk}</span>
               {openingNusuk ? (
-                <span className="w-4 h-4 sm:w-[18px] sm:h-[18px] border-2 border-emerald-500 border-t-transparent rounded-full animate-spin inline-block flex-shrink-0" />
+                <span className="w-4 h-4 sm:w-5 sm:h-5 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin inline-block flex-shrink-0" />
               ) : (
-                <ExternalLink className="w-4 h-4 sm:w-[18px] sm:h-[18px] flex-shrink-0 stroke-[2] text-zinc-500 group-hover/link:text-emerald-600 dark:text-zinc-400 dark:group-hover/link:text-emerald-400 group-hover/link:translate-x-0.5 group-hover/link:-translate-y-0.5 transition-all duration-200" />
+                <ExternalLink className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0 stroke-[2.2] text-zinc-500 group-hover/link:text-emerald-600 dark:text-zinc-400 dark:group-hover/link:text-emerald-400 group-hover/link:translate-x-0.5 group-hover/link:-translate-y-0.5 transition-all duration-200" />
               )}
             </motion.a>
           </Tooltip>

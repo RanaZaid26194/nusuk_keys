@@ -55,7 +55,8 @@ export const KeyGrid: React.FC<KeyGridProps> = ({
 }) => {
   const searchInputRef = useRef<HTMLInputElement>(null);
   const sortRef = useRef<HTMLDivElement>(null);
-  const [displayLimit, setDisplayLimit] = useState(60);
+  const tabRefs = useRef<Record<string, HTMLButtonElement | null>>({});
+  const [displayLimit, setDisplayLimit] = useState(24);
   const [confirmingClear, setConfirmingClear] = useState(false);
   const [isSortOpen, setIsSortOpen] = useState(false);
   const t = translations[lang];
@@ -72,8 +73,14 @@ export const KeyGrid: React.FC<KeyGridProps> = ({
   // Reset pagination when filter or search changes
   useEffect(() =>
   {
-    setDisplayLimit(60);
+    setDisplayLimit(24);
   }, [activeTab, searchQuery]);
+
+  // Ensure active tab is scrolled into view on mobile
+  useEffect(() =>
+  {
+    tabRefs.current[activeTab]?.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "nearest" });
+  }, [activeTab]);
 
   // Reset clear confirmation when leaving tab
   useEffect(() =>
@@ -81,10 +88,12 @@ export const KeyGrid: React.FC<KeyGridProps> = ({
     setConfirmingClear(false);
   }, [activeTab]);
 
-  // Quick / or Ctrl+K focus shortcut
+  // Quick / or Ctrl+K focus shortcut (only when not typing in any input)
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if ((e.key === "/" || ((e.metaKey || e.ctrlKey) && e.key === "k")) && document.activeElement !== searchInputRef.current) {
+      const activeEl = document.activeElement;
+      const isInputFocused = activeEl && (["INPUT", "TEXTAREA"].includes(activeEl.tagName) || (activeEl as HTMLElement).isContentEditable);
+      if ((e.key === "/" || ((e.metaKey || e.ctrlKey) && e.key === "k")) && !isInputFocused) {
         e.preventDefault();
         searchInputRef.current?.focus();
       }
@@ -93,10 +102,10 @@ export const KeyGrid: React.FC<KeyGridProps> = ({
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, []);
 
-  // Sort dropdown click outside and Escape listener
+  // Sort dropdown pointerdown outside and Escape listener (iOS & Android friendly)
   useEffect(() =>
   {
-    const handleClickOutside = (e: MouseEvent) =>
+    const handleClickOutside = (e: PointerEvent) =>
     {
       if (sortRef.current && !sortRef.current.contains(e.target as Node))
         setIsSortOpen(false);
@@ -107,11 +116,11 @@ export const KeyGrid: React.FC<KeyGridProps> = ({
         setIsSortOpen(false);
     };
 
-    document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener("pointerdown", handleClickOutside);
     window.addEventListener("keydown", handleEscape);
     return () =>
     {
-      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("pointerdown", handleClickOutside);
       window.removeEventListener("keydown", handleEscape);
     };
   }, []);
@@ -124,11 +133,7 @@ export const KeyGrid: React.FC<KeyGridProps> = ({
   const handleLoadMore = () =>
   {
     playHapticSound('click');
-    setDisplayLimit((prev) => Math.min(prev + 60, items.length));
-    setTimeout(() =>
-    {
-      window.scrollBy({ top: 120, behavior: "smooth" });
-    }, 60);
+    setDisplayLimit((prev) => Math.min(prev + 24, items.length));
   };
 
   const visibleItems = useMemo(() =>
@@ -155,7 +160,13 @@ export const KeyGrid: React.FC<KeyGridProps> = ({
 
               <input
                 ref={searchInputRef}
-                type="text"
+                type="search"
+                inputMode="search"
+                enterKeyHint="search"
+                autoCapitalize="off"
+                autoCorrect="off"
+                spellCheck={false}
+                autoComplete="off"
                 value={searchQuery}
                 onChange={(e) => onSearchChange(e.target.value)}
                 placeholder={t.searchPlaceholder}
@@ -177,7 +188,7 @@ export const KeyGrid: React.FC<KeyGridProps> = ({
                         onSearchChange("");
                         searchInputRef.current?.focus();
                       }}
-                      className="pointer-events-auto p-1 rounded-full bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white transition-colors"
+                      className="pointer-events-auto p-1.5 min-w-[32px] min-h-[32px] flex items-center justify-center rounded-full bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white transition-colors"
                     >
                       <X className="w-3.5 h-3.5" />
                     </motion.button>
@@ -224,7 +235,7 @@ export const KeyGrid: React.FC<KeyGridProps> = ({
             <div
               role="tablist"
               aria-label={isAr ? "خيارات التصفية" : "Filter options"}
-              className="flex items-center gap-1 p-1 rounded-full bg-zinc-100/90 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 overflow-x-auto no-scrollbar shadow-sm"
+              className="flex items-center gap-1 p-1 rounded-full bg-zinc-100/90 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 overflow-x-auto no-scrollbar shadow-sm max-w-full touch-pan-x"
             >
               {(["all", "verified", "popular", "latest", "used"] as FilterTab[]).map((tab) =>
               {
@@ -234,6 +245,7 @@ export const KeyGrid: React.FC<KeyGridProps> = ({
                 return (
                   <motion.button
                     key={tab}
+                    ref={(el) => { tabRefs.current[tab] = el; }}
                     role="tab"
                     aria-selected={isActive}
                     aria-label={t.tabs[tab]}
@@ -374,7 +386,7 @@ export const KeyGrid: React.FC<KeyGridProps> = ({
                           onClearUsed();
                           setConfirmingClear(false);
                         }}
-                        className="px-2 py-0.5 rounded-md bg-rose-600 hover:bg-rose-500 text-white text-[11px] font-semibold transition-colors"
+                        className="px-3 py-1.5 rounded-lg bg-rose-600 hover:bg-rose-500 text-white text-xs font-semibold shadow-xs transition-colors"
                       >
                         {isAr ? "تأكيد" : "Yes, clear"}
                       </button>
@@ -385,7 +397,7 @@ export const KeyGrid: React.FC<KeyGridProps> = ({
                           playHapticSound('click');
                           setConfirmingClear(false);
                         }}
-                        className="px-2 py-0.5 rounded-md bg-zinc-200 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 text-[11px] font-medium transition-colors"
+                        className="px-3 py-1.5 rounded-lg bg-zinc-200 hover:bg-zinc-300 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-200 text-xs font-medium transition-colors"
                       >
                         {isAr ? "إلغاء" : "Cancel"}
                       </button>
@@ -423,7 +435,7 @@ export const KeyGrid: React.FC<KeyGridProps> = ({
               {Array.from({ length: 8 }).map((_, idx) => (
                 <div
                   key={idx}
-                  className="relative p-5 rounded-2xl bg-white/80 dark:bg-zinc-900/60 border border-zinc-300/80 dark:border-zinc-800/80 flex flex-col justify-between h-44 overflow-hidden shadow-xs dark:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.04)]"
+                  className="relative p-5 rounded-2xl bg-white/80 dark:bg-zinc-900/60 border border-zinc-300/80 dark:border-zinc-800/80 flex flex-col justify-between min-h-[210px] h-[210px] overflow-hidden shadow-xs dark:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.04)]"
                 >
                   {/* Shimmer light sweep */}
                   <div className="absolute inset-0 -translate-x-full animate-shimmer bg-gradient-to-r from-transparent via-zinc-200/50 dark:via-zinc-700/25 to-transparent pointer-events-none" />

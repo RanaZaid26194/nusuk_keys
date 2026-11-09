@@ -108,7 +108,10 @@ export default function Home()
     const handleVisibility = () =>
     {
       if (document.visibilityState === "visible")
+      {
         refreshUsedSnapshot();
+        loadKeys();
+      }
     };
 
     window.addEventListener("storage", handleStorage);
@@ -411,22 +414,50 @@ export default function Home()
     // Supabase Realtime Subscription if configured
     if (isSupabaseConfigured && supabase) {
       const client = supabase;
+      let throttleTimer: NodeJS.Timeout | null = null;
+
       const channel = client
         .channel("realtime-challenge-keys")
         .on(
           "postgres_changes",
           { event: "*", schema: "public", table: "challenge_keys" },
-          () => {
-            loadKeys();
+          (payload: any) => {
+            // Direct in-place update for individual row edits (votes/copies)
+            if (payload?.eventType === "UPDATE" && payload?.new?.id) {
+              setKeys((prev) => {
+                const currentVotes = getUserVotes();
+                return prev.map((k) => {
+                  if (k.id === payload.new.id) {
+                    return {
+                      ...k,
+                      ...payload.new,
+                      userVoted: k.userVoted ?? currentVotes[k.id] ?? null,
+                    };
+                  }
+                  return k;
+                });
+              });
+              return;
+            }
+
+            // For INSERT/DELETE, throttle loadKeys to avoid network waterfalls
+            if (!throttleTimer) {
+              throttleTimer = setTimeout(() => {
+                throttleTimer = null;
+                loadKeys();
+              }, 2500);
+            }
           }
         )
         .subscribe();
 
       return () => {
+        if (throttleTimer)
+          clearTimeout(throttleTimer);
         client.removeChannel(channel);
       };
     }
-  }, [loadKeys]);
+  }, [loadKeys, getUserVotes]);
 
   // Save to localStorage when in offline mode
   const persistOfflineKeys = (updated: ChallengeKey[]) => {
@@ -439,7 +470,7 @@ export default function Home()
     }
   };
 
-  // Upvote / Downvote Handler
+  // Upvote / Downvote Handler with optimistic update and rollback on failure
   const handleVote = useCallback(async (keyId: string, type: 'UP' | 'DOWN', codeParam?: string) =>
   {
     const userVotes = getUserVotes();
@@ -450,25 +481,17 @@ export default function Home()
     localStorage.setItem(LOCAL_STORAGE_VOTES, JSON.stringify(userVotes));
 
     let votedCode = codeParam || "";
+    if (!votedCode)
+    {
+      const found = keys.find(k => k.id === keyId);
+      if (found?.code)
+        votedCode = found.code;
+    }
 
-    // mark as used in local history safely
     if (votedCode)
     {
       const nextUsed = markUsed(votedCode);
       setUsedMap(nextUsed);
-    }
-    else
-    {
-      setKeys((prevKeys) =>
-      {
-        const target = prevKeys.find(k => k.id === keyId);
-        if (target?.code)
-        {
-          const nextUsed = markUsed(target.code);
-          setUsedMap(nextUsed);
-        }
-        return prevKeys;
-      });
     }
 
     // Optimistic UI update
@@ -493,6 +516,32 @@ export default function Home()
       return updated;
     });
 
+    // Helper to rollback vote if server request fails
+    const rollbackVote = () =>
+    {
+      const rollbackVotes = getUserVotes();
+      delete rollbackVotes[keyId];
+      localStorage.setItem(LOCAL_STORAGE_VOTES, JSON.stringify(rollbackVotes));
+      setKeys((prevKeys) =>
+      {
+        const rolled = prevKeys.map((k) =>
+        {
+          if (k.id === keyId)
+          {
+            return {
+              ...k,
+              upvotes: type === 'UP' ? Math.max(0, k.upvotes - 1) : k.upvotes,
+              downvotes: type === 'DOWN' ? Math.max(0, k.downvotes - 1) : k.downvotes,
+              userVoted: null,
+            };
+          }
+          return k;
+        });
+        persistOfflineKeys(rolled);
+        return rolled;
+      });
+    };
+
     // Atomic server-side vote casting
     if (isSupabaseConfigured && supabase)
     {
@@ -504,38 +553,34 @@ export default function Home()
         });
 
         if (error)
+        {
           console.error("Supabase cast_vote error:", error);
+          rollbackVote();
+        }
       }
       catch (err)
       {
         console.error("Supabase cast_vote exception:", err);
+        rollbackVote();
       }
     }
-  }, [getUserVotes]);
+  }, [getUserVotes, keys]);
 
   // Copy Count Increment with Soft Anti-Spam
   const handleCopy = useCallback(async (keyId: string, codeParam?: string) =>
   {
     let targetCode = codeParam || "";
+    if (!targetCode)
+    {
+      const found = keys.find(k => k.id === keyId);
+      if (found?.code)
+        targetCode = found.code;
+    }
 
-    // Always mark as used in local history safely
     if (targetCode)
     {
       const nextUsed = markUsed(targetCode);
       setUsedMap(nextUsed);
-    }
-    else
-    {
-      setKeys((prevKeys) =>
-      {
-        const target = prevKeys.find(k => k.id === keyId);
-        if (target?.code)
-        {
-          const nextUsed = markUsed(target.code);
-          setUsedMap(nextUsed);
-        }
-        return prevKeys;
-      });
     }
 
     // Soft anti-spam: count only once per key per 24 hours per browser

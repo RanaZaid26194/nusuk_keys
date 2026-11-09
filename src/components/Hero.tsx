@@ -257,7 +257,7 @@ export const Hero: React.FC<HeroProps> = ({
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
                 <span className="relative inline-flex rounded-full h-2.5 w-2.5 sm:h-3 sm:w-3 bg-emerald-500" />
               </span>
-              <span>{isConnectedToSupabase ? "Sync" : "Active"}</span>
+              <span>{isConnectedToSupabase ? (isAr ? "مباشر" : "Sync") : (isAr ? "نشط" : "Active")}</span>
             </div>
             <div className={`text-[11px] sm:text-xs text-zinc-600 dark:text-zinc-400 mt-0.5 sm:mt-1 ${isAr ? "font-arabic" : ""}`}>
               {t.stats.liveStatus}
