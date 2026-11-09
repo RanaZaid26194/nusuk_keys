@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, KeyRound, CheckCircle2, AlertCircle, Send, HeartHandshake } from "lucide-react";
+import { X, KeyRound, CheckCircle2, AlertCircle, Send, HeartHandshake, Clipboard } from "lucide-react";
 import { Language } from "@/lib/types";
 import { translations } from "@/lib/translations";
 import { checkSubmissionRateLimit, recordSubmissionRateLimit } from "@/lib/security";
@@ -28,6 +28,7 @@ export const SubmitModal: React.FC<SubmitModalProps> = ({
   const [submitting, setSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isSuccess, setIsSuccess] = useState(false);
+  const [rateLimitCountdown, setRateLimitCountdown] = useState<number>(0);
 
   const t = translations[lang];
   const isAr = lang === "ar";
@@ -35,6 +36,28 @@ export const SubmitModal: React.FC<SubmitModalProps> = ({
   const isComplete = bodyCount === KEY_BODY_LENGTH && isValidKey(code);
   const previousFocusRef = useRef<HTMLElement | null>(null);
   const modalRef = useRef<HTMLDivElement>(null);
+
+  // Live rate limit countdown interval
+  useEffect(() =>
+  {
+    if (rateLimitCountdown <= 0)
+      return;
+
+    const timer = setInterval(() =>
+    {
+      setRateLimitCountdown((prev) =>
+      {
+        if (prev <= 1)
+        {
+          setErrorMessage(null);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [rateLimitCountdown]);
 
   useEffect(() =>
   {
@@ -135,6 +158,28 @@ export const SubmitModal: React.FC<SubmitModalProps> = ({
     setErrorMessage(null);
   };
 
+  const handleClipboardPaste = async () =>
+  {
+    try
+    {
+      if (typeof navigator !== "undefined" && navigator.clipboard?.readText)
+      {
+        const text = await navigator.clipboard.readText();
+        if (text)
+        {
+          const sanitized = sanitizeKeyInput(text);
+          setCode(sanitized);
+          setErrorMessage(null);
+          playHapticSound('click');
+        }
+      }
+    }
+    catch
+    {
+      // browser permission fallback
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) =>
   {
     e.preventDefault();
@@ -145,10 +190,12 @@ export const SubmitModal: React.FC<SubmitModalProps> = ({
     const rateCheck = checkSubmissionRateLimit();
     if (!rateCheck.allowed)
     {
+      const waitSec = rateCheck.waitSeconds ?? 30;
+      setRateLimitCountdown(waitSec);
       setErrorMessage(
         isAr
-          ? `يرجى الانتظار ${rateCheck.waitSeconds} ثانية قبل مشاركة رمز آخر لمنع التكرار.`
-          : `Please wait ${rateCheck.waitSeconds}s before submitting another key (anti-spam protection).`
+          ? `يرجى الانتظار ${waitSec} ثانية قبل مشاركة رمز آخر لمنع التكرار.`
+          : `Please wait ${waitSec}s before submitting another key (anti-spam protection).`
       );
       return;
     }
@@ -289,15 +336,28 @@ export const SubmitModal: React.FC<SubmitModalProps> = ({
                   </div>
                 </div>
 
-                {/* Input Field with live counter */}
+                {/* Input Field with live counter and Paste button */}
                 <div className="mb-4">
                   <div className="flex items-center justify-between mb-1.5">
                     <label className={`block text-xs font-medium text-zinc-700 dark:text-zinc-300 ${isAr ? "font-arabic" : ""}`}>
                       {t.modal.inputLabel}
                     </label>
-                    <span className={`text-[11px] font-mono font-medium transition-colors ${bodyCount === KEY_BODY_LENGTH ? "text-emerald-600 dark:text-emerald-400 font-bold" : "text-zinc-400 dark:text-zinc-500"}`}>
-                      {bodyCount}/{KEY_BODY_LENGTH}
-                    </span>
+                    <div className="flex items-center gap-2">
+                      <motion.button
+                        type="button"
+                        onClick={handleClipboardPaste}
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.94 }}
+                        className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300 text-[11px] font-medium border border-zinc-200 dark:border-zinc-700/60 shadow-xs transition-colors"
+                        title={t.modal.paste || "Paste"}
+                      >
+                        <Clipboard className="w-3 h-3 text-emerald-600 dark:text-emerald-400" />
+                        <span className={isAr ? "font-arabic" : ""}>{t.modal.paste || "Paste"}</span>
+                      </motion.button>
+                      <span className={`text-[11px] font-mono font-medium transition-colors ${bodyCount === KEY_BODY_LENGTH ? "text-emerald-600 dark:text-emerald-400 font-bold" : "text-zinc-400 dark:text-zinc-500"}`}>
+                        {bodyCount}/{KEY_BODY_LENGTH}
+                      </span>
+                    </div>
                   </div>
                   <input
                     type="text"
@@ -328,7 +388,7 @@ export const SubmitModal: React.FC<SubmitModalProps> = ({
                   </div>
                 )}
 
-                {/* Error Banner with Shake Animation */}
+                {/* Error Banner with Shake Animation and live countdown */}
                 {errorMessage && (
                   <motion.div
                     initial={{ opacity: 0, y: -4, x: -6 }}
@@ -337,7 +397,15 @@ export const SubmitModal: React.FC<SubmitModalProps> = ({
                     className="flex items-start gap-2.5 p-3 mb-4 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-600/40 text-rose-700 dark:text-rose-200 text-xs shadow-sm"
                   >
                     <AlertCircle className="w-4 h-4 flex-shrink-0 text-rose-500 dark:text-rose-400 mt-0.5" />
-                    <span className="leading-relaxed font-medium">{errorMessage}</span>
+                    <span className="leading-relaxed font-medium">
+                      {rateLimitCountdown > 0 ? (
+                        isAr
+                          ? `يرجى الانتظار ${rateLimitCountdown} ثانية قبل مشاركة رمز آخر لمنع التكرار.`
+                          : `Please wait ${rateLimitCountdown}s before submitting another key (anti-spam protection).`
+                      ) : (
+                        errorMessage
+                      )}
+                    </span>
                   </motion.div>
                 )}
 

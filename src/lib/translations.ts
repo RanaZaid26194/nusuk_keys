@@ -13,6 +13,12 @@ export const translations = {
       latest: "Recently Added",
       used: "Used by Me",
     },
+    sort: {
+      label: "Sort by",
+      newest: "Newest",
+      copies: "Most Copied",
+      rating: "Best Rated",
+    },
     keyCard: {
       verified: "Verified Active",
       needsReview: "Needs Verification",
@@ -57,6 +63,7 @@ export const translations = {
       subtitle: "Help other pilgrims complete their challenges. Codes must start with NG-",
       inputLabel: "Challenge Code",
       placeholder: "e.g. NG-aB3dE5gH",
+      paste: "Paste",
       preview: "Live Preview",
       cancel: "Cancel",
       submit: "Submit Key",
@@ -78,13 +85,23 @@ export const translations = {
     usedHint: "Tried these? Let others know if they worked.",
     emptyUsed: {
       title: "No used keys yet",
-      description: "Keys you copy or try will show up here so you can vote on them.",
+      description: "Copy a key and it shows up here so you can track and vote on what you've used.",
     },
     clearHistory: "Clear history",
     confirmClear: "Clear all used keys?",
+    install: {
+      title: "Add to Home Screen",
+      desc: "Install Nusuk Keys for instant, one-tap access on your pilgrimage.",
+      button: "Install App",
+      iosInstruction: "Tap Share below, then select 'Add to Home Screen'",
+      dismiss: "Not now",
+    },
     footer: {
       disclaimer: "Independent open portal. Not officially affiliated with or endorsed by the Saudi Ministry of Hajj & Umrah or Nusuk platform.",
       quickCopy: "One-tap copy to Nusuk app",
+      lastSync: "Live sync active",
+      github: "GitHub Repository",
+      reportBroken: "Report a broken key",
     },
   },
   ar: {
@@ -100,6 +117,12 @@ export const translations = {
       popular: "الأكثر استخداماً",
       latest: "أحدث المفاتيح",
       used: "استخدمتُها",
+    },
+    sort: {
+      label: "الترتيب حسب",
+      newest: "الأحدث",
+      copies: "الأكثر نسخاً",
+      rating: "الأعلى تقييماً",
     },
     keyCard: {
       verified: "يعمل ومؤكد",
@@ -145,6 +168,7 @@ export const translations = {
       subtitle: "ساعد إخوانك المعتمرين في إكمال التحدي. يبدأ الرمز بـ NG-",
       inputLabel: "رمز التحدي",
       placeholder: "مثال: NG-aB3dE5gH",
+      paste: "لصق",
       preview: "معاينة مباشرة",
       cancel: "إلغاء",
       submit: "إرسال المفتاح",
@@ -166,13 +190,23 @@ export const translations = {
     usedHint: "هل جربت هذه المفاتيح؟ شاركنا برأيك لمعرفة ما إذا كانت تعمل.",
     emptyUsed: {
       title: "لا توجد مفاتيح مستخدمة بعد",
-      description: "المفاتيح التي تنسخها أو تجربها ستظهر هنا لتتمكن من تقييمها والتصويت عليها.",
+      description: "انسخ أي مفتاح وسيظهر هنا تلقائياً لتتبع ما استخدمته وتقييمه.",
     },
     clearHistory: "مسح السجل",
     confirmClear: "هل تريد مسح جميع المفاتيح المستخدمة؟",
+    install: {
+      title: "تثبيت تطبيق مفاتيح نسك",
+      desc: "أضف التطبيق للشاشة الرئيسية للوصول الفوري والسريع أثناء رحلتك.",
+      button: "تثبيت الآن",
+      iosInstruction: "اضغط على زر المشاركة بالأسفل، ثم اختر 'إضافة إلى الصفحة الرئيسية'",
+      dismiss: "ليس الآن",
+    },
     footer: {
       disclaimer: "بوابة مفتوحة ومستقلة، غير تابعة أو معتمدة رسمياً من قبل وزارة الحج والعمرة أو منصة نسك.",
       quickCopy: "نسخ فوري برابط مباشر لتطبيق نسك",
+      lastSync: "تزامن مباشر نشط",
+      github: "مستودع GitHub",
+      reportBroken: "الإبلاغ عن مفتاح معطل",
     },
   },
 };

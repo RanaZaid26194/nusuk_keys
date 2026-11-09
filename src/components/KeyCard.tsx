@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Copy, Check, ExternalLink, ThumbsUp, ThumbsDown, Clock, ShieldCheck, AlertCircle, RotateCcw } from "lucide-react";
 import { ChallengeKey, Language } from "@/lib/types";
@@ -46,6 +46,38 @@ const KeyCardComponent: React.FC<KeyCardProps> = ({
   const successRate = calculateSuccessRate(item.upvotes, item.downvotes);
   const isVerified = successRate >= 75 && item.upvotes >= 2;
   const isExpired = item.downvotes > item.upvotes + 3;
+
+  // Live relative time updating every minute
+  const [timeAgo, setTimeAgo] = useState<string>(() => formatTimeAgo(item.created_at, lang));
+
+  useEffect(() =>
+  {
+    setTimeAgo(formatTimeAgo(item.created_at, lang));
+    const timer = setInterval(() =>
+    {
+      setTimeAgo(formatTimeAgo(item.created_at, lang));
+    }, 60000);
+    return () => clearInterval(timer);
+  }, [item.created_at, lang]);
+
+  // Full timestamp for hover inspection
+  const fullDate = useMemo(() =>
+  {
+    if (!item.created_at)
+      return "";
+    try
+    {
+      const d = new Date(item.created_at);
+      return d.toLocaleString(lang === "ar" ? "ar-SA" : "en-US", {
+        dateStyle: "medium",
+        timeStyle: "short",
+      });
+    }
+    catch
+    {
+      return item.created_at;
+    }
+  }, [item.created_at, lang]);
 
   // zero-react-rerender spotlight tracking and subtle 3D tilt (max 2deg)
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) =>
@@ -193,13 +225,14 @@ const KeyCardComponent: React.FC<KeyCardProps> = ({
           )}
         </div>
 
-        {/* Time Ago */}
+        {/* Time Ago with full timestamp on hover */}
         <span
           suppressHydrationWarning
-          className={`text-[11px] text-zinc-600 dark:text-zinc-400 flex items-center gap-1 flex-shrink-0 ${isAr ? "font-arabic leading-none" : ""}`}
+          title={fullDate}
+          className={`text-[11px] text-zinc-600 dark:text-zinc-400 flex items-center gap-1 flex-shrink-0 cursor-help ${isAr ? "font-arabic leading-none" : ""}`}
         >
           <Clock className="w-3 h-3 opacity-60 flex-shrink-0" />
-          <span>{formatTimeAgo(item.created_at, lang)}</span>
+          <span>{timeAgo}</span>
         </span>
       </div>
 

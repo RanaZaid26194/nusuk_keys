@@ -12,6 +12,8 @@ export interface ChallengeKey {
 
 export type FilterTab = 'all' | 'verified' | 'popular' | 'latest' | 'used';
 
+export type SortOption = 'newest' | 'copies' | 'rating';
+
 export type Language = 'en' | 'ar';
 
 export interface SubmitKeyInput {

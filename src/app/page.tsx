@@ -1,14 +1,17 @@
 "use client";
 
 import React, { useState, useEffect, useMemo, useCallback } from "react";
-import { MotionConfig } from "framer-motion";
-import { ChallengeKey, FilterTab, Language, Stats } from "@/lib/types";
+import { MotionConfig, motion } from "framer-motion";
+import { Plus } from "lucide-react";
+import { ChallengeKey, FilterTab, Language, Stats, SortOption } from "@/lib/types";
 import { Header } from "@/components/Header";
 import { Hero } from "@/components/Hero";
 import { KeyGrid } from "@/components/KeyGrid";
 import { SubmitModal } from "@/components/SubmitModal";
 import { InfoModal } from "@/components/InfoModal";
 import { Footer } from "@/components/Footer";
+import { BackToTop } from "@/components/BackToTop";
+import { PWAInstallPrompt } from "@/components/PWAInstallPrompt";
 import { supabase, isSupabaseConfigured, INITIAL_DEMO_KEYS } from "@/lib/supabase";
 import { calculateSuccessRate } from "@/lib/utils";
 import { loadUsedKeys, markUsed, unmarkUsed, clearUsedKeys, normalizeCode, STORAGE_KEY_USED } from "@/lib/usedKeys";
@@ -31,6 +34,7 @@ export default function Home()
 
   const [searchQuery, setSearchQuery] = useState("");
   const [activeTab, setActiveTab] = useState<FilterTab>("latest");
+  const [sortBy, setSortBy] = useState<SortOption>("newest");
   const [isSubmitModalOpen, setIsSubmitModalOpen] = useState(false);
   const [isInfoModalOpen, setIsInfoModalOpen] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
@@ -122,6 +126,10 @@ export default function Home()
   const handleTabChange = (tab: FilterTab) =>
   {
     setActiveTab(tab);
+    if (tab === "popular")
+      setSortBy("copies");
+    else if (tab === "latest")
+      setSortBy("newest");
     refreshUsedSnapshot();
   };
 
@@ -726,13 +734,27 @@ export default function Home()
       if (hasSearch)
         list = list.filter(k => Boolean(k?.code && k.code.toLowerCase().includes(q)));
 
-      // Sort: most recently used first
-      list.sort((a, b) =>
+      if (sortBy === "copies")
+        list.sort((a, b) => (b.copies_count || 0) - (a.copies_count || 0) || (b.upvotes || 0) - (a.upvotes || 0));
+      else if (sortBy === "rating")
       {
-        const timeA = (a?.code && usedMap[normalizeCode(a.code)]) || 0;
-        const timeB = (b?.code && usedMap[normalizeCode(b.code)]) || 0;
-        return timeB - timeA;
-      });
+        list.sort((a, b) =>
+        {
+          const rateA = calculateSuccessRate(a.upvotes, a.downvotes);
+          const rateB = calculateSuccessRate(b.upvotes, b.downvotes);
+          return rateB - rateA || (b.upvotes || 0) - (a.upvotes || 0);
+        });
+      }
+      else
+      {
+        // Sort: most recently used first
+        list.sort((a, b) =>
+        {
+          const timeA = (a?.code && usedMap[normalizeCode(a.code)]) || 0;
+          const timeB = (b?.code && usedMap[normalizeCode(b.code)]) || 0;
+          return timeB - timeA;
+        });
+      }
 
       return list;
     }
@@ -745,29 +767,35 @@ export default function Home()
       list = list.filter(k => Boolean(k?.code && k.code.toLowerCase().includes(q)));
 
     // Tabs
-    switch (activeTab)
+    if (activeTab === "verified")
+      list = list.filter(k => calculateSuccessRate(k.upvotes, k.downvotes) >= 70 && (k.upvotes || 0) >= 2);
+
+    // Apply active SortOption across all standard tabs
+    list.sort((a, b) =>
     {
-      case "verified":
-        list = list.filter(k => calculateSuccessRate(k.upvotes, k.downvotes) >= 70 && (k.upvotes || 0) >= 2);
-        break;
-      case "popular":
-        list.sort((a, b) => (b.copies_count || 0) - (a.copies_count || 0) || (b.upvotes || 0) - (a.upvotes || 0));
-        break;
-      case "latest":
-      case "all":
-      default:
-        // Default ranking: strictly newest to oldest (safe timestamp math)
-        list.sort((a, b) =>
-        {
-          const timeA = a?.created_at ? new Date(a.created_at).getTime() || 0 : 0;
-          const timeB = b?.created_at ? new Date(b.created_at).getTime() || 0 : 0;
-          return timeB - timeA;
-        });
-        break;
-    }
+      if (sortBy === "copies")
+      {
+        const diff = (b.copies_count || 0) - (a.copies_count || 0);
+        if (diff !== 0)
+          return diff;
+        return (b.upvotes || 0) - (a.upvotes || 0);
+      }
+      if (sortBy === "rating")
+      {
+        const rateA = calculateSuccessRate(a.upvotes, a.downvotes);
+        const rateB = calculateSuccessRate(b.upvotes, b.downvotes);
+        if (rateB !== rateA)
+          return rateB - rateA;
+        return (b.upvotes || 0) - (a.upvotes || 0);
+      }
+      // 'newest' (default)
+      const timeA = a?.created_at ? new Date(a.created_at).getTime() || 0 : 0;
+      const timeB = b?.created_at ? new Date(b.created_at).getTime() || 0 : 0;
+      return timeB - timeA;
+    });
 
     return list;
-  }, [keys, searchQuery, activeTab, usedMap, usedSnapshot]);
+  }, [keys, searchQuery, activeTab, sortBy, usedMap, usedSnapshot]);
 
   // Derived counts for used keys
   const usedCount = useMemo(() =>
@@ -825,12 +853,14 @@ export default function Home()
             lang={lang}
             searchQuery={searchQuery}
             activeTab={activeTab}
+            sortBy={sortBy}
             usedMap={usedMap}
             usedCount={usedCount}
             shouldPulseUsedBadge={shouldPulseUsedBadge}
             hasUnvotedUsedKeys={hasUnvotedUsedKeys}
             onSearchChange={setSearchQuery}
             onTabChange={handleTabChange}
+            onSortChange={setSortBy}
             onVote={handleVote}
             onCopy={handleCopy}
             onOpenSubmit={() => setIsSubmitModalOpen(true)}
@@ -839,6 +869,27 @@ export default function Home()
             onClearUsed={handleClearUsed}
           />
         </main>
+
+        {/* Mobile Floating Action Button (Bottom right / RTL bottom left, safe area aware) */}
+        <div className="fixed bottom-5 right-4 rtl:right-auto rtl:left-4 z-40 sm:hidden pb-[env(safe-area-inset-bottom)]">
+          <motion.button
+            type="button"
+            onClick={() => setIsSubmitModalOpen(true)}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            className="flex items-center gap-2 px-4 py-3 rounded-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-sm shadow-xl shadow-emerald-950/30 border border-emerald-400/30 backdrop-blur-md transition-colors"
+            aria-label={translations[lang].shareCodeBtn}
+          >
+            <Plus className="w-4 h-4 stroke-[2.5]" />
+            <span className={lang === "ar" ? "font-arabic" : ""}>{translations[lang].shareCodeBtn}</span>
+          </motion.button>
+        </div>
+
+        {/* Floating Back to Top Button */}
+        <BackToTop lang={lang} />
+
+        {/* Gentle PWA Install Prompt */}
+        <PWAInstallPrompt lang={lang} />
 
         {/* Share Modal Dialog */}
         <SubmitModal
