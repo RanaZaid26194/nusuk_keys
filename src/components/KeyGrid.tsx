@@ -32,7 +32,7 @@ interface KeyGridProps
   onClearUsed?: () => void;
 }
 
-export const KeyGrid: React.FC<KeyGridProps> = ({
+const KeyGridComponent: React.FC<KeyGridProps> = ({
   items,
   isLoading = false,
   lang,
@@ -605,3 +605,6 @@ export const KeyGrid: React.FC<KeyGridProps> = ({
     </section>
   );
 };
+
+export const KeyGrid = React.memo(KeyGridComponent);
+KeyGrid.displayName = "KeyGrid";

@@ -11,7 +11,7 @@ interface FooterProps {
   lang: Language;
 }
 
-export const Footer: React.FC<FooterProps> = ({ lang }) =>
+const FooterComponent: React.FC<FooterProps> = ({ lang }) =>
 {
   const [syncTime, setSyncTime] = useState<string>("Live");
   const [cooldown, setCooldown] = useState<number>(0);
@@ -191,3 +191,6 @@ export const Footer: React.FC<FooterProps> = ({ lang }) =>
     </footer>
   );
 };
+
+export const Footer = React.memo(FooterComponent);
+Footer.displayName = "Footer";

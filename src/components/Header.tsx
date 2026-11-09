@@ -16,7 +16,7 @@ interface HeaderProps {
   onOpenInfo: () => void;
 }
 
-export const Header: React.FC<HeaderProps> = ({
+const HeaderComponent: React.FC<HeaderProps> = ({
   lang,
   onLanguageChange,
   onOpenSubmit,
@@ -40,13 +40,13 @@ export const Header: React.FC<HeaderProps> = ({
   };
 
   const handleOpenSubmit = () => {
-    playHapticSound('click');
     onOpenSubmit();
+    playHapticSound('click');
   };
 
   const handleOpenInfo = () => {
-    playHapticSound('click');
     onOpenInfo();
+    playHapticSound('click');
   };
 
   return (
@@ -174,3 +174,6 @@ export const Header: React.FC<HeaderProps> = ({
     </header>
   );
 };
+
+export const Header = React.memo(HeaderComponent);
+Header.displayName = "Header";

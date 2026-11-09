@@ -977,8 +977,8 @@ export default function Home()
           <motion.button
             type="button"
             onClick={() => {
-              playHapticSound('click');
               handleOpenSubmitModal();
+              playHapticSound('click');
             }}
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}

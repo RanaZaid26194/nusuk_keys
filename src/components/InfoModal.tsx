@@ -145,20 +145,21 @@ export const InfoModal: React.FC<InfoModalProps> = ({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
+            transition={{ duration: 0.12, ease: "easeOut" }}
             onClick={onClose}
             className="fixed inset-0 bg-black/65 dark:bg-black/80 sm:backdrop-blur-sm"
           />
 
-          {/* Modal Container (lightweight GPU entrance) */}
+          {/* Modal Container (instant lightweight GPU entrance) */}
           <motion.div
             ref={modalRef}
             role="dialog"
             aria-modal="true"
             aria-labelledby="info-modal-title"
-            initial={{ opacity: 0, scale: 0.95, y: 8 }}
+            initial={{ opacity: 0.3, scale: 0.97, y: 4 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.95, y: 8 }}
-            transition={{ duration: 0.16, ease: [0.16, 1, 0.3, 1] }}
+            exit={{ opacity: 0, scale: 0.97, y: 4 }}
+            transition={{ duration: 0.12, ease: "easeOut" }}
             style={{ willChange: "transform, opacity" }}
             className="relative w-full max-w-lg max-h-[calc(100dvh-2rem)] overflow-y-auto overscroll-contain my-auto rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 p-4 sm:p-7 shadow-2xl z-10 transition-colors"
           >

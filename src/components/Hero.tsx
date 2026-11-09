@@ -19,7 +19,7 @@ interface HeroProps {
   onOpenInfo: () => void;
 }
 
-export const Hero: React.FC<HeroProps> = ({
+const HeroComponent: React.FC<HeroProps> = ({
   lang,
   stats,
   isConnectedToSupabase = false,
@@ -64,13 +64,13 @@ export const Hero: React.FC<HeroProps> = ({
   const ArrowIcon = isAr ? ArrowLeft : ArrowRight;
 
   const handleOpenSubmit = () => {
-    playHapticSound('click');
     onOpenSubmit();
+    playHapticSound('click');
   };
 
   const handleOpenInfo = () => {
-    playHapticSound('click');
     onOpenInfo();
+    playHapticSound('click');
   };
 
   return (
@@ -269,3 +269,6 @@ export const Hero: React.FC<HeroProps> = ({
     </section>
   );
 };
+
+export const Hero = React.memo(HeroComponent);
+Hero.displayName = "Hero";
