@@ -3,7 +3,8 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 const CHROME_PATH = 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe';
-const TEMP_PROFILE = 'C:\\Users\\Administrator\\AppData\\Local\\Temp\\chrome-icon-build';
+const TEMP_PROFILE = `C:\\Users\\Administrator\\AppData\\Local\\Temp\\chrome-icon-build-${Date.now()}`;
+const DEBUG_PORT = 9228;
 
 try {
   fs.rmSync(TEMP_PROFILE, { recursive: true, force: true });
@@ -11,7 +12,7 @@ try {
 
 const chrome = spawn(CHROME_PATH, [
   '--headless=new',
-  '--remote-debugging-port=9222',
+  `--remote-debugging-port=${DEBUG_PORT}`,
   `--user-data-dir=${TEMP_PROFILE}`,
   '--no-first-run',
   '--no-default-browser-check',
@@ -25,7 +26,7 @@ function sleep(ms) {
 async function waitForPort() {
   for (let i = 0; i < 30; i++) {
     try {
-      const res = await fetch('http://127.0.0.1:9222/json');
+      const res = await fetch(`http://127.0.0.1:${DEBUG_PORT}/json`);
       if (res.ok) {
         const data = await res.json();
         if (data.length > 0) return data[0];
@@ -36,27 +37,45 @@ async function waitForPort() {
   throw new Error('Chrome remote debugging did not respond');
 }
 
-export function generate3DIconSvg(size = 512) {
-  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="${size}" height="${size}">
+/**
+ * Generates the SVG for Nusuk Keys icon.
+ * @param {object} opts
+ * @param {boolean} opts.fullBleed - true for iOS apple-touch-icon and Android maskable icons (no transparent corners, 100% full background bleed).
+ * @param {number} opts.keyScale - scale factor for key geometry to fit Android / iOS safe zones perfectly.
+ */
+export function buildIconSvg({ fullBleed = false, keyScale = 1.0 } = {}) {
+  const bgRect = fullBleed
+    ? `<rect width="512" height="512" fill="url(#sqBg)"/>
+       <rect width="512" height="512" fill="url(#ambientCore)"/>`
+    : `<rect x="16" y="16" width="480" height="480" rx="124" fill="url(#sqBg)"/>
+       <rect x="17" y="17" width="478" height="478" rx="123" fill="none" stroke="url(#sqBevel)" stroke-width="2"/>
+       <rect x="16" y="16" width="480" height="480" rx="124" fill="url(#ambientCore)"/>`;
+
+  // Scale key around center (256, 256)
+  const transform = keyScale !== 1.0
+    ? `transform="translate(256, 256) scale(${keyScale}) translate(-256, -256)"`
+    : '';
+
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
   <defs>
-    <!-- Deep Obsidian / Dark Slate Squircle Background -->
-    <radialGradient id="sqBg" cx="50%" cy="30%" r="80%">
-      <stop offset="0%" stop-color="#16181f"/>
-      <stop offset="45%" stop-color="#0e1015"/>
-      <stop offset="100%" stop-color="#060709"/>
+    <!-- Deep Obsidian / Dark Slate Background -->
+    <radialGradient id="sqBg" cx="50%" cy="30%" r="85%">
+      <stop offset="0%" stop-color="#161822"/>
+      <stop offset="50%" stop-color="#0c0e14"/>
+      <stop offset="100%" stop-color="#050608"/>
     </radialGradient>
 
-    <!-- Luxury Ambient Core Lighting -->
-    <radialGradient id="ambientCore" cx="40%" cy="40%" r="60%">
-      <stop offset="0%" stop-color="#d4af37" stop-opacity="0.16"/>
-      <stop offset="50%" stop-color="#10b981" stop-opacity="0.07"/>
+    <!-- Luxury Ambient Core Glow -->
+    <radialGradient id="ambientCore" cx="42%" cy="40%" r="62%">
+      <stop offset="0%" stop-color="#d4af37" stop-opacity="0.18"/>
+      <stop offset="45%" stop-color="#10b981" stop-opacity="0.08"/>
       <stop offset="100%" stop-color="#000000" stop-opacity="0"/>
     </radialGradient>
 
-    <!-- Squircle Edge Soft Bevel (NO GREEN OUTLINE!) -->
+    <!-- Squircle Edge Soft Bevel -->
     <linearGradient id="sqBevel" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.14"/>
-      <stop offset="40%" stop-color="#ffffff" stop-opacity="0.04"/>
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.16"/>
+      <stop offset="40%" stop-color="#ffffff" stop-opacity="0.05"/>
       <stop offset="70%" stop-color="#000000" stop-opacity="0.3"/>
       <stop offset="100%" stop-color="#000000" stop-opacity="0.7"/>
     </linearGradient>
@@ -72,13 +91,13 @@ export function generate3DIconSvg(size = 512) {
     <!-- 3D Gold Front Face (Radiant Polished Metallic Gold) -->
     <linearGradient id="goldPolish" x1="15%" y1="10%" x2="85%" y2="90%">
       <stop offset="0%" stop-color="#fffbeb"/>
-      <stop offset="18%" stop-color="#fde047"/>
-      <stop offset="45%" stop-color="#eab308"/>
-      <stop offset="75%" stop-color="#ca8a04"/>
+      <stop offset="16%" stop-color="#fde047"/>
+      <stop offset="44%" stop-color="#eab308"/>
+      <stop offset="76%" stop-color="#ca8a04"/>
       <stop offset="100%" stop-color="#a16207"/>
     </linearGradient>
 
-    <!-- Specular Ridge Glint (Diamond Light Edge) -->
+    <!-- Specular Ridge Glint -->
     <linearGradient id="goldGlint" x1="0%" y1="0%" x2="100%" y2="100%">
       <stop offset="0%" stop-color="#ffffff" stop-opacity="0.95"/>
       <stop offset="30%" stop-color="#fef9c3" stop-opacity="0.75"/>
@@ -86,7 +105,7 @@ export function generate3DIconSvg(size = 512) {
       <stop offset="100%" stop-color="#eab308" stop-opacity="0"/>
     </linearGradient>
 
-    <!-- Emerald Jewel Core (Rich Gemstone Depth) -->
+    <!-- Emerald Gem Core (Rich Gemstone Depth) -->
     <radialGradient id="emeraldGem" cx="35%" cy="32%" r="68%">
       <stop offset="0%" stop-color="#6ee7b7"/>
       <stop offset="25%" stop-color="#34d399"/>
@@ -95,24 +114,20 @@ export function generate3DIconSvg(size = 512) {
       <stop offset="100%" stop-color="#022c22"/>
     </radialGradient>
 
-    <!-- Realistic Key Drop Shadow onto Canvas -->
+    <!-- Realistic Drop Shadow -->
     <filter id="keyDropShadow" x="-30%" y="-30%" width="160%" height="160%">
       <feDropShadow dx="10" dy="20" stdDeviation="16" flood-color="#000000" flood-opacity="0.75"/>
       <feDropShadow dx="3" dy="6" stdDeviation="6" flood-color="#000000" flood-opacity="0.5"/>
     </filter>
   </defs>
 
-  <!-- 1. Background Squircle Canvas with Clean Organic Radius (NO GREEN OUTLINE!) -->
-  <rect x="20" y="20" width="472" height="472" rx="120" fill="url(#sqBg)"/>
-  <rect x="21" y="21" width="470" height="470" rx="119" fill="none" stroke="url(#sqBevel)" stroke-width="2"/>
+  <!-- 1. Canvas Background -->
+  ${bgRect}
 
-  <!-- Ambient Light Halo -->
-  <rect x="20" y="20" width="472" height="472" rx="120" fill="url(#ambientCore)"/>
+  <!-- 2. Volumetric 3D Key Object with Safe-Zone Scaling -->
+  <g ${transform} filter="url(#keyDropShadow)">
 
-  <!-- 2. Volumetric 3D Key Object -->
-  <g filter="url(#keyDropShadow)">
-
-    <!-- LAYER A: 3D EXTRUSION SIDES (Thickness/Depth of the key) -->
+    <!-- LAYER A: 3D EXTRUSION SIDES -->
     <g fill="url(#bronzeExtrusion)">
       <!-- Head Cylinder Side (extruded down-right) -->
       <path d="M 109 180 
@@ -192,24 +207,37 @@ export function generate3DIconSvg(size = 512) {
 </svg>`;
 }
 
-function createPngIco(pngBuffer) {
-  // Create a 1-image ICO file wrapping the 32x32 PNG buffer
+function createPngIco(png32, png16) {
+  // Create an ICO containing 16x16 and 32x32 images
   const header = Buffer.alloc(6);
   header.writeUInt16LE(0, 0); // reserved
   header.writeUInt16LE(1, 2); // type 1 = icon
-  header.writeUInt16LE(1, 4); // 1 image
+  header.writeUInt16LE(2, 4); // 2 images
 
-  const dirEntry = Buffer.alloc(16);
-  dirEntry.writeUInt8(32, 0); // width
-  dirEntry.writeUInt8(32, 1); // height
-  dirEntry.writeUInt8(0, 2);  // color count
-  dirEntry.writeUInt8(0, 3);  // reserved
-  dirEntry.writeUInt16LE(1, 4); // color planes
-  dirEntry.writeUInt16LE(32, 6); // bpp
-  dirEntry.writeUInt32LE(pngBuffer.length, 8); // size of image data
-  dirEntry.writeUInt32LE(22, 12); // offset of image data (6 + 16 = 22)
+  const offset0 = 6 + (16 * 2); // 38
+  const offset1 = offset0 + png16.length;
 
-  return Buffer.concat([header, dirEntry, pngBuffer]);
+  const entry0 = Buffer.alloc(16);
+  entry0.writeUInt8(16, 0); // width
+  entry0.writeUInt8(16, 1); // height
+  entry0.writeUInt8(0, 2);  // color count
+  entry0.writeUInt8(0, 3);  // reserved
+  entry0.writeUInt16LE(1, 4); // color planes
+  entry0.writeUInt16LE(32, 6); // bpp
+  entry0.writeUInt32LE(png16.length, 8);
+  entry0.writeUInt32LE(offset0, 12);
+
+  const entry1 = Buffer.alloc(16);
+  entry1.writeUInt8(32, 0); // width
+  entry1.writeUInt8(32, 1); // height
+  entry1.writeUInt8(0, 2);  // color count
+  entry1.writeUInt8(0, 3);  // reserved
+  entry1.writeUInt16LE(1, 4); // color planes
+  entry1.writeUInt16LE(32, 6); // bpp
+  entry1.writeUInt32LE(png32.length, 8);
+  entry1.writeUInt32LE(offset1, 12);
+
+  return Buffer.concat([header, entry0, entry1, png16, png32]);
 }
 
 async function run() {
@@ -241,16 +269,10 @@ async function run() {
     await new Promise(r => ws.onopen = r);
     await send('Page.enable');
 
-    const svgContent = generate3DIconSvg(512);
+    const repoRoot = path.resolve(import.meta.dirname, '..');
 
-    // 1. Write the SVG vector files
-    const repoRoot = path.resolve('D:/@1/Repos/nusuk_keys');
-    fs.writeFileSync(path.join(repoRoot, 'src/app/icon.svg'), svgContent, 'utf8');
-    fs.writeFileSync(path.join(repoRoot, 'public/icon.svg'), svgContent, 'utf8');
-    console.log('✓ Written src/app/icon.svg & public/icon.svg');
-
-    // Helper to render and capture exact PNG at given size
-    async function renderPng(size) {
+    // Helper to render and capture PNG
+    async function renderPng(svgString, size) {
       await send('Emulation.setDeviceMetricsOverride', {
         width: size,
         height: size,
@@ -279,49 +301,72 @@ async function run() {
 </style>
 </head>
 <body>
-  ${generate3DIconSvg(size)}
+  ${svgString}
 </body>
 </html>`;
 
       await send('Page.navigate', { url: `data:text/html;charset=utf-8,${encodeURIComponent(html)}` });
-      await sleep(200);
+      await sleep(150);
 
-      const shot = await send('Page.captureScreenshot', { format: 'png', fromSurface: true });
+      const shot = await send('Page.captureScreenshot', { format: 'png' });
       return Buffer.from(shot.data, 'base64');
     }
 
-    // Render sizes
-    const png512 = await renderPng(512);
-    fs.writeFileSync(path.join(repoRoot, 'public/icon-512.png'), png512);
-    console.log('✓ Rendered public/icon-512.png');
+    console.log('Generating pixel-perfect multi-device icons...');
 
-    const png192 = await renderPng(192);
-    fs.writeFileSync(path.join(repoRoot, 'public/icon-192.png'), png192);
-    console.log('✓ Rendered public/icon-192.png');
+    // 1. Vector SVG (Standard with subtle squircle bevel for desktop/browser)
+    const standardSvg = buildIconSvg({ fullBleed: false, keyScale: 0.96 });
+    fs.writeFileSync(path.join(repoRoot, 'src/app/icon.svg'), standardSvg, 'utf8');
+    fs.writeFileSync(path.join(repoRoot, 'public/icon.svg'), standardSvg, 'utf8');
+    console.log('✓ Vector SVG written to src/app/icon.svg & public/icon.svg');
 
-    const png180 = await renderPng(180);
-    fs.writeFileSync(path.join(repoRoot, 'src/app/apple-icon.png'), png180);
-    fs.writeFileSync(path.join(repoRoot, 'public/apple-touch-icon.png'), png180);
-    console.log('✓ Rendered apple-icon.png (180x180)');
+    // 2. Full-bleed SVG for Apple Touch Icon & Android Maskable icons
+    // Key scale: 0.80 fits strictly within Android 80% circle safe zone & Apple squircle safe area
+    const fullBleedMaskableSvg = buildIconSvg({ fullBleed: true, keyScale: 0.80 });
+    // Standard Any SVG (Full bleed edge for crisp modern PWA standard)
+    const anySvg = buildIconSvg({ fullBleed: true, keyScale: 0.88 });
 
-    const png32 = await renderPng(32);
+    // 3. Apple Touch Icon (180x180, Full Bleed, NO transparency, tailored for iOS HIG)
+    const apple180 = await renderPng(buildIconSvg({ fullBleed: true, keyScale: 0.82 }), 180);
+    fs.writeFileSync(path.join(repoRoot, 'src/app/apple-icon.png'), apple180);
+    fs.writeFileSync(path.join(repoRoot, 'public/apple-touch-icon.png'), apple180);
+    console.log('✓ Apple Touch Icon (180x180) rendered with 100% full-bleed opaque canvas');
+
+    // 4. Android Maskable Icons (192x192 & 512x512 with safe-zone inset)
+    const maskable192 = await renderPng(fullBleedMaskableSvg, 192);
+    fs.writeFileSync(path.join(repoRoot, 'public/icon-maskable-192.png'), maskable192);
+    console.log('✓ Android Maskable Icon (192x192) rendered with safe-zone inset');
+
+    const maskable512 = await renderPng(fullBleedMaskableSvg, 512);
+    fs.writeFileSync(path.join(repoRoot, 'public/icon-maskable-512.png'), maskable512);
+    console.log('✓ Android Maskable Icon (512x512) rendered with safe-zone inset');
+
+    // 5. Standard PWA "any" Icons (192x192 & 512x512 for Chrome, Edge, Windows, macOS)
+    const any192 = await renderPng(anySvg, 192);
+    fs.writeFileSync(path.join(repoRoot, 'public/icon-192.png'), any192);
+    console.log('✓ Standard PWA Icon (192x192) rendered');
+
+    const any512 = await renderPng(anySvg, 512);
+    fs.writeFileSync(path.join(repoRoot, 'public/icon-512.png'), any512);
+    console.log('✓ Standard PWA Icon (512x512) rendered');
+
+    // 6. Favicons (32x32, 16x16, and multi-resolution ICO)
+    const png32 = await renderPng(anySvg, 32);
     fs.writeFileSync(path.join(repoRoot, 'public/favicon-32x32.png'), png32);
-    console.log('✓ Rendered public/favicon-32x32.png');
 
-    const png16 = await renderPng(16);
+    const png16 = await renderPng(anySvg, 16);
     fs.writeFileSync(path.join(repoRoot, 'public/favicon-16x16.png'), png16);
-    console.log('✓ Rendered public/favicon-16x16.png');
 
-    // Create .ico
-    const icoBuffer = createPngIco(png32);
+    const icoBuffer = createPngIco(png32, png16);
     fs.writeFileSync(path.join(repoRoot, 'src/app/favicon.ico'), icoBuffer);
     fs.writeFileSync(path.join(repoRoot, 'public/favicon.ico'), icoBuffer);
-    console.log('✓ Created src/app/favicon.ico & public/favicon.ico');
+    console.log('✓ Multi-resolution favicon.ico (16x16, 32x32) generated');
 
     ws.close();
     chrome.kill();
+    console.log('ALL ICONS GENERATED SUCCESSFULLY!');
   } catch (err) {
-    console.error(err);
+    console.error('Icon build error:', err);
     chrome.kill();
   }
 }
