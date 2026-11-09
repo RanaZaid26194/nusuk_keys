@@ -124,6 +124,11 @@ const HeroComponent: React.FC<HeroProps> = ({
           <div className="relative inline-flex items-center">
             <motion.button
               ref={buttonRef}
+              onPointerDown={(e) => {
+                if (e.pointerType === 'touch') {
+                  handleOpenSubmit();
+                }
+              }}
               onClick={handleOpenSubmit}
               onMouseMove={handleButtonMouseMove}
               onMouseLeave={handleButtonMouseLeave}
@@ -132,7 +137,7 @@ const HeroComponent: React.FC<HeroProps> = ({
               whileTap={{ scale: 0.96 }}
               transition={{ type: "spring", stiffness: 350, damping: 25 }}
               aria-label={t.shareCodeBtn}
-              className="group flex items-center gap-2.5 px-7 sm:px-9 py-3 rounded-full bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-sm sm:text-base shadow-lg shadow-emerald-600/25 dark:shadow-emerald-950/60 transition-colors duration-150"
+              className="group flex items-center gap-2.5 px-7 sm:px-9 py-3 rounded-full bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-sm sm:text-base shadow-lg shadow-emerald-600/25 dark:shadow-emerald-950/60 transition-colors duration-150 touch-manipulation cursor-pointer"
             >
               <KeyRound className="w-4 h-4 sm:w-5 sm:h-5 transition-transform duration-200 group-hover:scale-110 group-hover:rotate-6" />
               <span className={isAr ? "font-arabic text-base sm:text-lg" : ""}>{t.shareCodeBtn}</span>
@@ -148,6 +153,12 @@ const HeroComponent: React.FC<HeroProps> = ({
                 dotColor="emerald"
               >
                 <motion.button
+                  onPointerDown={(e) => {
+                    if (e.pointerType === 'touch') {
+                      e.stopPropagation();
+                      handleOpenInfo();
+                    }
+                  }}
                   onClick={(e) => {
                     e.stopPropagation();
                     handleOpenInfo();

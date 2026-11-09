@@ -36,15 +36,19 @@ export default function Home()
   const [searchQuery, setSearchQuery] = useState("");
   const [activeTab, setActiveTab] = useState<FilterTab>("latest");
   const [sortBy, setSortBy] = useState<SortOption>("newest");
-  const [isSubmitModalOpen, setIsSubmitModalOpen] = useState(false);
-  const [isInfoModalOpen, setIsInfoModalOpen] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
   const [isLanguageFlipping, setIsLanguageFlipping] = useState(false);
 
-  const handleOpenSubmitModal = useCallback(() => setIsSubmitModalOpen(true), []);
-  const handleCloseSubmitModal = useCallback(() => setIsSubmitModalOpen(false), []);
-  const handleOpenInfoModal = useCallback(() => setIsInfoModalOpen(true), []);
-  const handleCloseInfoModal = useCallback(() => setIsInfoModalOpen(false), []);
+  const handleOpenSubmitModal = useCallback(() => {
+    if (typeof window !== "undefined") {
+      window.dispatchEvent(new CustomEvent("open-submit-modal"));
+    }
+  }, []);
+  const handleOpenInfoModal = useCallback(() => {
+    if (typeof window !== "undefined") {
+      window.dispatchEvent(new CustomEvent("open-info-modal"));
+    }
+  }, []);
 
   // local history for used keys
   const [usedMap, setUsedMap] = useState<Record<string, number>>({});
@@ -976,13 +980,19 @@ export default function Home()
         <div className="fixed bottom-5 right-4 rtl:right-auto rtl:left-4 z-40 sm:hidden pb-[env(safe-area-inset-bottom)]">
           <motion.button
             type="button"
+            onPointerDown={(e) => {
+              if (e.pointerType === 'touch') {
+                handleOpenSubmitModal();
+                playHapticSound('click');
+              }
+            }}
             onClick={() => {
               handleOpenSubmitModal();
               playHapticSound('click');
             }}
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            className="flex items-center gap-2 px-4 py-3 rounded-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-sm shadow-xl shadow-emerald-950/30 border border-emerald-400/30 backdrop-blur-md transition-colors"
+            className="flex items-center gap-2 px-4 py-3 rounded-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-sm shadow-xl shadow-emerald-950/30 border border-emerald-400/30 backdrop-blur-md transition-colors touch-manipulation cursor-pointer"
             aria-label={translations[lang].shareCodeBtn}
           >
             <Plus className="w-4 h-4 stroke-[2.5]" />
@@ -998,17 +1008,13 @@ export default function Home()
 
         {/* Share Modal Dialog */}
         <SubmitModal
-          isOpen={isSubmitModalOpen}
           lang={lang}
-          onClose={handleCloseSubmitModal}
           onSubmit={handleSubmitKey}
         />
 
         {/* Noble Motivation (i) Modal */}
         <InfoModal
-          isOpen={isInfoModalOpen}
           lang={lang}
-          onClose={handleCloseInfoModal}
           onOpenSubmit={handleOpenSubmitModal}
         />
 

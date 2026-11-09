@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, HeartHandshake, BookOpen, Quote } from "lucide-react";
 import { Language } from "@/lib/types";
@@ -9,19 +9,34 @@ import { playHapticSound } from "@/lib/audio";
 
 interface InfoModalProps
 {
-  isOpen: boolean;
+  isOpen?: boolean;
   lang: Language;
-  onClose: () => void;
+  onClose?: () => void;
   onOpenSubmit: () => void;
 }
 
 export const InfoModal: React.FC<InfoModalProps> = ({
-  isOpen,
+  isOpen: propIsOpen,
   lang,
   onClose,
   onOpenSubmit,
 }) =>
 {
+  const [internalIsOpen, setInternalIsOpen] = useState(false);
+  const isOpen = propIsOpen || internalIsOpen;
+
+  useEffect(() =>
+  {
+    const handleOpen = () => setInternalIsOpen(true);
+    window.addEventListener("open-info-modal", handleOpen);
+    return () => window.removeEventListener("open-info-modal", handleOpen);
+  }, []);
+
+  const handleClose = () =>
+  {
+    setInternalIsOpen(false);
+    onClose?.();
+  };
   const t = translations[lang];
   const isAr = lang === "ar";
   const previousFocusRef = useRef<HTMLElement | null>(null);
@@ -38,11 +53,11 @@ export const InfoModal: React.FC<InfoModalProps> = ({
     }
   }, [isOpen]);
 
-  const onCloseRef = useRef(onClose);
+  const onCloseRef = useRef(handleClose);
   useEffect(() =>
   {
-    onCloseRef.current = onClose;
-  }, [onClose]);
+    onCloseRef.current = handleClose;
+  }, [handleClose]);
 
   // Android back button / browser history navigation closes modal
   useEffect(() =>
@@ -91,7 +106,7 @@ export const InfoModal: React.FC<InfoModalProps> = ({
     {
       if (e.key === "Escape")
       {
-        onClose();
+        handleClose();
         return;
       }
 
@@ -131,48 +146,44 @@ export const InfoModal: React.FC<InfoModalProps> = ({
 
   const handleActionSubmit = () =>
   {
+    handleClose();
     playHapticSound('click');
-    onClose();
     onOpenSubmit();
   };
 
   return (
-    <AnimatePresence>
-      {isOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
-          {/* Backdrop (crisp on mobile, blurred on desktop) */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.12, ease: "easeOut" }}
-            onClick={onClose}
-            className="fixed inset-0 bg-black/65 dark:bg-black/80 sm:backdrop-blur-sm"
-          />
+    <div
+      className={`fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 overflow-y-auto transition-opacity duration-150 ${
+        isOpen
+          ? "opacity-100 pointer-events-auto visible"
+          : "opacity-0 pointer-events-none invisible"
+      }`}
+      aria-hidden={!isOpen}
+    >
+      {/* Backdrop (crisp on mobile, blurred on desktop) */}
+      <div
+        onClick={handleClose}
+        className="fixed inset-0 bg-black/65 dark:bg-black/80 sm:backdrop-blur-sm"
+      />
 
-          {/* Modal Container (instant lightweight GPU entrance) */}
-          <motion.div
-            ref={modalRef}
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="info-modal-title"
-            initial={{ opacity: 0.3, scale: 0.97, y: 4 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.97, y: 4 }}
-            transition={{ duration: 0.12, ease: "easeOut" }}
-            style={{ willChange: "transform, opacity" }}
-            className="relative w-full max-w-lg max-h-[calc(100dvh-2rem)] overflow-y-auto overscroll-contain my-auto rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 p-4 sm:p-7 shadow-2xl z-10 transition-colors"
-          >
-            {/* Close Button - positioned on left in RTL, right in LTR to avoid header overlap */}
-            <motion.button
-              onClick={onClose}
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.9 }}
-              aria-label={t.hook.close}
-              className={`absolute top-4 sm:top-5 ${isAr ? "left-4 sm:left-5" : "right-4 sm:right-5"} p-2 min-w-[36px] min-h-[36px] flex items-center justify-center rounded-xl text-zinc-400 hover:text-zinc-700 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors z-20`}
-            >
-              <X className="w-4 h-4" />
-            </motion.button>
+      {/* Modal Container (pure CSS hardware accelerated) */}
+      <div
+        ref={modalRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="info-modal-title"
+        className={`relative w-full max-w-lg max-h-[calc(100dvh-2rem)] overflow-y-auto overscroll-contain my-auto rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 p-4 sm:p-7 shadow-2xl z-10 transition-all duration-150 transform ${
+          isOpen ? "scale-100 translate-y-0 opacity-100" : "scale-95 translate-y-2 opacity-0"
+        }`}
+      >
+        {/* Close Button - positioned on left in RTL, right in LTR to avoid header overlap */}
+        <button
+          onClick={handleClose}
+          aria-label={t.hook.close}
+          className={`absolute top-4 sm:top-5 ${isAr ? "left-4 sm:left-5" : "right-4 sm:right-5"} p-2 min-w-[36px] min-h-[36px] flex items-center justify-center rounded-xl text-zinc-400 hover:text-zinc-700 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors z-20`}
+        >
+          <X className="w-4 h-4" />
+        </button>
 
             {/* Header */}
             <div className="flex items-center gap-3 mb-4 sm:mb-5">
@@ -233,7 +244,7 @@ export const InfoModal: React.FC<InfoModalProps> = ({
             <div className="flex items-center justify-end gap-2.5">
               <motion.button
                 type="button"
-                onClick={onClose}
+                onClick={handleClose}
                 whileHover={{ scale: 1.03 }}
                 whileTap={{ scale: 0.96 }}
                 transition={{ duration: 0.16, ease: "easeOut" }}
@@ -253,9 +264,7 @@ export const InfoModal: React.FC<InfoModalProps> = ({
                 {t.shareCodeBtn}
               </motion.button>
             </div>
-          </motion.div>
+          </div>
         </div>
-      )}
-    </AnimatePresence>
-  );
+      );
 };

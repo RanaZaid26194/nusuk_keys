@@ -12,19 +12,34 @@ import { Tooltip } from "./Tooltip";
 
 interface SubmitModalProps
 {
-  isOpen: boolean;
+  isOpen?: boolean;
   lang: Language;
-  onClose: () => void;
+  onClose?: () => void;
   onSubmit: (code: string) => Promise<{ success: boolean; error?: string }>;
 }
 
 export const SubmitModal: React.FC<SubmitModalProps> = ({
-  isOpen,
+  isOpen: propIsOpen,
   lang,
   onClose,
   onSubmit,
 }) =>
 {
+  const [internalIsOpen, setInternalIsOpen] = useState(false);
+  const isOpen = propIsOpen || internalIsOpen;
+
+  useEffect(() =>
+  {
+    const handleOpen = () => setInternalIsOpen(true);
+    window.addEventListener("open-submit-modal", handleOpen);
+    return () => window.removeEventListener("open-submit-modal", handleOpen);
+  }, []);
+
+  const handleClose = () =>
+  {
+    setInternalIsOpen(false);
+    onClose?.();
+  };
   const [code, setCode] = useState<string>(KEY_PREFIX);
   const [submitting, setSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -85,11 +100,11 @@ export const SubmitModal: React.FC<SubmitModalProps> = ({
     }
   }, [isOpen]);
 
-  const onCloseRef = useRef(onClose);
+  const onCloseRef = useRef(handleClose);
   useEffect(() =>
   {
-    onCloseRef.current = onClose;
-  }, [onClose]);
+    onCloseRef.current = handleClose;
+  }, [handleClose]);
 
   // Android back button / browser history navigation closes modal
   useEffect(() =>
@@ -138,7 +153,7 @@ export const SubmitModal: React.FC<SubmitModalProps> = ({
     {
       if (e.key === "Escape")
       {
-        onClose();
+        handleClose();
         return;
       }
 
@@ -259,7 +274,7 @@ export const SubmitModal: React.FC<SubmitModalProps> = ({
         playHapticSound('click');
         setTimeout(() =>
         {
-          onClose();
+          handleClose();
         }, 1800);
       }
       else
@@ -276,35 +291,33 @@ export const SubmitModal: React.FC<SubmitModalProps> = ({
   };
 
   return (
-    <AnimatePresence>
-      {isOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
-          {/* Backdrop (crisp on mobile, blurred on desktop) */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.12, ease: "easeOut" }}
-            onClick={onClose}
-            className="fixed inset-0 bg-black/65 dark:bg-black/80 sm:backdrop-blur-sm"
-          />
+    <div
+      className={`fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 overflow-y-auto transition-opacity duration-150 ${
+        isOpen
+          ? "opacity-100 pointer-events-auto visible"
+          : "opacity-0 pointer-events-none invisible"
+      }`}
+      aria-hidden={!isOpen}
+    >
+      {/* Backdrop (crisp on mobile, blurred on desktop) */}
+      <div
+        onClick={handleClose}
+        className="fixed inset-0 bg-black/65 dark:bg-black/80 sm:backdrop-blur-sm"
+      />
 
-          {/* Dialog Container (instant lightweight GPU entrance) */}
-          <motion.div
-            ref={modalRef}
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="submit-modal-title"
-            initial={{ opacity: 0.3, scale: 0.97, y: 4 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.97, y: 4 }}
-            transition={{ duration: 0.12, ease: "easeOut" }}
-            style={{ willChange: "transform, opacity" }}
-            className="relative w-full max-w-lg max-h-[calc(100dvh-2rem)] overflow-y-auto overscroll-contain my-auto rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 p-4 sm:p-7 shadow-2xl z-10 transition-colors"
-          >
+      {/* Dialog Container (pure CSS hardware accelerated) */}
+      <div
+        ref={modalRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="submit-modal-title"
+        className={`relative w-full max-w-lg max-h-[calc(100dvh-2rem)] overflow-y-auto overscroll-contain my-auto rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 p-4 sm:p-7 shadow-2xl z-10 transition-all duration-150 transform ${
+          isOpen ? "scale-100 translate-y-0 opacity-100" : "scale-95 translate-y-2 opacity-0"
+        }`}
+      >
             {/* Close Button - positioned on left in RTL, right in LTR to avoid header overlap */}
             <motion.button
-              onClick={onClose}
+              onClick={handleClose}
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.9 }}
               aria-label={t.hook.close}
@@ -466,7 +479,7 @@ export const SubmitModal: React.FC<SubmitModalProps> = ({
                 <div className="flex items-center justify-end gap-2.5 mt-5">
                   <button
                     type="button"
-                    onClick={onClose}
+                    onClick={handleClose}
                     className="px-4 py-2 rounded-xl bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300 text-xs sm:text-sm font-medium transition-colors"
                   >
                     {t.modal.cancel}
@@ -483,9 +496,7 @@ export const SubmitModal: React.FC<SubmitModalProps> = ({
                 </div>
               </form>
             )}
-          </motion.div>
+          </div>
         </div>
-      )}
-    </AnimatePresence>
-  );
+      );
 };

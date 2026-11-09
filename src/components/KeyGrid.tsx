@@ -589,6 +589,9 @@ const KeyGridComponent: React.FC<KeyGridProps> = ({
                   </motion.button>
                 )}
                 <motion.button
+                  onPointerDown={(e) => {
+                    if (e.pointerType === 'touch') onOpenSubmit();
+                  }}
                   onClick={onOpenSubmit}
                   whileHover={{ scale: 1.04 }}
                   whileTap={{ scale: 0.96 }}

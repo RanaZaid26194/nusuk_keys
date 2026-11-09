@@ -131,12 +131,17 @@ const HeaderComponent: React.FC<HeaderProps> = ({
           {/* Share Your Key Button with Apple-style corner (i) button */}
           <div className="relative inline-flex items-center">
             <motion.button
+              onPointerDown={(e) => {
+                if (e.pointerType === 'touch') {
+                  handleOpenSubmit();
+                }
+              }}
               onClick={handleOpenSubmit}
               whileHover={{ scale: 1.03, y: -0.5 }}
               whileTap={{ scale: 0.96 }}
               transition={{ duration: 0.16, ease: "easeOut" }}
               aria-label={t.shareCodeBtn}
-              className="group flex items-center justify-center gap-1.5 p-2 sm:px-4 sm:py-2 rounded-full bg-emerald-600 hover:bg-emerald-500 text-white font-medium text-xs sm:text-sm transition-colors duration-150 shadow-sm shadow-emerald-600/20 hover:shadow-emerald-600/35"
+              className="group flex items-center justify-center gap-1.5 p-2 sm:px-4 sm:py-2 rounded-full bg-emerald-600 hover:bg-emerald-500 text-white font-medium text-xs sm:text-sm transition-colors duration-150 shadow-sm shadow-emerald-600/20 hover:shadow-emerald-600/35 touch-manipulation cursor-pointer"
             >
               <Plus className="w-4 h-4 stroke-[2.5] group-hover:rotate-90 transition-transform duration-300" />
               <span className={`hidden sm:inline ${lang === 'ar' ? 'font-arabic text-sm' : ''}`}>{t.shareCodeBtn}</span>
@@ -151,6 +156,12 @@ const HeaderComponent: React.FC<HeaderProps> = ({
                 dotColor="emerald"
               >
                 <motion.button
+                  onPointerDown={(e) => {
+                    if (e.pointerType === 'touch') {
+                      e.stopPropagation();
+                      handleOpenInfo();
+                    }
+                  }}
                   onClick={(e) => {
                     e.stopPropagation();
                     handleOpenInfo();
