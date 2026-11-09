@@ -16,6 +16,9 @@ const LOCAL_STORAGE_KEYS = "nusuk_keys_data_v1";
 const LOCAL_STORAGE_CACHE = "nusuk_keys_cache_v2";
 const LOCAL_STORAGE_VOTES = "nusuk_user_votes_v1";
 const LOCAL_STORAGE_LANG = "nusuk_keys_lang_v1";
+const LOCAL_STORAGE_COPY_COUNTED = "nusuk_copy_counted_v1";
+const COPY_COOLDOWN_MS = 24 * 60 * 60 * 1000; // 24h soft anti-spam cooldown
+const MAX_COPY_COUNTED_ENTRIES = 2000;
 
 export default function Home() {
   const [lang, setLang] = useState<Language>("en");
@@ -380,16 +383,20 @@ export default function Home() {
   };
 
   // Upvote / Downvote Handler
-  const handleVote = async (keyId: string, type: 'UP' | 'DOWN') => {
+  const handleVote = async (keyId: string, type: 'UP' | 'DOWN') =>
+  {
     const userVotes = getUserVotes();
-    if (userVotes[keyId]) return; // Already voted
+    if (userVotes[keyId])
+      return; // Already voted
 
     userVotes[keyId] = type;
     localStorage.setItem(LOCAL_STORAGE_VOTES, JSON.stringify(userVotes));
 
     // Optimistic UI update
-    const updated = keys.map((k) => {
-      if (k.id === keyId) {
+    const updated = keys.map((k) =>
+    {
+      if (k.id === keyId)
+      {
         const newUpvotes = type === 'UP' ? k.upvotes + 1 : k.upvotes;
         const newDownvotes = type === 'DOWN' ? k.downvotes + 1 : k.downvotes;
         return {
@@ -413,39 +420,30 @@ export default function Home() {
       setUsedMap(nextUsed);
     }
 
-    // Sync to Supabase
-    if (isSupabaseConfigured && supabase) {
-      try {
-        const target = keys.find(k => k.id === keyId);
-        if (target) {
-          await supabase
-            .from("challenge_keys")
-            .update({
-              upvotes: type === 'UP' ? target.upvotes + 1 : target.upvotes,
-              downvotes: type === 'DOWN' ? target.downvotes + 1 : target.downvotes,
-              last_verified_at: new Date().toISOString(),
-            })
-            .eq("id", keyId);
-        }
-      } catch (err) {
-        console.error("Supabase vote update error:", err);
+    // Atomic server-side vote casting
+    if (isSupabaseConfigured && supabase)
+    {
+      try
+      {
+        const { error } = await supabase.rpc("cast_vote", {
+          p_key_id: keyId,
+          p_type: type,
+        });
+
+        if (error)
+          console.error("Supabase cast_vote error:", error);
+      }
+      catch (err)
+      {
+        console.error("Supabase cast_vote exception:", err);
       }
     }
   };
 
-  // Copy Count Increment
-  const handleCopy = async (keyId: string) => {
-    const updated = keys.map((k) => {
-      if (k.id === keyId) {
-        return { ...k, copies_count: k.copies_count + 1 };
-      }
-      return k;
-    });
-
-    setKeys(updated);
-    persistOfflineKeys(updated);
-
-    // mark as used
+  // Copy Count Increment with Soft Anti-Spam
+  const handleCopy = async (keyId: string) =>
+  {
+    // Always mark as used in local history
     const targetKey = keys.find(k => k.id === keyId);
     if (targetKey)
     {
@@ -453,17 +451,68 @@ export default function Home() {
       setUsedMap(nextUsed);
     }
 
-    if (isSupabaseConfigured && supabase) {
-      try {
-        const target = keys.find(k => k.id === keyId);
-        if (target) {
-          await supabase
-            .from("challenge_keys")
-            .update({ copies_count: target.copies_count + 1 })
-            .eq("id", keyId);
+    // Soft anti-spam: count only once per key per 24 hours per browser
+    let shouldCount = true;
+    const cleanCode = targetKey ? normalizeCode(targetKey.code) : "";
+    if (cleanCode)
+    {
+      try
+      {
+        const raw = localStorage.getItem(LOCAL_STORAGE_COPY_COUNTED);
+        const map: Record<string, number> = raw ? JSON.parse(raw) : {};
+        const lastCounted = map[cleanCode];
+        const now = Date.now();
+
+        if (lastCounted && now - lastCounted < COPY_COOLDOWN_MS)
+          shouldCount = false;
+        else
+        {
+          map[cleanCode] = now;
+          const entries = Object.entries(map);
+          let finalMap = map;
+          if (entries.length > MAX_COPY_COUNTED_ENTRIES)
+          {
+            entries.sort((a, b) => b[1] - a[1]);
+            finalMap = Object.fromEntries(entries.slice(0, MAX_COPY_COUNTED_ENTRIES));
+          }
+          localStorage.setItem(LOCAL_STORAGE_COPY_COUNTED, JSON.stringify(finalMap));
         }
-      } catch (err) {
-        console.error("Supabase copy count update error:", err);
+      }
+      catch
+      {
+        // storage disabled or quota exceeded
+      }
+    }
+
+    if (!shouldCount)
+      return;
+
+    // Optimistic UI update
+    const updated = keys.map((k) =>
+    {
+      if (k.id === keyId)
+        return { ...k, copies_count: (k.copies_count || 0) + 1 };
+      return k;
+    });
+
+    setKeys(updated);
+    persistOfflineKeys(updated);
+
+    // Atomic server-side counter increment
+    if (isSupabaseConfigured && supabase)
+    {
+      try
+      {
+        const { error } = await supabase.rpc("increment_copy", {
+          p_key_id: keyId,
+        });
+
+        if (error)
+          console.error("Supabase increment_copy error:", error);
+      }
+      catch (err)
+      {
+        console.error("Supabase increment_copy exception:", err);
       }
     }
   };

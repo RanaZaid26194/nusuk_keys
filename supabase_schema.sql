@@ -22,7 +22,7 @@ ON challenge_keys (is_active, created_at DESC);
 -- 3. Enable Row Level Security (RLS)
 ALTER TABLE challenge_keys ENABLE ROW LEVEL SECURITY;
 
--- 4. Set RLS Policies
+-- 4. Set RLS Policies (Read and Insert only; Updates go through atomic RPCs)
 DROP POLICY IF EXISTS "Allow public read active keys" ON challenge_keys;
 CREATE POLICY "Allow public read active keys" 
 ON challenge_keys FOR SELECT USING (is_active = true);
@@ -31,11 +31,70 @@ DROP POLICY IF EXISTS "Allow public submit new keys" ON challenge_keys;
 CREATE POLICY "Allow public submit new keys" 
 ON challenge_keys FOR INSERT WITH CHECK (code ~ '^NG-[A-Za-z0-9_-]+$');
 
+-- Ensure direct public updates are blocked
 DROP POLICY IF EXISTS "Allow public update voting and copies" ON challenge_keys;
-CREATE POLICY "Allow public update voting and copies" 
-ON challenge_keys FOR UPDATE USING (true);
 
--- 5. Enable Supabase Realtime publication
+-- 5. Atomic RPC Server-Side Functions (SECURITY DEFINER)
+CREATE OR REPLACE FUNCTION increment_copy(p_key_id UUID)
+RETURNS INT
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+DECLARE
+  v_new_count INT;
+BEGIN
+  UPDATE challenge_keys
+  SET copies_count = COALESCE(copies_count, 0) + 1
+  WHERE id = p_key_id AND is_active = true
+  RETURNING copies_count INTO v_new_count;
+
+  RETURN v_new_count;
+END;
+$$;
+
+CREATE OR REPLACE FUNCTION cast_vote(p_key_id UUID, p_type TEXT)
+RETURNS JSONB
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+DECLARE
+  v_upvotes INT;
+  v_downvotes INT;
+BEGIN
+  -- Validate vote type strictly
+  IF p_type NOT IN ('UP', 'DOWN') THEN
+    RAISE EXCEPTION 'Invalid vote type: %. Must be UP or DOWN.', p_type;
+  END IF;
+
+  IF p_type = 'UP' THEN
+    UPDATE challenge_keys
+    SET upvotes = COALESCE(upvotes, 0) + 1,
+        last_verified_at = NOW()
+    WHERE id = p_key_id AND is_active = true
+    RETURNING upvotes, downvotes INTO v_upvotes, v_downvotes;
+  ELSE
+    UPDATE challenge_keys
+    SET downvotes = COALESCE(downvotes, 0) + 1,
+        last_verified_at = NOW()
+    WHERE id = p_key_id AND is_active = true
+    RETURNING upvotes, downvotes INTO v_upvotes, v_downvotes;
+  END IF;
+
+  RETURN jsonb_build_object(
+    'id', p_key_id,
+    'upvotes', v_upvotes,
+    'downvotes', v_downvotes
+  );
+END;
+$$;
+
+-- Grant execution privileges to anon and authenticated users
+GRANT EXECUTE ON FUNCTION increment_copy(UUID) TO anon, authenticated;
+GRANT EXECUTE ON FUNCTION cast_vote(UUID, TEXT) TO anon, authenticated;
+
+-- 6. Enable Supabase Realtime publication
 DO $$
 BEGIN
   IF NOT EXISTS (
@@ -46,7 +105,7 @@ BEGIN
   END IF;
 END $$;
 
--- 6. Insert initial seed keys so table is populated immediately
+-- 7. Insert initial seed keys so table is populated immediately
 INSERT INTO challenge_keys (code, upvotes, downvotes, copies_count, is_active, created_at)
 VALUES 
   ('NG-SBs90X', 42, 1, 189, true, NOW() - INTERVAL '18 minutes'),
