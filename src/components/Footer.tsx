@@ -5,6 +5,7 @@ import { Shield, ExternalLink, Github, Flag } from "lucide-react";
 import { Language } from "@/lib/types";
 import { translations } from "@/lib/translations";
 import { checkReportRateLimit, recordReportRateLimit } from "@/lib/security";
+import { playHapticSound } from "@/lib/audio";
 import { Tooltip } from "./Tooltip";
 
 interface FooterProps {
@@ -59,26 +60,14 @@ const FooterComponent: React.FC<FooterProps> = ({ lang }) =>
     return () => clearInterval(timer);
   }, [cooldown]);
 
-  const mailtoBody = encodeURIComponent(
-    "Assalamu Alaikum,\n\nI would like to report an expired or broken Nusuk key.\n\nKey Code: NG-\nIssue: (Expired / Reached Max Pilgrims / Invalid Code)\nDetails: \n\nSent from Nusuk Keys Directory"
-  );
-  const mailtoUrl = `mailto:ranazaide288@gmail.com?subject=Report%20Broken%20Nusuk%20Key&body=${mailtoBody}`;
-
-  const handleReportClick = (e: React.MouseEvent<HTMLAnchorElement>) =>
+  const handleReportClick = (e: React.MouseEvent) =>
   {
-    const rateCheck = checkReportRateLimit();
-    if (!rateCheck.allowed)
+    e.preventDefault();
+    playHapticSound('click');
+    if (typeof window !== "undefined")
     {
-      e.preventDefault();
-      const wait = rateCheck.waitSeconds ?? 30;
-      setCooldown(wait);
-      setShowWarning(true);
-      setTimeout(() => setShowWarning(false), 3000);
-      return;
+      window.dispatchEvent(new CustomEvent("open-report-modal"));
     }
-
-    recordReportRateLimit();
-    setCooldown(30);
   };
 
   return (
@@ -97,6 +86,7 @@ const FooterComponent: React.FC<FooterProps> = ({ lang }) =>
             <Tooltip
               content={isAr ? "تزامن مباشر مع قاعدة بيانات Supabase" : "Real-time updates via Supabase"}
               position="top"
+              align={isAr ? "end" : "start"}
               dotColor="emerald"
             >
               <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-zinc-200/60 dark:bg-zinc-900 border border-zinc-300/60 dark:border-zinc-800 text-[11px] text-zinc-700 dark:text-zinc-300 cursor-default">
@@ -119,14 +109,20 @@ const FooterComponent: React.FC<FooterProps> = ({ lang }) =>
                     : (isAr ? "الإبلاغ عن رمز منتهي أو غير صالح للدعم" : "Report an expired or invalid key")
                 }
                 position="top"
+                align={isAr ? "start" : "end"}
                 dotColor={cooldown > 0 ? "amber" : "none"}
               >
-                <a
-                  href={cooldown > 0 ? undefined : mailtoUrl}
+                <button
+                  type="button"
+                  onPointerDown={(e) => {
+                    if (e.pointerType === 'touch') {
+                      handleReportClick(e);
+                    }
+                  }}
                   onClick={handleReportClick}
-                  className={`group flex items-center gap-1 text-xs transition-colors ${
+                  className={`group flex items-center gap-1 text-xs transition-colors cursor-pointer ${
                     cooldown > 0
-                      ? "cursor-not-allowed text-amber-600 dark:text-amber-400"
+                      ? "text-amber-600 dark:text-amber-400"
                       : "text-zinc-600 hover:text-rose-600 dark:text-zinc-400 dark:hover:text-rose-400"
                   }`}
                   aria-label={t.footer.reportBroken || "Report a broken key"}
@@ -137,14 +133,14 @@ const FooterComponent: React.FC<FooterProps> = ({ lang }) =>
                       ? (isAr ? `انتظر ${cooldown} ث` : `Wait ${cooldown}s`)
                       : (t.footer.reportBroken || "Report broken key")}
                   </span>
-                </a>
+                </button>
               </Tooltip>
 
-              {/* Toast warning on attempted spam/rate-limit hit */}
+              {/* Toast warning on attempted spam/rate-limit hit - viewport safe, no screen overflow */}
               {showWarning && (
                 <div
                   role="alert"
-                  className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 z-30 px-2.5 py-1 text-[11px] font-medium rounded-lg bg-zinc-900 dark:bg-zinc-800 text-amber-300 border border-amber-500/40 shadow-lg whitespace-nowrap animate-in fade-in slide-in-from-bottom-1"
+                  className="absolute bottom-full mb-2 right-0 sm:left-1/2 sm:-translate-x-1/2 rtl:left-0 rtl:right-auto sm:rtl:left-1/2 sm:rtl:-translate-x-1/2 z-30 px-3 py-1.5 text-[11px] font-medium rounded-lg bg-zinc-900 dark:bg-zinc-800 text-amber-300 border border-amber-500/40 shadow-xl max-w-[calc(100vw-2rem)] w-max max-w-xs text-center animate-in fade-in slide-in-from-bottom-1"
                 >
                   {t.footer.reportCooldown?.replace("{s}", cooldown.toString()) || `Wait ${cooldown}s (anti-spam)`}
                 </div>
@@ -155,6 +151,7 @@ const FooterComponent: React.FC<FooterProps> = ({ lang }) =>
             <Tooltip
               content={isAr ? "استعراض الكود المصدري على GitHub" : "View source code on GitHub"}
               position="top"
+              align={isAr ? "start" : "end"}
             >
               <a
                 href="https://github.com/RanaZaid26194/nusuk_keys"
@@ -172,6 +169,7 @@ const FooterComponent: React.FC<FooterProps> = ({ lang }) =>
             <Tooltip
               content={isAr ? "بوابة منصة خدمات نسك الرسمية" : "Official Saudi Nusuk Platform Portal"}
               position="top"
+              align={isAr ? "start" : "end"}
               dotColor="emerald"
             >
               <a

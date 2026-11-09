@@ -264,7 +264,7 @@ const KeyCardComponent: React.FC<KeyCardProps> = ({
               <div className="w-2 h-2 bg-zinc-900 dark:bg-zinc-900 border-l border-t border-zinc-700/80 dark:border-zinc-700/80 rotate-45 translate-y-1 mx-auto" />
             </div>
 
-            <div className="flex items-center gap-2 px-2.5 py-1.5 rounded-lg bg-zinc-900/95 dark:bg-zinc-900/95 text-zinc-200 border border-zinc-700/80 dark:border-zinc-700/80 ring-1 ring-emerald-500/20 shadow-2xl shadow-black/60 backdrop-blur-md whitespace-nowrap text-[11px]">
+            <div className="flex items-center gap-2 px-2.5 py-1.5 rounded-lg bg-zinc-900/95 dark:bg-zinc-900/95 text-zinc-200 border border-zinc-700/80 dark:border-zinc-700/80 ring-1 ring-emerald-500/20 shadow-2xl shadow-black/60 backdrop-blur-md max-w-[calc(100vw-2rem)] whitespace-normal sm:whitespace-nowrap break-words text-[11px]">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse flex-shrink-0" />
               <div className="flex flex-col gap-0.5">
                 <div className="flex items-center gap-1 leading-none">

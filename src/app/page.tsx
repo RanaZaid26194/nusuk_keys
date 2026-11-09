@@ -9,6 +9,7 @@ import { Hero } from "@/components/Hero";
 import { KeyGrid } from "@/components/KeyGrid";
 import { SubmitModal } from "@/components/SubmitModal";
 import { InfoModal } from "@/components/InfoModal";
+import { ReportModal } from "@/components/ReportModal";
 import { Footer } from "@/components/Footer";
 import { BackToTop } from "@/components/BackToTop";
 import { PWAInstallPrompt } from "@/components/PWAInstallPrompt";
@@ -1017,6 +1018,9 @@ export default function Home()
           lang={lang}
           onOpenSubmit={handleOpenSubmitModal}
         />
+
+        {/* Report Broken Key Modal (100% reliable on iOS & mobile) */}
+        <ReportModal lang={lang} />
 
         {/* Footer */}
         <Footer lang={lang} />

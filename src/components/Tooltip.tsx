@@ -93,13 +93,13 @@ export const Tooltip: React.FC<TooltipProps> = ({
 
       <div
         role="tooltip"
-        className={`hidden sm:block absolute ${positionClasses} ${alignClasses} z-50 pointer-events-none opacity-0 invisible ${transitionOrigin} group-hover/tooltip:opacity-100 group-hover/tooltip:visible group-focus-within/tooltip:opacity-100 group-focus-within/tooltip:visible transition-all duration-150 ease-out select-none ${className}`}
+        className={`hidden sm:block absolute ${positionClasses} ${alignClasses} z-50 pointer-events-none opacity-0 invisible max-w-[calc(100vw-2rem)] ${transitionOrigin} group-hover/tooltip:opacity-100 group-hover/tooltip:visible group-focus-within/tooltip:opacity-100 group-focus-within/tooltip:visible transition-all duration-150 ease-out select-none ${className}`}
       >
         {/* Caret pointing toward target */}
         <div className={`absolute ${caretClasses} ${caretAlignClasses} w-2 h-2 bg-zinc-900 border-zinc-700/80 rotate-45 pointer-events-none`} />
 
-        {/* Floating pill container */}
-        <div className="relative flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-zinc-900/95 text-zinc-100 text-[11px] font-medium border border-zinc-700/80 ring-1 ring-emerald-500/20 shadow-xl shadow-black/60 backdrop-blur-md whitespace-nowrap">
+        {/* Floating pill container (protected against viewport overflow on all displays) */}
+        <div className="relative flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-zinc-900/95 text-zinc-100 text-[11px] font-medium border border-zinc-700/80 ring-1 ring-emerald-500/20 shadow-xl shadow-black/60 backdrop-blur-md max-w-[calc(100vw-2rem)] w-max max-w-xs whitespace-normal sm:whitespace-nowrap break-words">
           {dotColor === "emerald" && (
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse flex-shrink-0" />
           )}
