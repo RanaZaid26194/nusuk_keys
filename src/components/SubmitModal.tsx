@@ -76,6 +76,12 @@ export const SubmitModal: React.FC<SubmitModalProps> = ({
     }
   }, [isOpen]);
 
+  const onCloseRef = useRef(onClose);
+  useEffect(() =>
+  {
+    onCloseRef.current = onClose;
+  }, [onClose]);
+
   // Android back button / browser history navigation closes modal
   useEffect(() =>
   {
@@ -86,7 +92,7 @@ export const SubmitModal: React.FC<SubmitModalProps> = ({
 
     const handlePopState = () =>
     {
-      onClose();
+      onCloseRef.current();
     };
 
     window.addEventListener("popstate", handlePopState);
@@ -96,7 +102,7 @@ export const SubmitModal: React.FC<SubmitModalProps> = ({
       if (window.history.state?.modal === "submit")
         window.history.back();
     };
-  }, [isOpen, onClose]);
+  }, [isOpen]);
 
   // lock page scroll while modal is open
   useEffect(() =>

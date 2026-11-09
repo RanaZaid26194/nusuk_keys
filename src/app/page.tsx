@@ -40,6 +40,11 @@ export default function Home()
   const [isMounted, setIsMounted] = useState(false);
   const [isLanguageFlipping, setIsLanguageFlipping] = useState(false);
 
+  const handleOpenSubmitModal = useCallback(() => setIsSubmitModalOpen(true), []);
+  const handleCloseSubmitModal = useCallback(() => setIsSubmitModalOpen(false), []);
+  const handleOpenInfoModal = useCallback(() => setIsInfoModalOpen(true), []);
+  const handleCloseInfoModal = useCallback(() => setIsInfoModalOpen(false), []);
+
   // local history for used keys
   const [usedMap, setUsedMap] = useState<Record<string, number>>({});
   const [usedSnapshot, setUsedSnapshot] = useState<Set<string>>(new Set());
@@ -929,8 +934,8 @@ export default function Home()
         <Header
           lang={lang}
           onLanguageChange={handleLanguageChange}
-          onOpenSubmit={() => setIsSubmitModalOpen(true)}
-          onOpenInfo={() => setIsInfoModalOpen(true)}
+          onOpenSubmit={handleOpenSubmitModal}
+          onOpenInfo={handleOpenInfoModal}
         />
 
         {/* Main Content Area with smooth 150ms language crossfade */}
@@ -939,8 +944,8 @@ export default function Home()
             lang={lang}
             stats={stats}
             isConnectedToSupabase={isSupabaseConfigured}
-            onOpenSubmit={() => setIsSubmitModalOpen(true)}
-            onOpenInfo={() => setIsInfoModalOpen(true)}
+            onOpenSubmit={handleOpenSubmitModal}
+            onOpenInfo={handleOpenInfoModal}
           />
 
           <KeyGrid
@@ -959,7 +964,7 @@ export default function Home()
             onSortChange={setSortBy}
             onVote={handleVote}
             onCopy={handleCopy}
-            onOpenSubmit={() => setIsSubmitModalOpen(true)}
+            onOpenSubmit={handleOpenSubmitModal}
             onOpenNusuk={handleOpenNusuk}
             onToggleUsed={handleToggleUsed}
             onClearUsed={handleClearUsed}
@@ -970,7 +975,7 @@ export default function Home()
         <div className="fixed bottom-5 right-4 rtl:right-auto rtl:left-4 z-40 sm:hidden pb-[env(safe-area-inset-bottom)]">
           <motion.button
             type="button"
-            onClick={() => setIsSubmitModalOpen(true)}
+            onClick={handleOpenSubmitModal}
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             className="flex items-center gap-2 px-4 py-3 rounded-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-sm shadow-xl shadow-emerald-950/30 border border-emerald-400/30 backdrop-blur-md transition-colors"
@@ -991,7 +996,7 @@ export default function Home()
         <SubmitModal
           isOpen={isSubmitModalOpen}
           lang={lang}
-          onClose={() => setIsSubmitModalOpen(false)}
+          onClose={handleCloseSubmitModal}
           onSubmit={handleSubmitKey}
         />
 
@@ -999,8 +1004,8 @@ export default function Home()
         <InfoModal
           isOpen={isInfoModalOpen}
           lang={lang}
-          onClose={() => setIsInfoModalOpen(false)}
-          onOpenSubmit={() => setIsSubmitModalOpen(true)}
+          onClose={handleCloseInfoModal}
+          onOpenSubmit={handleOpenSubmitModal}
         />
 
         {/* Footer */}

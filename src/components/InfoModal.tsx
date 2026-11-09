@@ -38,6 +38,12 @@ export const InfoModal: React.FC<InfoModalProps> = ({
     }
   }, [isOpen]);
 
+  const onCloseRef = useRef(onClose);
+  useEffect(() =>
+  {
+    onCloseRef.current = onClose;
+  }, [onClose]);
+
   // Android back button / browser history navigation closes modal
   useEffect(() =>
   {
@@ -48,7 +54,7 @@ export const InfoModal: React.FC<InfoModalProps> = ({
 
     const handlePopState = () =>
     {
-      onClose();
+      onCloseRef.current();
     };
 
     window.addEventListener("popstate", handlePopState);
@@ -58,7 +64,7 @@ export const InfoModal: React.FC<InfoModalProps> = ({
       if (window.history.state?.modal === "info")
         window.history.back();
     };
-  }, [isOpen, onClose]);
+  }, [isOpen]);
 
   // lock page scroll while modal is open
   useEffect(() =>
