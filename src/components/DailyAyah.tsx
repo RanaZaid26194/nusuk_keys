@@ -191,7 +191,7 @@ export const DailyAyah: React.FC<DailyAyahProps> = ({ lang, onOpenInfo, mockFrid
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: shouldReduceMotion ? 0 : -3 }}
               transition={{ duration: shouldReduceMotion ? 0.15 : 0.22, ease: "easeInOut" }}
-              className="w-full"
+              className="w-full flex flex-col items-center justify-center text-center"
             >
               {/* 1 & 6. Label above the ayah with Friday conditional */}
               <div className="flex items-center justify-center gap-1.5 mb-1">
@@ -213,17 +213,29 @@ export const DailyAyah: React.FC<DailyAyahProps> = ({ lang, onOpenInfo, mockFrid
                 variants={containerVariants}
                 initial="hidden"
                 animate="visible"
-                style={{ textAlign: "center" }}
-                className="font-arabic font-normal text-gold-800 dark:text-gold-200 text-base sm:text-lg leading-[2.2] py-1 px-2 text-center !text-center mx-auto group-hover:text-gold-950 dark:group-hover:text-gold-100 transition-colors overflow-visible select-text"
+                style={{ textAlign: "center", textWrap: "balance" }}
+                className="w-full font-arabic font-normal text-gold-800 dark:text-gold-200 text-base sm:text-lg leading-[2.2] sm:leading-[2.3] py-1 px-2 text-center !text-center mx-auto group-hover:text-gold-950 dark:group-hover:text-gold-100 transition-colors overflow-visible select-text"
               >
-                «{arabicWords.map((word, idx) => (
-                  <React.Fragment key={idx}>
-                    <motion.span variants={wordVariants} className="inline-block">
-                      {word}
-                    </motion.span>
-                    {idx < arabicWords.length - 1 ? " " : ""}
-                  </React.Fragment>
-                ))}»
+                {arabicWords.map((word, idx) => {
+                  const isFirst = idx === 0;
+                  const isLast = idx === arabicWords.length - 1;
+                  const wordText = isFirst && isLast
+                    ? `«${word}»`
+                    : isFirst
+                    ? `«${word}`
+                    : isLast
+                    ? `${word}»`
+                    : word;
+
+                  return (
+                    <React.Fragment key={idx}>
+                      <motion.span variants={wordVariants} className="inline-block whitespace-nowrap">
+                        {wordText}
+                      </motion.span>
+                      {!isLast ? " " : ""}
+                    </React.Fragment>
+                  );
+                })}
               </motion.div>
 
               {/* 5. Ayah End Marker ۝ (U+06DD) in dim gold as divider (EN mode only) */}
