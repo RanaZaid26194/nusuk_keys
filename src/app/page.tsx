@@ -20,37 +20,11 @@ const LOCAL_STORAGE_COPY_COUNTED = "nusuk_copy_counted_v1";
 const COPY_COOLDOWN_MS = 24 * 60 * 60 * 1000; // 24h soft anti-spam cooldown
 const MAX_COPY_COUNTED_ENTRIES = 2000;
 
-export default function Home() {
+export default function Home()
+{
   const [lang, setLang] = useState<Language>("en");
-  
-  // Instant Initial State via Local Cache (0ms on repeat visits)
-  const [keys, setKeys] = useState<ChallengeKey[]>(() => {
-    if (typeof window !== "undefined") {
-      try {
-        const cached = localStorage.getItem(LOCAL_STORAGE_CACHE);
-        if (cached) {
-          const parsed = JSON.parse(cached);
-          if (Array.isArray(parsed) && parsed.length > 0) {
-            return parsed;
-          }
-        }
-      } catch {}
-    }
-    return [];
-  });
-
-  const [isLoading, setIsLoading] = useState<boolean>(() => {
-    if (typeof window !== "undefined") {
-      try {
-        const cached = localStorage.getItem(LOCAL_STORAGE_CACHE);
-        if (cached) {
-          const parsed = JSON.parse(cached);
-          if (Array.isArray(parsed) && parsed.length > 0) return false;
-        }
-      } catch {}
-    }
-    return true;
-  });
+  const [keys, setKeys] = useState<ChallengeKey[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
 
   const [searchQuery, setSearchQuery] = useState("");
   const [activeTab, setActiveTab] = useState<FilterTab>("latest");
@@ -147,15 +121,35 @@ export default function Home() {
     refreshUsedSnapshot();
   };
 
-  // Initialize Language & Direction
-  useEffect(() => {
+  // Post-mount hydration sync: restores local cache & saved language safely without SSR mismatch
+  useEffect(() =>
+  {
     setIsMounted(true);
+
+    try
+    {
+      const cached = localStorage.getItem(LOCAL_STORAGE_CACHE);
+      if (cached)
+      {
+        const parsed = JSON.parse(cached);
+        if (Array.isArray(parsed) && parsed.length > 0)
+        {
+          setKeys(parsed);
+          setIsLoading(false);
+        }
+      }
+    }
+    catch {}
+
     const savedLang = localStorage.getItem(LOCAL_STORAGE_LANG) as Language | null;
-    if (savedLang === "en" || savedLang === "ar") {
+    if (savedLang === "en" || savedLang === "ar")
+    {
       setLang(savedLang);
       document.documentElement.setAttribute("dir", savedLang === "ar" ? "rtl" : "ltr");
       document.documentElement.setAttribute("lang", savedLang);
-    } else {
+    }
+    else
+    {
       document.documentElement.setAttribute("dir", "ltr");
       document.documentElement.setAttribute("lang", "en");
     }

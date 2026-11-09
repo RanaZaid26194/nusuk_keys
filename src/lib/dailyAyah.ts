@@ -232,6 +232,93 @@ export async function resolveDailyAyah(
   now: Date = new Date()
 ): Promise<{ ayah: DailyAyahData; source: AyahSource }>
 {
-  // return the longest allowed ayah per user request so they can preview max capacity
-  return { ayah: LONGEST_ALLOWED_AYAH, source: 'fallback' };
+  const dayKey = getDayKey(now);
+  const cached = readCachedAyah();
+
+  let finalAyah: DailyAyahData | null = null;
+  let finalSource: AyahSource = 'fallback';
+  let attemptCount = 0;
+  let resolvedNum: string | number = '';
+
+  // check if we got fresh api cache
+  if (cached && cached.dayKey === dayKey)
+  {
+    if (cached.source === 'api')
+    {
+      finalAyah = cached.ayah;
+      finalSource = 'api';
+      attemptCount = 0;
+      resolvedNum = cached.ayah.globalNumber || `${cached.ayah.surah}:${cached.ayah.numberInSurah}`;
+    }
+    else if (cached.source === 'fallback' && Date.now() - cached.lastTried < RETRY_FALLBACK_AFTER_MS)
+    {
+      finalAyah = cached.ayah;
+      finalSource = 'fallback';
+      attemptCount = 0;
+      resolvedNum = `${cached.ayah.surah}:${cached.ayah.numberInSurah}`;
+    }
+  }
+
+  // if not resolved from cache, hit the api candidates
+  if (!finalAyah)
+  {
+    const candidates = seededCandidates(dayKey, MAX_ATTEMPTS);
+    for (let i = 0; i < candidates.length; i++)
+    {
+      const candidate = candidates[i];
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), TIMEOUT_MS);
+
+      try
+      {
+        const result = await fetchCandidateAyah(candidate, controller.signal);
+        clearTimeout(timer);
+        if (result)
+        {
+          finalAyah = result;
+          finalSource = 'api';
+          attemptCount = i + 1;
+          resolvedNum = result.globalNumber || `${result.surah}:${result.numberInSurah}`;
+
+          const entry: DailyAyahCache =
+          {
+            dayKey,
+            source: 'api',
+            lastTried: Date.now(),
+            ayah: result
+          };
+          writeCachedAyah(entry);
+          break;
+        }
+      }
+      catch
+      {
+        clearTimeout(timer);
+      }
+    }
+
+    // all candidates struck out, drop to fallback
+    if (!finalAyah)
+    {
+      finalAyah = await getFallbackAyah(dayKey);
+      finalSource = 'fallback';
+      attemptCount = MAX_ATTEMPTS;
+      resolvedNum = `${finalAyah.surah}:${finalAyah.numberInSurah}`;
+
+      const fallbackEntry: DailyAyahCache =
+      {
+        dayKey,
+        source: 'fallback',
+        lastTried: Date.now(),
+        ayah: finalAyah
+      };
+      writeCachedAyah(fallbackEntry);
+    }
+  }
+
+  // single dev-only log
+  if (process.env.NODE_ENV !== 'production')
+    console.log(`[DailyAyah] #${resolvedNum} (attempt ${attemptCount}/${MAX_ATTEMPTS}, source: ${finalSource})`);
+
+  return { ayah: finalAyah, source: finalSource };
 }

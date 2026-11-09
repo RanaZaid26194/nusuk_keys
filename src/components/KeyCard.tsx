@@ -148,7 +148,10 @@ export const KeyCard: React.FC<KeyCardProps> = ({
         </div>
 
         {/* Time Ago */}
-        <span className={`text-[11px] text-zinc-600 dark:text-zinc-400 flex items-center gap-1 flex-shrink-0 ${isAr ? "font-arabic" : ""}`}>
+        <span
+          suppressHydrationWarning
+          className={`text-[11px] text-zinc-600 dark:text-zinc-400 flex items-center gap-1 flex-shrink-0 ${isAr ? "font-arabic" : ""}`}
+        >
           <Clock className="w-3 h-3 opacity-60" />
           {formatTimeAgo(item.created_at, lang)}
         </span>

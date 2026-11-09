@@ -15,6 +15,13 @@ interface DailyAyahProps
   mockFriday?: boolean;
 }
 
+// helper to convert ascii digits to arabic-indic digits for mushaf ayah marker
+function toArabicIndic(num: number): string
+{
+  const digits = ["٠", "١", "٢", "٣", "٤", "٥", "٦", "٧", "٨", "٩"];
+  return String(num).replace(/[0-9]/g, (d) => digits[Number(d)]);
+}
+
 // helper to calculate exact word stagger and total reveal time in ms
 export function computeRevealTimeMs(
   wordCount: number,
@@ -219,39 +226,51 @@ export const DailyAyah: React.FC<DailyAyahProps> = ({ lang, onOpenInfo, mockFrid
                 {arabicWords.map((word, idx) => {
                   const isFirst = idx === 0;
                   const isLast = idx === arabicWords.length - 1;
-                  const wordText = isFirst && isLast
-                    ? `«${word}»`
-                    : isFirst
-                    ? `«${word}`
-                    : isLast
-                    ? `${word}»`
-                    : word;
+
+                  if (isFirst && isLast)
+                  {
+                    return (
+                      <motion.span key={idx} variants={wordVariants} className="inline-block whitespace-nowrap">
+                        «{word}&nbsp;<span className="font-arabic text-gold-700/80 dark:text-gold-accent/80 select-none text-[1.05em] leading-none" aria-hidden="true">&#x06DD;{toArabicIndic(ayah.numberInSurah)}</span>»
+                      </motion.span>
+                    );
+                  }
+
+                  if (isFirst)
+                  {
+                    return (
+                      <React.Fragment key={idx}>
+                        <motion.span variants={wordVariants} className="inline-block whitespace-nowrap">
+                          «{word}
+                        </motion.span>
+                        {" "}
+                      </React.Fragment>
+                    );
+                  }
+
+                  if (isLast)
+                  {
+                    return (
+                      <motion.span key={idx} variants={wordVariants} className="inline-block whitespace-nowrap">
+                        {word}&nbsp;<span className="font-arabic text-gold-700/80 dark:text-gold-accent/80 select-none text-[1.05em] leading-none" aria-hidden="true">&#x06DD;{toArabicIndic(ayah.numberInSurah)}</span>»
+                      </motion.span>
+                    );
+                  }
 
                   return (
                     <React.Fragment key={idx}>
                       <motion.span variants={wordVariants} className="inline-block whitespace-nowrap">
-                        {wordText}
+                        {word}
                       </motion.span>
-                      {!isLast ? " " : ""}
+                      {" "}
                     </React.Fragment>
                   );
                 })}
               </motion.div>
 
-              {/* 5. Ayah End Marker ۝ (U+06DD) in dim gold as divider (EN mode only) */}
+              {/* English translation and reference in muted zinc */}
               {!isAr && (
-                <div className="flex items-center justify-center gap-2.5 my-1.5 max-w-[200px] mx-auto opacity-70 select-none">
-                  <div className="flex-1 h-[1px] bg-gradient-to-r from-transparent via-gold-accent/30 dark:via-gold-accent/20 to-gold-accent/40 dark:to-gold-accent/35" />
-                  <span className="font-arabic text-gold-700/80 dark:text-gold-accent/80 text-sm leading-none" aria-hidden="true">
-                    &#x06DD;
-                  </span>
-                  <div className="flex-1 h-[1px] bg-gradient-to-l from-transparent via-gold-accent/30 dark:via-gold-accent/20 to-gold-accent/40 dark:to-gold-accent/35" />
-                </div>
-              )}
-
-              {/* 2. English translation and reference in muted zinc */}
-              {!isAr && (
-                <>
+                <div className="mt-1">
                   <div
                     style={{ textAlign: "center" }}
                     className="text-[11px] sm:text-xs text-zinc-600 dark:text-zinc-400 text-center !text-center transition-colors mx-auto"
@@ -264,7 +283,7 @@ export const DailyAyah: React.FC<DailyAyahProps> = ({ lang, onOpenInfo, mockFrid
                   >
                     Sahih International
                   </div>
-                </>
+                </div>
               )}
 
               {/* 2. In Arabic mode: Arabic reference only, in muted zinc */}

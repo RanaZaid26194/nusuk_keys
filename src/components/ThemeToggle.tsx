@@ -79,7 +79,7 @@ export const ThemeToggle: React.FC<ThemeToggleProps> = ({ isAr = false }) =>
       className="p-2 rounded-xl bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-700 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white shadow-sm transition-colors flex items-center justify-center relative overflow-hidden"
     >
       <AnimatePresence mode="wait" initial={false}>
-        {mounted && resolvedTheme === "dark" ? (
+        {resolvedTheme === "dark" ? (
           <motion.div
             key="moon"
             initial={{ rotate: -45, scale: 0.6, opacity: 0 }}

@@ -96,6 +96,9 @@ export const metadata: Metadata = {
     statusBarStyle: "black-translucent",
     title: "Nusuk Keys",
   },
+  other: {
+    "mobile-web-app-capable": "yes",
+  },
   icons: {
     icon: [
       { url: "/favicon.ico", sizes: "32x32" },
