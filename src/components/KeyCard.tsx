@@ -157,6 +157,7 @@ export const KeyCard: React.FC<KeyCardProps> = ({
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.94 }}
           title={t.keyCard.copyKey}
+          aria-label={t.keyCard.copyKey}
           className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold transition-all shadow-xs ${
             copied
               ? "bg-emerald-600 text-white shadow-emerald-950/60"
@@ -195,7 +196,7 @@ export const KeyCard: React.FC<KeyCardProps> = ({
 
       {/* Trust & Usage Progress Bar */}
       <div className="relative z-10 space-y-1.5 mb-4">
-        <div className="flex justify-between items-center text-xs text-zinc-500 dark:text-zinc-400">
+        <div className="flex justify-between items-center text-xs text-zinc-600 dark:text-zinc-400">
           <span className={isAr ? "font-arabic" : ""}>
             <span className="font-mono text-zinc-800 dark:text-zinc-300 font-semibold">{item.copies_count}</span> {t.keyCard.copiedTimes}
           </span>
@@ -224,6 +225,7 @@ export const KeyCard: React.FC<KeyCardProps> = ({
             whileHover={{ scale: 1.08 }}
             whileTap={{ scale: 0.90 }}
             disabled={item.userVoted === 'UP'}
+            aria-label={isAr ? `تصويت إيجابي للمفتاح ${item.code}` : `Upvote key ${item.code}`}
             className={`flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium transition-colors ${
               item.userVoted === 'UP'
                 ? "bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border border-emerald-500/40 shadow-xs"
@@ -244,6 +246,7 @@ export const KeyCard: React.FC<KeyCardProps> = ({
             whileHover={{ scale: 1.08 }}
             whileTap={{ scale: 0.90 }}
             disabled={item.userVoted === 'DOWN'}
+            aria-label={isAr ? `تصويت سلبي للمفتاح ${item.code}` : `Downvote key ${item.code}`}
             className={`flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium transition-colors ${
               item.userVoted === 'DOWN'
                 ? "bg-rose-500/15 text-rose-700 dark:text-rose-300 border border-rose-500/40 shadow-xs"
@@ -266,8 +269,9 @@ export const KeyCard: React.FC<KeyCardProps> = ({
           target="_blank"
           rel="noopener noreferrer"
           whileHover={{ x: isAr ? -3 : 3 }}
-          className="flex items-center gap-1 text-[11px] text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-200 transition-colors"
+          className="flex items-center gap-1 text-[11px] text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-200 transition-colors"
           title={t.keyCard.openNusuk}
+          aria-label={t.keyCard.openNusuk}
         >
           <span className={isAr ? "font-arabic" : ""}>{t.keyCard.openNusuk}</span>
           <ExternalLink className="w-3 h-3 opacity-70" />

@@ -61,8 +61,10 @@ export default function Home() {
     if (savedLang === "en" || savedLang === "ar") {
       setLang(savedLang);
       document.documentElement.setAttribute("dir", savedLang === "ar" ? "rtl" : "ltr");
+      document.documentElement.setAttribute("lang", savedLang);
     } else {
       document.documentElement.setAttribute("dir", "ltr");
+      document.documentElement.setAttribute("lang", "en");
     }
   }, []);
 
@@ -70,6 +72,7 @@ export default function Home() {
     setLang(newLang);
     localStorage.setItem(LOCAL_STORAGE_LANG, newLang);
     document.documentElement.setAttribute("dir", newLang === "ar" ? "rtl" : "ltr");
+    document.documentElement.setAttribute("lang", newLang);
   };
 
   // Load user votes map from localStorage
@@ -87,11 +90,12 @@ export default function Home() {
     const userVotes = getUserVotes();
 
     if (isSupabaseConfigured && supabase) {
+      const client = supabase;
       try {
         const STAGE_1_SIZE = 500;
 
         // ⭐ STAGE 1: Ultra-fast initial chunk (<100ms, 0 - 499 keys)
-        const { data: stage1Data, count, error } = await supabase
+        const { data: stage1Data, count, error } = await client
           .from("challenge_keys")
           .select("*", { count: "exact" })
           .eq("is_active", true)
@@ -124,82 +128,105 @@ export default function Home() {
             localStorage.setItem(LOCAL_STORAGE_CACHE, JSON.stringify(stage1Mapped));
           } catch {}
 
-          // If database has more than 500 keys, progressively hydrate Stages 2, 3, and 4
+          // If database has more than 500 keys, progressively hydrate Stages 2, 3, and 4 quietly in background
           if (totalCount > STAGE_1_SIZE) {
-            let accumulated: any[] = [...stage1Data];
+            const deferSync = async () => {
+              try {
+                let accumulated: any[] = [...stage1Data];
 
-            // ⭐ STAGE 2 (Background Sync): Next 500 keys (500 - 999)
-            if (totalCount > 500) {
-              const { data: stage2Data } = await supabase
-                .from("challenge_keys")
-                .select("*")
-                .eq("is_active", true)
-                .order("created_at", { ascending: false })
-                .range(500, Math.min(999, totalCount - 1));
-
-              if (stage2Data && stage2Data.length > 0) {
-                accumulated = accumulated.concat(stage2Data);
-                const stage2Mapped = accumulated.map((d: any) => ({
-                  ...d,
-                  userVoted: userVotes[d.id] || null,
-                }));
-                setKeys((prev) => (prev.length > stage2Mapped.length ? prev : stage2Mapped));
-              }
-            }
-
-            // ⭐ STAGE 3 (Background Sync): Next 500 keys (1,000 - 1,499)
-            if (totalCount > 1000) {
-              const { data: stage3Data } = await supabase
-                .from("challenge_keys")
-                .select("*")
-                .eq("is_active", true)
-                .order("created_at", { ascending: false })
-                .range(1000, Math.min(1499, totalCount - 1));
-
-              if (stage3Data && stage3Data.length > 0) {
-                accumulated = accumulated.concat(stage3Data);
-                const stage3Mapped = accumulated.map((d: any) => ({
-                  ...d,
-                  userVoted: userVotes[d.id] || null,
-                }));
-                setKeys((prev) => (prev.length > stage3Mapped.length ? prev : stage3Mapped));
-              }
-            }
-
-            // ⭐ STAGE 4 (Background Sync): All remaining keys (1,500 -> totalCount) in parallel
-            if (totalCount > 1500) {
-              const remainingPromises = [];
-              for (let from = 1500; from < totalCount; from += 1000) {
-                const to = Math.min(from + 999, totalCount - 1);
-                remainingPromises.push(
-                  supabase
+                // ⭐ STAGE 2 (Background Sync): Next 500 keys (500 - 999)
+                if (totalCount > 500) {
+                  const { data: stage2Data } = await client
                     .from("challenge_keys")
                     .select("*")
                     .eq("is_active", true)
                     .order("created_at", { ascending: false })
-                    .range(from, to)
-                );
-              }
+                    .range(500, Math.min(999, totalCount - 1));
 
-              const remainingResults = await Promise.all(remainingPromises);
-              for (const res of remainingResults) {
-                if (res.data && res.data.length > 0) {
-                  accumulated = accumulated.concat(res.data);
+                  if (stage2Data && stage2Data.length > 0) {
+                    accumulated = accumulated.concat(stage2Data);
+                    const stage2Mapped = accumulated.map((d: any) => ({
+                      ...d,
+                      userVoted: userVotes[d.id] || null,
+                    }));
+                    setKeys((prev) => (prev.length > stage2Mapped.length ? prev : stage2Mapped));
+                  }
                 }
+
+                // Smooth delay between stages so UI remains responsive & rolling counter animates
+                await new Promise((r) => setTimeout(r, 350));
+
+                // ⭐ STAGE 3 (Background Sync): Next 500 keys (1,000 - 1,499)
+                if (totalCount > 1000) {
+                  const { data: stage3Data } = await client
+                    .from("challenge_keys")
+                    .select("*")
+                    .eq("is_active", true)
+                    .order("created_at", { ascending: false })
+                    .range(1000, Math.min(1499, totalCount - 1));
+
+                  if (stage3Data && stage3Data.length > 0) {
+                    accumulated = accumulated.concat(stage3Data);
+                    const stage3Mapped = accumulated.map((d: any) => ({
+                      ...d,
+                      userVoted: userVotes[d.id] || null,
+                    }));
+                    setKeys((prev) => (prev.length > stage3Mapped.length ? prev : stage3Mapped));
+                  }
+                }
+
+                // Smooth delay between stages so UI remains responsive & rolling counter animates
+                await new Promise((r) => setTimeout(r, 450));
+
+                // ⭐ STAGE 4 (Background Sync): All remaining keys (1,500 -> totalCount) in parallel
+                if (totalCount > 1500) {
+                  const remainingPromises = [];
+                  for (let from = 1500; from < totalCount; from += 1000) {
+                    const to = Math.min(from + 999, totalCount - 1);
+                    remainingPromises.push(
+                      client
+                        .from("challenge_keys")
+                        .select("*")
+                        .eq("is_active", true)
+                        .order("created_at", { ascending: false })
+                        .range(from, to)
+                    );
+                  }
+
+                  const remainingResults = await Promise.all(remainingPromises);
+                  for (const res of remainingResults) {
+                    if (res.data && res.data.length > 0) {
+                      accumulated = accumulated.concat(res.data);
+                    }
+                  }
+
+                  const allMapped = accumulated.map((d: any) => ({
+                    ...d,
+                    userVoted: userVotes[d.id] || null,
+                  }));
+                  setKeys(allMapped);
+
+                  try {
+                    localStorage.setItem(LOCAL_STORAGE_CACHE, JSON.stringify(allMapped));
+                  } catch {
+                    try {
+                      localStorage.setItem(LOCAL_STORAGE_CACHE, JSON.stringify(stage1Mapped));
+                    } catch {}
+                  }
+                }
+              } catch (e) {
+                console.warn("Background hydration warning:", e);
               }
+            };
 
-              const allMapped = accumulated.map((d: any) => ({
-                ...d,
-                userVoted: userVotes[d.id] || null,
-              }));
-              setKeys(allMapped);
-
-              try {
-                localStorage.setItem(LOCAL_STORAGE_CACHE, JSON.stringify(allMapped));
-              } catch {
-                try {
-                  localStorage.setItem(LOCAL_STORAGE_CACHE, JSON.stringify(stage1Mapped));
-                } catch {}
+            // Defer background stages until initial render & critical paints complete
+            if (typeof window !== "undefined") {
+              if ("requestIdleCallback" in window) {
+                (window as any).requestIdleCallback(() => {
+                  setTimeout(deferSync, 600);
+                }, { timeout: 3000 });
+              } else {
+                setTimeout(deferSync, 1200);
               }
             }
           }

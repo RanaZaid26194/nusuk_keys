@@ -180,6 +180,12 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
+        {/* Preconnect to Critical Origins */}
+        <link rel="preconnect" href="https://dttwxygghtdxokcebwta.supabase.co" crossOrigin="anonymous" />
+        <link rel="dns-prefetch" href="https://dttwxygghtdxokcebwta.supabase.co" />
+        <link rel="preconnect" href="https://api.alquran.cloud" crossOrigin="anonymous" />
+        <link rel="dns-prefetch" href="https://api.alquran.cloud" />
+
         {/* Synchronous inline script to prevent theme flash (FOUT) */}
         <script
           dangerouslySetInnerHTML={{

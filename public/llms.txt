@@ -19,6 +19,9 @@
 - **Performance**: 100% self-hosted fonts, zero external render-blocking scripts, Vercel Edge CDN distribution.
 - **Bilingual**: English (LTR) and Arabic (RTL) with native Nasta'liq and Amiri typography.
 
-## Full Documentation
-For complete technical specifications, schema, and API details, visit:
-- https://keys-nusuk.vercel.app/llms-full.txt
+## Links & Documentation
+- [Nusuk Keys Homepage](https://keys-nusuk.vercel.app/): Main interactive challenge keys directory.
+- [Arabic Version](https://keys-nusuk.vercel.app/?lang=ar): دليل مفاتيح ورموز تحدي نسك باللغة العربية.
+- [Full Technical Documentation](https://keys-nusuk.vercel.app/llms-full.txt): Complete LLM context and architecture documentation.
+- [Official Saudi Nusuk Platform](https://services.nusuk.sa): Official Umrah and Hajj government portal.
+- [Sitemap](https://keys-nusuk.vercel.app/sitemap.xml): XML sitemap for search and indexing engines.

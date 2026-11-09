@@ -73,11 +73,12 @@ export const Header: React.FC<HeaderProps> = ({
           <ThemeToggle isAr={lang === 'ar'} />
 
           {/* Language Switcher */}
-          <div className="flex items-center p-0.5 sm:p-1 rounded-xl bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-sm transition-colors">
+          <div className="flex items-center p-0.5 sm:p-1 rounded-xl bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-sm transition-colors" role="group" aria-label="Language selection">
             <button
               onClick={() => handleLang("en")}
+              aria-label="Switch to English"
               className={`relative px-2 sm:px-2.5 py-1 text-[11px] sm:text-xs font-medium rounded-lg transition-colors ${
-                lang === "en" ? "text-zinc-900 dark:text-white" : "text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200"
+                lang === "en" ? "text-zinc-900 dark:text-white" : "text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200"
               }`}
             >
               {lang === "en" && (
@@ -92,8 +93,9 @@ export const Header: React.FC<HeaderProps> = ({
 
             <button
               onClick={() => handleLang("ar")}
+              aria-label="التغيير إلى العربية"
               className={`relative px-2 sm:px-2.5 py-1 text-[11px] sm:text-xs font-medium rounded-lg transition-colors font-arabic ${
-                lang === "ar" ? "text-zinc-900 dark:text-white" : "text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200"
+                lang === "ar" ? "text-zinc-900 dark:text-white" : "text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200"
               }`}
             >
               {lang === "ar" && (

@@ -45,24 +45,16 @@ export const Hero: React.FC<HeroProps> = ({
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
         {/* Minimal Animated Badge */}
-        <motion.div
-          initial={{ opacity: 0, y: -12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4, ease: "easeOut" }}
-          className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-700 dark:text-zinc-300 text-xs sm:text-sm font-medium mb-5 shadow-sm transition-colors"
-        >
+        <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-700 dark:text-zinc-300 text-xs sm:text-sm font-medium mb-5 shadow-sm transition-colors">
           <span className="relative flex h-2 w-2">
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
             <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-400" />
           </span>
           <span>{isAr ? "مفاتيح نسك" : "Nusuk Keys"}</span>
-        </motion.div>
+        </div>
 
-        {/* Heading with Motion */}
-        <motion.h1
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.45, delay: 0.08, ease: "easeOut" }}
+        {/* Immediate Semantic Heading for Instant LCP */}
+        <h1
           className={`text-3xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-zinc-900 dark:text-white max-w-3xl mx-auto leading-tight transition-colors ${
             isAr ? "font-arabic leading-[1.3] sm:leading-[1.3]" : ""
           }`}
@@ -76,19 +68,16 @@ export const Hero: React.FC<HeroProps> = ({
               Discover & Share <span className="text-zinc-700 dark:text-zinc-100">Nusuk Challenge Keys</span>
             </>
           )}
-        </motion.h1>
+        </h1>
 
         {/* Subtitle */}
-        <motion.p
-          initial={{ opacity: 0, y: 14 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.45, delay: 0.16, ease: "easeOut" }}
+        <p
           className={`mt-4 text-sm sm:text-base text-zinc-600 dark:text-zinc-400 max-w-2xl mx-auto leading-relaxed transition-colors ${
             isAr ? "font-arabic text-base sm:text-lg" : ""
           }`}
         >
           {t.heroDescription}
-        </motion.p>
+        </p>
 
         {/* Share Button with Apple-style Corner (i) Button */}
         <motion.div
@@ -102,6 +91,7 @@ export const Hero: React.FC<HeroProps> = ({
               onClick={handleOpenSubmit}
               whileHover={{ scale: 1.03 }}
               whileTap={{ scale: 0.96 }}
+              aria-label={t.shareCodeBtn}
               className="flex items-center gap-2.5 px-7 sm:px-9 py-3 rounded-full bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-sm sm:text-base shadow-lg shadow-emerald-950/60 transition-all"
             >
               <KeyRound className="w-4 h-4 sm:w-5 sm:h-5" />
@@ -148,7 +138,7 @@ export const Hero: React.FC<HeroProps> = ({
             <div className="text-xl sm:text-3xl font-bold text-zinc-900 dark:text-white tracking-tight font-mono transition-colors">
               <NumberCounter value={stats.totalKeys} />
             </div>
-            <div className={`text-[11px] sm:text-xs text-zinc-500 dark:text-zinc-400 mt-0.5 sm:mt-1 ${isAr ? "font-arabic" : ""}`}>
+            <div className={`text-[11px] sm:text-xs text-zinc-600 dark:text-zinc-400 mt-0.5 sm:mt-1 ${isAr ? "font-arabic" : ""}`}>
               {t.stats.totalKeys}
             </div>
           </motion.div>
@@ -167,7 +157,7 @@ export const Hero: React.FC<HeroProps> = ({
             <div className="text-xl sm:text-3xl font-bold text-zinc-900 dark:text-white tracking-tight font-mono transition-colors">
               <NumberCounter value={stats.successRate} suffix="%" />
             </div>
-            <div className={`text-[11px] sm:text-xs text-zinc-500 dark:text-zinc-400 mt-0.5 sm:mt-1 ${isAr ? "font-arabic" : ""}`}>
+            <div className={`text-[11px] sm:text-xs text-zinc-600 dark:text-zinc-400 mt-0.5 sm:mt-1 ${isAr ? "font-arabic" : ""}`}>
               {t.stats.activeRate}
             </div>
           </motion.div>
@@ -186,7 +176,7 @@ export const Hero: React.FC<HeroProps> = ({
             <div className="text-xl sm:text-3xl font-bold text-zinc-900 dark:text-white tracking-tight font-mono transition-colors">
               <NumberCounter value={stats.totalCopies} />
             </div>
-            <div className={`text-[11px] sm:text-xs text-zinc-500 dark:text-zinc-400 mt-0.5 sm:mt-1 ${isAr ? "font-arabic" : ""}`}>
+            <div className={`text-[11px] sm:text-xs text-zinc-600 dark:text-zinc-400 mt-0.5 sm:mt-1 ${isAr ? "font-arabic" : ""}`}>
               {t.stats.totalCopies}
             </div>
           </motion.div>
@@ -209,7 +199,7 @@ export const Hero: React.FC<HeroProps> = ({
               </span>
               <span>{isConnectedToSupabase ? "Sync" : "Active"}</span>
             </div>
-            <div className={`text-[11px] sm:text-xs text-zinc-500 dark:text-zinc-400 mt-0.5 sm:mt-1 ${isAr ? "font-arabic" : ""}`}>
+            <div className={`text-[11px] sm:text-xs text-zinc-600 dark:text-zinc-400 mt-0.5 sm:mt-1 ${isAr ? "font-arabic" : ""}`}>
               {t.stats.liveStatus}
             </div>
           </motion.div>

@@ -101,7 +101,7 @@ export const KeyGrid: React.FC<KeyGridProps> = ({
         className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4 mb-8"
       >
         {/* Animated Search Bar with Keyboard Hint (RTL/LTR Adaptive) */}
-        <div className="relative flex-1 max-w-md group">
+        <div className="relative flex-1 max-w-md group" role="search">
           <div className={`absolute inset-y-0 ${isAr ? "right-0 pr-3.5" : "left-0 pl-3.5"} flex items-center pointer-events-none text-zinc-400 dark:text-zinc-500 group-focus-within:text-zinc-600 dark:group-focus-within:text-zinc-300 transition-colors`}>
             <Search className="w-4 h-4" />
           </div>
@@ -112,6 +112,7 @@ export const KeyGrid: React.FC<KeyGridProps> = ({
             value={searchQuery}
             onChange={(e) => onSearchChange(e.target.value)}
             placeholder={t.searchPlaceholder}
+            aria-label={t.searchPlaceholder}
             className={`w-full ${isAr ? "pr-10 pl-16 text-right font-arabic" : "pl-10 pr-16 text-left"} py-2.5 rounded-full bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-base sm:text-sm text-zinc-900 dark:text-white placeholder-zinc-400 dark:placeholder-zinc-500 focus:outline-none focus:border-zinc-400 dark:focus:border-zinc-600 focus:ring-1 focus:ring-zinc-400 dark:focus:ring-zinc-600 shadow-sm transition-all`}
           />
 
@@ -121,6 +122,7 @@ export const KeyGrid: React.FC<KeyGridProps> = ({
                 <motion.button
                   key="clear"
                   type="button"
+                  aria-label={isAr ? "مسح البحث" : "Clear search"}
                   initial={{ opacity: 0, scale: 0.8 }}
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0, scale: 0.8 }}
@@ -142,7 +144,11 @@ export const KeyGrid: React.FC<KeyGridProps> = ({
         </div>
 
         {/* Sliding Filter Tabs (Clean Apple-style Segmented Control) */}
-        <div className="flex items-center gap-1 p-1 rounded-full bg-zinc-100/90 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 overflow-x-auto no-scrollbar shadow-sm">
+        <div
+          role="tablist"
+          aria-label={isAr ? "خيارات التصفية" : "Filter options"}
+          className="flex items-center gap-1 p-1 rounded-full bg-zinc-100/90 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 overflow-x-auto no-scrollbar shadow-sm"
+        >
           {(["all", "verified", "popular", "latest"] as FilterTab[]).map((tab) => {
             const Icon = tabIcons[tab];
             const isActive = activeTab === tab;
@@ -150,11 +156,14 @@ export const KeyGrid: React.FC<KeyGridProps> = ({
             return (
               <motion.button
                 key={tab}
+                role="tab"
+                aria-selected={isActive}
+                aria-label={t.tabs[tab]}
                 onClick={() => handleTabClick(tab)}
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.96 }}
                 className={`relative flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs sm:text-sm font-medium whitespace-nowrap transition-colors select-none ${
-                  isActive ? "text-zinc-900 dark:text-white font-semibold" : "text-zinc-500 dark:text-zinc-400 hover:text-zinc-800 dark:hover:text-zinc-200"
+                  isActive ? "text-zinc-900 dark:text-white font-semibold" : "text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200"
                 } ${isAr ? "font-arabic" : ""}`}
               >
                 {isActive && (
@@ -212,6 +221,7 @@ export const KeyGrid: React.FC<KeyGridProps> = ({
                 onClick={handleLoadMore}
                 whileHover={{ scale: 1.03, y: -1 }}
                 whileTap={{ scale: 0.96 }}
+                aria-label={isAr ? "عرض المزيد من المفاتيح" : "Show more keys"}
                 className="flex items-center gap-2 px-6 py-2.5 rounded-full bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700/80 hover:bg-zinc-50 dark:hover:bg-zinc-800 text-xs sm:text-sm font-semibold text-zinc-800 dark:text-zinc-200 shadow-sm transition-all"
               >
                 <span>
@@ -278,6 +288,7 @@ export const KeyGrid: React.FC<KeyGridProps> = ({
                 onClick={() => onSearchChange("")}
                 whileHover={{ scale: 1.04 }}
                 whileTap={{ scale: 0.96 }}
+                aria-label={t.empty.clearFilters}
                 className="px-4 py-2 rounded-full bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-xs sm:text-sm text-zinc-800 dark:text-white font-medium transition-colors"
               >
                 {t.empty.clearFilters}
@@ -287,6 +298,7 @@ export const KeyGrid: React.FC<KeyGridProps> = ({
               onClick={onOpenSubmit}
               whileHover={{ scale: 1.04 }}
               whileTap={{ scale: 0.96 }}
+              aria-label={t.shareCodeBtn}
               className="px-5 py-2 rounded-full bg-emerald-600 hover:bg-emerald-500 text-xs sm:text-sm text-white font-semibold shadow-sm transition-colors"
             >
               {t.shareCodeBtn}
