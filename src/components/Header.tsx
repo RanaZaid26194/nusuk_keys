@@ -133,7 +133,7 @@ export const Header: React.FC<HeaderProps> = ({
               whileTap={{ scale: 0.9 }}
               aria-label={t.hook.infoButtonAria}
               title={t.hook.infoButtonAria}
-              className="absolute -top-1 -right-1 sm:-top-1.5 sm:-right-1.5 rtl:-left-1 rtl:right-auto sm:rtl:-left-1.5 w-4.5 h-4.5 sm:w-5 sm:h-5 rounded-full bg-emerald-950 hover:bg-emerald-900 text-emerald-200 hover:text-white border border-emerald-400/50 shadow-md flex items-center justify-center transition-colors z-10"
+              className="absolute -top-0.5 right-0 rtl:left-0 rtl:right-auto sm:-top-1.5 sm:-right-1.5 sm:rtl:-left-1.5 sm:rtl:right-auto w-4.5 h-4.5 sm:w-5 sm:h-5 rounded-full bg-emerald-950 hover:bg-emerald-900 text-emerald-200 hover:text-white border border-emerald-400/50 shadow-md flex items-center justify-center transition-colors z-10"
             >
               <svg className="w-2.5 h-2.5 sm:w-3 sm:h-3" viewBox="0 0 12 12" fill="currentColor">
                 <circle cx="6" cy="2.5" r="1.1" />
