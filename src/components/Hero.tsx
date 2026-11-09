@@ -5,33 +5,55 @@ import { motion } from "framer-motion";
 import { KeyRound, ShieldCheck, Copy, Activity, ArrowRight, ArrowLeft } from "lucide-react";
 import { Language, Stats } from "@/lib/types";
 import { translations } from "@/lib/translations";
+import { NumberCounter } from "./NumberCounter";
 
 interface HeroProps {
   lang: Language;
   stats: Stats;
+  isConnectedToSupabase?: boolean;
   onOpenSubmit: () => void;
 }
 
-export const Hero: React.FC<HeroProps> = ({ lang, stats, onOpenSubmit }) => {
+export const Hero: React.FC<HeroProps> = ({
+  lang,
+  stats,
+  isConnectedToSupabase = false,
+  onOpenSubmit,
+}) => {
   const t = translations[lang];
   const isAr = lang === "ar";
   const ArrowIcon = isAr ? ArrowLeft : ArrowRight;
 
   return (
-    <section className="relative overflow-hidden pt-8 pb-12 sm:pt-14 sm:pb-16 bg-islamic-pattern">
-      {/* Ambient background glows */}
-      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[350px] sm:w-[650px] h-[350px] sm:h-[450px] bg-gradient-to-tr from-emerald-600/15 via-teal-500/10 to-gold-accent/10 rounded-full blur-3xl pointer-events-none" />
+    <section className="relative overflow-hidden pt-10 pb-14 sm:pt-16 sm:pb-20 bg-islamic-pattern">
+      {/* Dynamic Animated Ambient Orbs */}
+      <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[340px] sm:w-[680px] h-[340px] sm:h-[480px] bg-gradient-to-tr from-emerald-600/20 via-teal-500/15 to-gold-accent/15 rounded-full blur-[100px] pointer-events-none animate-pulse-subtle" />
+      
+      {/* Floating secondary decorative lights */}
+      <motion.div
+        className="absolute -top-12 left-1/4 w-72 h-72 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none"
+        animate={{ y: [0, 20, 0], scale: [1, 1.1, 1] }}
+        transition={{ duration: 7, repeat: Infinity, ease: "easeInOut" }}
+      />
+      <motion.div
+        className="absolute top-20 right-1/4 w-80 h-80 bg-gold-400/10 rounded-full blur-3xl pointer-events-none"
+        animate={{ y: [0, -25, 0], scale: [1, 1.15, 1] }}
+        transition={{ duration: 9, repeat: Infinity, ease: "easeInOut" }}
+      />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
-        {/* Top Badge */}
+        {/* Top Live Badge with Radar Ping */}
         <motion.div
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-950/70 border border-gold-400/30 text-gold-300 text-xs sm:text-sm font-medium mb-5 shadow-inner"
+          className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-emerald-950/80 border border-emerald-500/30 text-emerald-200 text-xs sm:text-sm font-medium mb-6 shadow-lg shadow-emerald-950/50 backdrop-blur-md"
         >
-          <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-          <span>{isAr ? "تحديث مباشر لتحدي نسك 1447هـ / 2026م" : "Nusuk App Umrah Challenge 2026"}</span>
+          <span className="relative flex h-2 w-2">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+            <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-400"></span>
+          </span>
+          <span>{isAr ? "تحديث مباشر لتحدي نسك 1447هـ / 2026م" : "Live Umrah Challenge Portal 2026"}</span>
         </motion.div>
 
         {/* Heading */}
@@ -53,7 +75,7 @@ export const Hero: React.FC<HeroProps> = ({ lang, stats, onOpenSubmit }) => {
           ) : (
             <>
               Discover & Share{" "}
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-teal-300 to-gold-300">
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-300 via-teal-200 to-gold-300">
                 Nusuk Challenge Keys
               </span>
             </>
@@ -81,75 +103,91 @@ export const Hero: React.FC<HeroProps> = ({ lang, stats, onOpenSubmit }) => {
         >
           <motion.button
             onClick={onOpenSubmit}
-            whileHover={{ scale: 1.05 }}
+            whileHover={{ scale: 1.05, y: -2 }}
             whileTap={{ scale: 0.95 }}
-            className="group flex items-center gap-3 px-6 sm:px-8 py-3.5 sm:py-4 rounded-2xl bg-gradient-to-r from-gold-500 via-amber-500 to-gold-600 text-slate-950 font-bold text-sm sm:text-base shadow-xl shadow-gold-950/40 border border-gold-300/40 hover:shadow-gold-500/30 transition-all"
+            className="group relative flex items-center gap-3 px-7 sm:px-9 py-3.5 sm:py-4 rounded-2xl bg-gradient-to-r from-gold-500 via-amber-400 to-gold-600 text-slate-950 font-bold text-sm sm:text-base shadow-xl shadow-gold-950/50 border border-gold-300/60 hover:shadow-gold-500/40 transition-all overflow-hidden"
           >
+            <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000 ease-in-out pointer-events-none" />
             <KeyRound className="w-5 h-5 text-slate-950" />
             <span className={isAr ? "font-arabic text-base sm:text-lg" : ""}>{t.shareCodeBtn}</span>
             <ArrowIcon className="w-4 h-4 transition-transform group-hover:translate-x-1" />
           </motion.button>
         </motion.div>
 
-        {/* Stats Grid */}
+        {/* Exact, Real-Time Dynamic Stats Grid */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, delay: 0.4 }}
           className="mt-12 sm:mt-16 grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 max-w-4xl mx-auto"
         >
-          {/* Card 1 */}
-          <div className="glass-panel p-3.5 sm:p-4 rounded-2xl border border-emerald-900/40 text-center">
-            <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-emerald-500/10 text-emerald-400 mx-auto mb-2">
+          {/* Exact Stat 1: Total Active Keys */}
+          <motion.div
+            whileHover={{ y: -3, scale: 1.02 }}
+            className="glass-panel p-4 sm:p-5 rounded-2xl border border-emerald-900/50 hover:border-emerald-500/40 text-center transition-all shadow-lg"
+          >
+            <div className="flex items-center justify-center w-9 h-9 rounded-xl bg-emerald-500/10 text-emerald-400 mx-auto mb-2.5">
               <KeyRound className="w-4 h-4" />
             </div>
-            <div className="text-xl sm:text-2xl font-bold text-white tracking-tight">
-              {stats.totalKeys}+
+            <div className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight font-mono">
+              <NumberCounter value={stats.totalKeys} />
             </div>
-            <div className={`text-xs text-slate-400 mt-0.5 ${isAr ? "font-arabic" : ""}`}>
+            <div className={`text-xs text-slate-400 font-medium mt-1 ${isAr ? "font-arabic" : ""}`}>
               {t.stats.totalKeys}
             </div>
-          </div>
+          </motion.div>
 
-          {/* Card 2 */}
-          <div className="glass-panel p-3.5 sm:p-4 rounded-2xl border border-emerald-900/40 text-center">
-            <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-gold-500/10 text-gold-400 mx-auto mb-2">
+          {/* Exact Stat 2: Verification Rate */}
+          <motion.div
+            whileHover={{ y: -3, scale: 1.02 }}
+            className="glass-panel p-4 sm:p-5 rounded-2xl border border-emerald-900/50 hover:border-gold-500/40 text-center transition-all shadow-lg"
+          >
+            <div className="flex items-center justify-center w-9 h-9 rounded-xl bg-gold-500/10 text-gold-400 mx-auto mb-2.5">
               <ShieldCheck className="w-4 h-4" />
             </div>
-            <div className="text-xl sm:text-2xl font-bold text-gold-300 tracking-tight">
-              {stats.successRate}%
+            <div className="text-2xl sm:text-3xl font-extrabold text-gold-300 tracking-tight font-mono">
+              <NumberCounter value={stats.successRate} suffix="%" />
             </div>
-            <div className={`text-xs text-slate-400 mt-0.5 ${isAr ? "font-arabic" : ""}`}>
+            <div className={`text-xs text-slate-400 font-medium mt-1 ${isAr ? "font-arabic" : ""}`}>
               {t.stats.activeRate}
             </div>
-          </div>
+          </motion.div>
 
-          {/* Card 3 */}
-          <div className="glass-panel p-3.5 sm:p-4 rounded-2xl border border-emerald-900/40 text-center">
-            <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-teal-500/10 text-teal-400 mx-auto mb-2">
+          {/* Exact Stat 3: Total Copies Count */}
+          <motion.div
+            whileHover={{ y: -3, scale: 1.02 }}
+            className="glass-panel p-4 sm:p-5 rounded-2xl border border-emerald-900/50 hover:border-teal-500/40 text-center transition-all shadow-lg"
+          >
+            <div className="flex items-center justify-center w-9 h-9 rounded-xl bg-teal-500/10 text-teal-400 mx-auto mb-2.5">
               <Copy className="w-4 h-4" />
             </div>
-            <div className="text-xl sm:text-2xl font-bold text-teal-300 tracking-tight">
-              {stats.totalCopies}+
+            <div className="text-2xl sm:text-3xl font-extrabold text-teal-300 tracking-tight font-mono">
+              <NumberCounter value={stats.totalCopies} />
             </div>
-            <div className={`text-xs text-slate-400 mt-0.5 ${isAr ? "font-arabic" : ""}`}>
+            <div className={`text-xs text-slate-400 font-medium mt-1 ${isAr ? "font-arabic" : ""}`}>
               {t.stats.totalCopies}
             </div>
-          </div>
+          </motion.div>
 
-          {/* Card 4 */}
-          <div className="glass-panel p-3.5 sm:p-4 rounded-2xl border border-emerald-900/40 text-center">
-            <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-emerald-500/10 text-emerald-400 mx-auto mb-2">
+          {/* Exact Stat 4: Live Status */}
+          <motion.div
+            whileHover={{ y: -3, scale: 1.02 }}
+            className="glass-panel p-4 sm:p-5 rounded-2xl border border-emerald-900/50 hover:border-emerald-500/40 text-center transition-all shadow-lg"
+          >
+            <div className="flex items-center justify-center w-9 h-9 rounded-xl bg-emerald-500/10 text-emerald-400 mx-auto mb-2.5">
               <Activity className="w-4 h-4" />
             </div>
-            <div className="flex items-center justify-center gap-1.5 text-xl sm:text-2xl font-bold text-white tracking-tight">
-              <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse" />
-              <span>Active</span>
+            <div className="flex items-center justify-center gap-2 text-2xl sm:text-3xl font-extrabold text-emerald-400 tracking-tight">
+              <span className="relative flex h-3 w-3">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-3 w-3 bg-emerald-400"></span>
+              </span>
+              <span>{isConnectedToSupabase ? "Sync" : "Active"}</span>
             </div>
-            <div className={`text-xs text-slate-400 mt-0.5 ${isAr ? "font-arabic" : ""}`}>
+            <div className={`text-xs text-slate-400 font-medium mt-1 ${isAr ? "font-arabic" : ""}`}>
               {t.stats.liveStatus}
             </div>
-          </div>
+          </motion.div>
         </motion.div>
       </div>
     </section>

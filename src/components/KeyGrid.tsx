@@ -1,11 +1,12 @@
 "use client";
 
-import React from "react";
+import React, { useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Search, X, Layers, ShieldCheck, Flame, Clock, Inbox } from "lucide-react";
+import { Search, X, Layers, ShieldCheck, Flame, Clock, Inbox, Command } from "lucide-react";
 import { ChallengeKey, FilterTab, Language } from "@/lib/types";
 import { translations } from "@/lib/translations";
 import { KeyCard } from "./KeyCard";
+import { playHapticSound } from "@/lib/audio";
 
 interface KeyGridProps {
   items: ChallengeKey[];
@@ -30,6 +31,7 @@ export const KeyGrid: React.FC<KeyGridProps> = ({
   onCopy,
   onOpenSubmit,
 }) => {
+  const searchInputRef = useRef<HTMLInputElement>(null);
   const t = translations[lang];
   const isAr = lang === "ar";
 
@@ -40,45 +42,72 @@ export const KeyGrid: React.FC<KeyGridProps> = ({
     latest: Clock,
   };
 
+  // Quick / or Ctrl+K focus shortcut
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.key === "/" || ((e.metaKey || e.ctrlKey) && e.key === "k")) && document.activeElement !== searchInputRef.current) {
+        e.preventDefault();
+        searchInputRef.current?.focus();
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
+
+  const handleTabClick = (tab: FilterTab) => {
+    playHapticSound('click');
+    onTabChange(tab);
+  };
+
   return (
-    <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-20">
+    <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-24">
       {/* Controls Container: Search & Tabs */}
       <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4 mb-8">
-        {/* Animated Search Bar */}
-        <div className="relative flex-1 max-w-md">
-          <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
-            <Search className="w-4 h-4 text-emerald-400" />
+        {/* Animated Search Bar with Keyboard Hint */}
+        <div className="relative flex-1 max-w-md group">
+          <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400 group-focus-within:text-emerald-400 transition-colors">
+            <Search className="w-4 h-4" />
           </div>
 
           <input
+            ref={searchInputRef}
             type="text"
             value={searchQuery}
             onChange={(e) => onSearchChange(e.target.value)}
             placeholder={t.searchPlaceholder}
-            className={`w-full pl-10 pr-10 py-2.5 sm:py-3 rounded-2xl bg-slate-900/90 border border-emerald-900/60 text-sm sm:text-base text-white placeholder-slate-400 focus:outline-none focus:border-emerald-400 focus:ring-2 focus:ring-emerald-500/20 shadow-inner transition-all ${
+            className={`w-full pl-10 pr-16 py-3 rounded-2xl bg-slate-900/90 border border-emerald-900/60 text-sm sm:text-base text-white placeholder-slate-400 focus:outline-none focus:border-emerald-400 focus:ring-2 focus:ring-emerald-500/20 shadow-inner transition-all ${
               isAr ? "font-arabic" : ""
             }`}
           />
 
-          <AnimatePresence>
-            {searchQuery && (
-              <motion.button
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.8 }}
-                onClick={() => onSearchChange("")}
-                className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-white"
-              >
-                <div className="w-5 h-5 rounded-full bg-slate-800 flex items-center justify-center hover:bg-slate-700">
-                  <X className="w-3 h-3" />
-                </div>
-              </motion.button>
-            )}
-          </AnimatePresence>
+          <div className="absolute inset-y-0 right-0 pr-3 flex items-center gap-1.5 pointer-events-none">
+            <AnimatePresence>
+              {searchQuery ? (
+                <motion.button
+                  key="clear"
+                  type="button"
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.8 }}
+                  onClick={() => {
+                    onSearchChange("");
+                    searchInputRef.current?.focus();
+                  }}
+                  className="pointer-events-auto p-1 rounded-full bg-slate-800 text-slate-400 hover:text-white hover:bg-slate-700 transition-colors"
+                >
+                  <X className="w-3.5 h-3.5" />
+                </motion.button>
+              ) : (
+                <span className="hidden sm:inline-flex items-center gap-0.5 px-2 py-0.5 rounded-md bg-slate-800/80 border border-slate-700/60 text-[10px] font-mono text-slate-400">
+                  <Command className="w-2.5 h-2.5" />K
+                </span>
+              )}
+            </AnimatePresence>
+          </div>
         </div>
 
         {/* Sliding Filter Tabs */}
-        <div className="flex items-center gap-1.5 p-1.5 rounded-2xl bg-slate-900/80 border border-emerald-900/50 overflow-x-auto no-scrollbar">
+        <div className="flex items-center gap-1.5 p-1.5 rounded-2xl bg-slate-900/80 border border-emerald-900/50 overflow-x-auto no-scrollbar shadow-inner">
           {(["all", "verified", "popular", "latest"] as FilterTab[]).map((tab) => {
             const Icon = tabIcons[tab];
             const isActive = activeTab === tab;
@@ -86,15 +115,15 @@ export const KeyGrid: React.FC<KeyGridProps> = ({
             return (
               <button
                 key={tab}
-                onClick={() => onTabChange(tab)}
-                className={`relative flex items-center gap-1.5 px-3 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-medium whitespace-nowrap transition-colors ${
+                onClick={() => handleTabClick(tab)}
+                className={`relative flex items-center gap-1.5 px-3.5 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-medium whitespace-nowrap transition-colors select-none ${
                   isActive ? "text-white" : "text-slate-400 hover:text-slate-200"
                 } ${isAr ? "font-arabic" : ""}`}
               >
                 {isActive && (
                   <motion.div
                     layoutId="activeFilterTab"
-                    className="absolute inset-0 bg-emerald-800/80 rounded-xl border border-emerald-500/30 shadow-md shadow-emerald-950/60"
+                    className="absolute inset-0 bg-emerald-800/80 rounded-xl border border-emerald-500/40 shadow-md shadow-emerald-950/70"
                     transition={{ type: "spring", stiffness: 450, damping: 35 }}
                   />
                 )}
@@ -120,6 +149,7 @@ export const KeyGrid: React.FC<KeyGridProps> = ({
                 key={item.id}
                 item={item}
                 lang={lang}
+                searchQuery={searchQuery}
                 onVote={onVote}
                 onCopy={onCopy}
               />

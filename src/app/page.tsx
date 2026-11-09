@@ -284,19 +284,21 @@ export default function Home() {
     return list;
   }, [keys, searchQuery, activeTab]);
 
-  // Overall Statistics Calculation
+  // Exact Real-Time Statistics Calculation (Strict math, zero hallucination)
   const stats: Stats = useMemo(() => {
     const totalKeys = keys.length;
-    const totalCopies = keys.reduce((acc, k) => acc + k.copies_count, 0);
-    const totalUpvotes = keys.reduce((acc, k) => acc + k.upvotes, 0);
-    const totalDownvotes = keys.reduce((acc, k) => acc + k.downvotes, 0);
-    const successRate = calculateSuccessRate(totalUpvotes, totalDownvotes);
+    const totalCopies = keys.reduce((acc, k) => acc + (k.copies_count || 0), 0);
+    const totalUpvotes = keys.reduce((acc, k) => acc + (k.upvotes || 0), 0);
+    const totalDownvotes = keys.reduce((acc, k) => acc + (k.downvotes || 0), 0);
+    const totalVotes = totalUpvotes + totalDownvotes;
+
+    const successRate = totalVotes > 0 ? Math.round((totalUpvotes / totalVotes) * 100) : 100;
 
     return {
       totalKeys,
       activeKeys: keys.filter(k => k.is_active).length,
       totalCopies,
-      successRate: isNaN(successRate) ? 98 : successRate,
+      successRate,
     };
   }, [keys]);
 
@@ -316,6 +318,7 @@ export default function Home() {
         <Hero
           lang={lang}
           stats={stats}
+          isConnectedToSupabase={isSupabaseConfigured}
           onOpenSubmit={() => setIsSubmitModalOpen(true)}
         />
 
