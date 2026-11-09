@@ -134,8 +134,8 @@ export const Hero: React.FC<HeroProps> = ({
             <HeartHandshake className="w-3.5 h-3.5 text-amber-400" />
           </div>
           <p className="text-xs text-zinc-300 truncate text-left rtl:text-right">
-            <span className="font-arabic font-semibold text-amber-200 text-sm group-hover:text-amber-100 transition-colors">
-              {t.hook.ayahArabic}
+            <span dir="rtl" className="font-nastaliq font-bold text-amber-200 text-sm sm:text-base group-hover:text-amber-100 transition-colors">
+              «{t.hook.ayahArabic}»
             </span>
             {!isAr && <span className="opacity-80 ml-2 text-[11px] text-zinc-400">— {t.hook.ayahTranslation}</span>}
           </p>

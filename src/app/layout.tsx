@@ -16,7 +16,7 @@ const amiri = Amiri({
 });
 
 export const viewport: Viewport = {
-  themeColor: "#064e3b",
+  themeColor: "#09090b",
   width: "device-width",
   initialScale: 1,
   maximumScale: 5,
@@ -48,7 +48,15 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="dark">
-      <body className={`${inter.variable} ${amiri.variable} font-sans antialiased bg-[#07130f] text-slate-100 min-h-screen selection:bg-emerald-500/30 selection:text-emerald-200`}>
+      <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link
+          href="https://fonts.googleapis.com/css2?family=Noto+Nastaliq+Urdu:wght@400;700&display=swap"
+          rel="stylesheet"
+        />
+      </head>
+      <body className={`${inter.variable} ${amiri.variable} font-sans antialiased bg-[#09090b] text-zinc-100 min-h-screen selection:bg-emerald-500/20 selection:text-emerald-200`}>
         {children}
       </body>
     </html>

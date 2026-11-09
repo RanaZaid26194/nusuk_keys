@@ -151,11 +151,11 @@ export const SubmitModal: React.FC<SubmitModalProps> = ({
                 </div>
 
                 {/* Noble Spiritual Hook Reminder Card */}
-                <div className="p-3 rounded-xl bg-zinc-950 border border-amber-500/20 mb-4 flex items-start gap-2.5">
-                  <HeartHandshake className="w-4 h-4 text-amber-400 flex-shrink-0 mt-0.5" />
+                <div className="p-3.5 rounded-xl bg-zinc-950 border border-amber-500/25 mb-4 flex items-start gap-2.5">
+                  <HeartHandshake className="w-4 h-4 text-amber-400 flex-shrink-0 mt-1" />
                   <div className="text-xs text-zinc-300 leading-relaxed">
-                    <span className="font-arabic font-semibold text-amber-200 block mb-0.5">
-                      {t.hook.hadithArabic}
+                    <span dir="rtl" className="font-nastaliq font-bold text-amber-200 block text-sm sm:text-base mb-1">
+                      «{t.hook.hadithArabic}»
                     </span>
                     <span className="text-[11px] text-zinc-400 block">
                       {t.hook.rewardMessage}

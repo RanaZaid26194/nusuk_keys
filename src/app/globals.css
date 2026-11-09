@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Nastaliq+Urdu:wght@400;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -18,11 +20,11 @@ body {
   overflow-x: hidden;
 }
 
-/* Subtle Geometric Accent */
-.bg-subtle-grid {
-  background-size: 32px 32px;
-  background-image: linear-gradient(to right, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
-                    linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+/* Nastaliq Calligraphy Class */
+.font-nastaliq {
+  font-family: 'Noto Nastaliq Urdu', 'Amiri', serif;
+  line-height: 2.1;
+  letter-spacing: 0.02em;
 }
 
 /* Custom scrollbars */
