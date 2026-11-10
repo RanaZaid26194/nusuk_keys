@@ -15,6 +15,7 @@ import { BackToTop } from "@/components/BackToTop";
 import { PWAInstallPrompt } from "@/components/PWAInstallPrompt";
 import { supabase, isSupabaseConfigured, INITIAL_DEMO_KEYS } from "@/lib/supabase";
 import { calculateSuccessRate } from "@/lib/utils";
+import { getKeyStatus } from "@/lib/keyStatus";
 import { loadUsedKeys, markUsed, unmarkUsed, clearUsedKeys, normalizeCode, STORAGE_KEY_USED } from "@/lib/usedKeys";
 import { isValidKey, normalizeNumerals } from "@/lib/keyFormat";
 import { translations } from "@/lib/translations";
@@ -1044,7 +1045,7 @@ export default function Home()
 
     // Tabs
     if (activeTab === "verified")
-      list = list.filter(k => calculateSuccessRate(k.upvotes, k.downvotes) >= 75 && (k.upvotes || 0) >= 2);
+      list = list.filter(k => getKeyStatus(k) === "verified");
 
     // Apply active SortOption across all standard tabs
     list.sort((a, b) =>

@@ -2,14 +2,16 @@
 
 import React, { useState, useRef, useEffect, useMemo } from "react";
 import { motion, AnimatePresence, useMotionValue, useSpring } from "framer-motion";
-import { Copy, Check, ExternalLink, ThumbsUp, ThumbsDown, Clock, ShieldCheck, AlertCircle, RotateCcw } from "lucide-react";
+import { Copy, Check, ExternalLink, ThumbsUp, ThumbsDown, Clock, AlertCircle, RotateCcw } from "lucide-react";
 import { ChallengeKey, Language } from "@/lib/types";
 import { translations } from "@/lib/translations";
+import { getKeyStatus } from "@/lib/keyStatus";
 import { calculateSuccessRate, formatTimeAgo, getNusukDeepLink } from "@/lib/utils";
 import { playHapticSound } from "@/lib/audio";
 import { copyToClipboard } from "@/lib/clipboard";
 import { useCanHover } from "@/lib/useCanHover";
 import { Tooltip } from "./Tooltip";
+import { StatusBadge } from "./StatusBadge";
 
 interface KeyCardProps
 {
@@ -52,8 +54,8 @@ const KeyCardComponent: React.FC<KeyCardProps> = ({
   const isAr = lang === "ar";
 
   const successRate = calculateSuccessRate(item.upvotes, item.downvotes);
-  const isVerified = successRate >= 75 && item.upvotes >= 2;
-  const isExpired = item.downvotes > item.upvotes + 3;
+  const status = getKeyStatus(item);
+  const isVerified = status === "verified";
   const hasVoted = Boolean(item.userVoted);
   const isUpvoted = item.userVoted === 'UP';
   const isDownvoted = item.userVoted === 'DOWN';
@@ -251,25 +253,7 @@ const KeyCardComponent: React.FC<KeyCardProps> = ({
       {/* Header: Badge & Time (Higher z-index so hover tooltip floats cleanly over key box) */}
       <div className="relative z-20 flex items-center justify-between gap-2 mb-3.5">
         <div className="flex items-center gap-1.5 flex-wrap">
-          {isExpired ? (
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium bg-rose-500/10 text-rose-700 dark:text-rose-300 border border-rose-500/20">
-              <AlertCircle className="w-3.5 h-3.5 text-rose-500 dark:text-rose-400 flex-shrink-0" />
-              <span className={isAr ? "font-arabic leading-none" : ""}>{t.keyCard.expired}</span>
-            </span>
-          ) : isVerified ? (
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30 ring-1 ring-gold-400/40 dark:ring-gold-400/35 shadow-[0_0_8px_rgba(245,158,11,0.12)]">
-              <ShieldCheck className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 flex-shrink-0" />
-              <span className={`inline-flex items-center gap-1 ${isAr ? "font-arabic leading-none" : ""}`}>
-                <span>{t.keyCard.verified}</span>
-                <span className="font-mono text-[11px] font-semibold leading-none opacity-90" dir="ltr">({successRate}%)</span>
-              </span>
-            </span>
-          ) : (
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-500/10 text-amber-800 dark:text-amber-300 border border-amber-500/20">
-              <Clock className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400 flex-shrink-0" />
-              <span className={isAr ? "font-arabic leading-none" : ""}>{t.keyCard.needsReview}</span>
-            </span>
-          )}
+          <StatusBadge status={status} lang={lang} />
 
           {isUsed && (
             <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-semibold bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-700/80 shadow-xs">

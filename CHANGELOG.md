@@ -6,6 +6,26 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ---
 
+## [2.8.0] - 2026-11-10
+
+### Added
+- **Single-Source Status Engine (`src/lib/keyStatus.ts`)**:
+  - Added `getKeyStatus(key)` returning `"expired" | "verified" | "likely" | "needs"` with shared named constants (`VERIFIED_MIN_UPVOTES = 2`, `VERIFIED_MIN_RATE = 75`, `EXPIRED_DOWNVOTE_MARGIN = 3`, `LIKELY_MIN_COPIES = 10`, `LIKELY_MAX_DOWNVOTE_RATIO = 0`).
+  - Introduced the **`Likely Working`** (`يُرجّح أنه يعمل`) tier for keys with high copy volume (`copies_count >= 10`) and clean dislike ratio before formal vote verification.
+- **4-Tier Status Badge Component (`src/components/StatusBadge.tsx`)**:
+  - Distinct color, typography weight, perimeter treatment, and `lucide-react` iconography (`ShieldCheck`, `TrendingUp`, `Clock`, `AlertTriangle`) engineered for instant scan hierarchy, grayscale clarity, and >= 4.5:1 WCAG contrast across light and dark themes.
+  - Identical `24px` (`h-6`) footprint and logical RTL/LTR padding across all states to eliminate layout shifts on status transitions.
+  - 250ms crossfade + scale on live status transitions, one-shot metallic glint on first `verified` render, and `prefers-reduced-motion` support (plain opacity fade only).
+- **Accessible Touch & Keyboard Tooltips (`src/components/Tooltip.tsx`)**:
+  - Added `toggleOnTap` and `wrap` modes so informational status tooltips work on mobile viewports via tap toggle, outside-tap dismiss, `Escape`, `3.5s` auto-dismiss, and keyboard `:focus-visible` navigation without obstructing Copy or vote controls.
+  - Dynamic bilingual status tooltip copy generated directly from `keyStatus.ts` thresholds (`translations.ts`).
+
+### Changed
+- **Unified Status Resolution (`KeyCard.tsx`, `page.tsx`)**:
+  - Replaced duplicated inline threshold checks in `KeyCard.tsx` and `page.tsx` (`Verified Working` tab filter) with `getKeyStatus(...)`.
+
+---
+
 ## [2.7.0] - 2026-11-10
 
 ### Added

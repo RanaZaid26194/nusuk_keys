@@ -41,6 +41,9 @@ A high-performance, modern progressive web application designed to help pilgrims
   - Daily Quranic Ayah banner rotating automatically with live API integration and verified offline fallback.
   - Platform-aware Ayah end marker engine (`۝`): precision composite centering on iOS WebKit while preserving native HarfBuzz ligatures on Desktop and Android.
   - Handcrafted **Nasta'liq** calligraphy style typography for Quranic Ayahs (*Surah Al-Ma'idah 5:2*) and Hadith (*Sahih Muslim 2699*), rendered with vertical breathing room.
+- **🔒 Strict Verification & 4-Tier Status Engine (`keyStatus.ts`)**:
+  - Unified status resolver categorizing keys into **Verified Active** (`2+` upvotes, `75%+` rating), **Likely Working** (`10+` copies, clean dislike ratio), **Needs Verification**, and **Expired / Inactive** (`downvotes > upvotes + 3`) across both `KeyCard` badges and the **Verified Working** filter.
+  - Distinct icons, border styles, and WCAG-verified palettes across light, dark, and grayscale views, paired with tap- and keyboard-accessible threshold tooltips.
 - **🛡️ Multi-Tier Security, Anti-Abuse & Moderation**:
   - Client & database level Regex sanitization: `^NG-[A-Za-z0-9_-]+$`.
   - Atomic RPC-Only Mutations: Direct `UPDATE` revoked from `anon`/`authenticated`; counters modify exclusively through hardened `SECURITY DEFINER` stored procedures (`cast_vote`, `increment_copy`).
@@ -205,6 +208,8 @@ nusuk_keys/
 │   │   ├── DailyAyah.tsx         # Daily rotating Quranic banner with live API & fallback
 │   │   ├── KeyGrid.tsx           # Search, filters, glass shimmer & card grid
 │   │   ├── KeyCard.tsx           # Interactive key card, copy action, up/down voting
+│   │   ├── StatusBadge.tsx       # 4-tier accessible status badge with dynamic tooltips
+│   │   ├── Tooltip.tsx           # Hover, focus, and touch-tap tooltip component
 │   │   ├── SubmitModal.tsx       # Share key dialog with live validation & haptics
 │   │   ├── InfoModal.tsx         # "Why Share?" modal with Nastaliq sacred quotes
 │   │   ├── NumberCounter.tsx     # Animated rolling counter for key totals
@@ -215,6 +220,7 @@ nusuk_keys/
 │   └── lib/
 │       ├── audio.ts              # Web Audio API procedural sound synthesizer
 │       ├── dailyAyah.ts          # Deterministic daily ayah resolver & cache
+│       ├── keyStatus.ts          # Single source of truth for key status & thresholds
 │       ├── safeStorage.ts        # Throw-resilient SSR-safe localStorage wrapper
 │       ├── security.ts           # Code sanitization, validation & rate limiting
 │       ├── supabase.ts           # Supabase client instantiation

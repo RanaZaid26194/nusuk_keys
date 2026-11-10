@@ -145,3 +145,16 @@ Arabic is a first-class citizen in Nusuk Keys:
 - **Robots & Sitemap**: Dynamically generated at `/robots.txt` and `/sitemap.xml`.
 - **AI Agent Context**: Provided at `/llms.txt` for clean consumption by LLMs and web agents.
 - **Social Metadata**: 1200×630 custom-crafted OpenGraph and Twitter cards rendered at `https://keys-nusuk.vercel.app/og-image.png`.
+
+---
+
+## 7. 🏷️ Key Status Classification & Badge System
+
+To prevent threshold drift between visual cards and list filters, classification logic lives exclusively in `src/lib/keyStatus.ts` (`getKeyStatus`):
+
+1. **`expired`**: `downvotes > upvotes + EXPIRED_DOWNVOTE_MARGIN` (`3`)
+2. **`verified`**: `successRate >= VERIFIED_MIN_RATE` (`75%`) and `upvotes >= VERIFIED_MIN_UPVOTES` (`2`)
+3. **`likely`**: `copies_count >= LIKELY_MIN_COPIES` (`10`) and `downvotes <= Math.floor(copies_count * LIKELY_MAX_DOWNVOTE_RATIO)` (`0`)
+4. **`needs`**: fallback state while awaiting community verification
+
+Both `KeyCard` (`StatusBadge.tsx`) and the **Verified Working** tab filter in `src/app/page.tsx` consume `getKeyStatus` directly. All four badge states maintain an identical `24px` (`h-6`) vertical footprint, non-color visual differentiation (fill weight, border style, and Lucide icon geometry), dynamic tooltips interpolating constants from `keyStatus.ts`, and reduced-motion fallbacks.
