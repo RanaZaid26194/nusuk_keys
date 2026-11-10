@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useRef, useEffect, useMemo } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useMotionValue, useSpring } from "framer-motion";
 import { Copy, Check, ExternalLink, ThumbsUp, ThumbsDown, Clock, ShieldCheck, AlertCircle, RotateCcw } from "lucide-react";
 import { ChallengeKey, Language } from "@/lib/types";
 import { translations } from "@/lib/translations";
@@ -39,7 +39,14 @@ const KeyCardComponent: React.FC<KeyCardProps> = ({
   const [openingNusuk, setOpeningNusuk] = useState(false);
   const cardRef = useRef<HTMLDivElement>(null);
   const spotlightRef = useRef<HTMLDivElement>(null);
+  const codeRef = useRef<HTMLDivElement>(null);
   const canHover = useCanHover();
+
+  const rawRotateX = useMotionValue(0);
+  const rawRotateY = useMotionValue(0);
+  const springConfig = { damping: 25, stiffness: 250 };
+  const rotateX = useSpring(rawRotateX, springConfig);
+  const rotateY = useSpring(rawRotateY, springConfig);
 
   const t = translations[lang];
   const isAr = lang === "ar";
@@ -86,7 +93,30 @@ const KeyCardComponent: React.FC<KeyCardProps> = ({
     }
   }, [item.created_at]);
 
-  // zero-react-rerender spotlight tracking and subtle 3D tilt (max 2deg)
+  // select code text when copy fails so long press works natively
+  useEffect(() =>
+  {
+    if (copyFailed && codeRef.current && typeof window !== "undefined")
+    {
+      try
+      {
+        const selection = window.getSelection();
+        if (selection)
+        {
+          const range = document.createRange();
+          range.selectNodeContents(codeRef.current);
+          selection.removeAllRanges();
+          selection.addRange(range);
+        }
+      }
+      catch
+      {
+        // selection error fallback
+      }
+    }
+  }, [copyFailed]);
+
+  // zero-react-rerender spotlight tracking and spring-driven 3D tilt (max 2deg)
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) =>
   {
     if (!cardRef.current || !spotlightRef.current)
@@ -98,19 +128,26 @@ const KeyCardComponent: React.FC<KeyCardProps> = ({
     spotlightRef.current.style.background = `radial-gradient(350px circle at ${x}px ${y}px, var(--spotlight-glow, rgba(16, 185, 129, 0.08)), transparent 80%)`;
 
     // subtle 3D tilt (max 2 degrees, desktop only)
-    const centerX = rect.width / 2;
-    const centerY = rect.height / 2;
-    const rotateX = Math.max(-2, Math.min(2, ((y - centerY) / centerY) * -2));
-    const rotateY = Math.max(-2, Math.min(2, ((x - centerX) / centerX) * 2));
-    cardRef.current.style.transform = `perspective(900px) rotateX(${rotateX.toFixed(2)}deg) rotateY(${rotateY.toFixed(2)}deg)`;
+    if (canHover)
+    {
+      const centerX = rect.width / 2;
+      const centerY = rect.height / 2;
+      const degX = Math.max(-2, Math.min(2, ((y - centerY) / centerY) * -2));
+      const degY = Math.max(-2, Math.min(2, ((x - centerX) / centerX) * 2));
+      rawRotateX.set(degX);
+      rawRotateY.set(degY);
+    }
   };
 
   const handleMouseLeave = () =>
   {
     if (spotlightRef.current)
       spotlightRef.current.style.opacity = "0";
-    if (cardRef.current)
-      cardRef.current.style.transform = "perspective(900px) rotateX(0deg) rotateY(0deg)";
+    if (canHover)
+    {
+      rawRotateX.set(0);
+      rawRotateY.set(0);
+    }
   };
 
   const handleCopy = async (e: React.MouseEvent) =>
@@ -193,6 +230,7 @@ const KeyCardComponent: React.FC<KeyCardProps> = ({
       whileHover={canHover ? { y: -4, scale: 1.008 } : undefined}
       whileTap={{ scale: 0.99 }}
       transition={{ duration: 0.16, ease: "easeOut" }}
+      style={canHover ? { rotateX, rotateY, transformPerspective: 900 } : undefined}
       className={`relative rounded-2xl bg-white dark:bg-zinc-900/70 p-4 sm:p-5 border transition-all duration-150 overflow-hidden shadow-xs hover:shadow-md dark:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.04)] dark:hover:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.07),0_8px_24px_-4px_rgba(0,0,0,0.5)] ${
         copied
           ? "border-emerald-500/80 ring-1 ring-emerald-500/40 shadow-[0_0_24px_rgba(16,185,129,0.18)]"
@@ -287,7 +325,9 @@ const KeyCardComponent: React.FC<KeyCardProps> = ({
         onClick={handleCopy}
         whileHover={{ scale: 1.01 }}
         whileTap={{ y: 1, scale: 0.995 }}
-        className={`relative z-10 flex items-center justify-between p-3 sm:p-3.5 rounded-xl border transition-all duration-150 cursor-pointer select-none mb-3.5 shadow-xs active:shadow-[inset_0_2px_4px_rgba(0,0,0,0.08)] dark:active:shadow-[inset_0_2px_4px_rgba(0,0,0,0.3)] overflow-hidden group ${
+        className={`relative z-10 flex items-center justify-between p-3 sm:p-3.5 rounded-xl border transition-all duration-150 mb-3.5 shadow-xs active:shadow-[inset_0_2px_4px_rgba(0,0,0,0.08)] dark:active:shadow-[inset_0_2px_4px_rgba(0,0,0,0.3)] overflow-hidden group ${
+          copyFailed ? "select-auto cursor-text" : "select-none cursor-pointer"
+        } ${
           copied
             ? "bg-emerald-500/10 dark:bg-emerald-500/15 border-emerald-500/60 ring-1 ring-emerald-500/30"
             : copyFailed
@@ -307,9 +347,12 @@ const KeyCardComponent: React.FC<KeyCardProps> = ({
         )}
 
         <motion.div
+          ref={codeRef}
           animate={copied ? { letterSpacing: ["0.08em", "0.14em", "0.08em"] } : {}}
           transition={{ duration: 0.16, ease: "easeOut" }}
-          className="relative z-10 font-mono text-sm sm:text-base md:text-lg font-bold tracking-wider sm:tracking-widest text-zinc-900 dark:text-zinc-100 group-hover:text-emerald-700 dark:group-hover:text-emerald-300 transition-colors truncate"
+          className={`relative z-10 font-mono text-sm sm:text-base md:text-lg font-bold tracking-wider sm:tracking-widest text-zinc-900 dark:text-zinc-100 group-hover:text-emerald-700 dark:group-hover:text-emerald-300 transition-colors truncate ${
+            copyFailed ? "select-text" : "select-none"
+          }`}
         >
           {renderHighlightedCode()}
         </motion.div>

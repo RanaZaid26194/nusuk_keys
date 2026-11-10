@@ -124,11 +124,6 @@ const HeroComponent: React.FC<HeroProps> = ({
           <div className="relative inline-flex items-center">
             <motion.button
               ref={buttonRef}
-              onPointerDown={(e) => {
-                if (e.pointerType === 'touch') {
-                  handleOpenSubmit();
-                }
-              }}
               onClick={handleOpenSubmit}
               onMouseMove={handleButtonMouseMove}
               onMouseLeave={handleButtonMouseLeave}
@@ -153,12 +148,6 @@ const HeroComponent: React.FC<HeroProps> = ({
                 dotColor="emerald"
               >
                 <motion.button
-                  onPointerDown={(e) => {
-                    if (e.pointerType === 'touch') {
-                      e.stopPropagation();
-                      handleOpenInfo();
-                    }
-                  }}
                   onClick={(e) => {
                     e.stopPropagation();
                     handleOpenInfo();

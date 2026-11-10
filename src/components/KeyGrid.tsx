@@ -165,8 +165,8 @@ const KeyGridComponent: React.FC<KeyGridProps> = ({
 
   return (
     <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-24">
-      {/* Sticky Filter Bar (Sticks below header once scrolled past hero) */}
-      <div className="sticky top-14 sm:top-[56px] z-30 -mx-4 sm:-mx-6 lg:-mx-8 px-4 sm:px-6 lg:px-8 py-3 bg-zinc-50/95 dark:bg-[#09090b]/95 backdrop-blur-md border-b border-zinc-200/50 dark:border-zinc-800/50 transition-colors shadow-xs mb-8">
+      {/* Sticky Filter Bar (Sticks cleanly below header once scrolled past hero, safe-area aware) */}
+      <div className="sticky top-[calc(env(safe-area-inset-top,0px)+53px)] sm:top-[calc(env(safe-area-inset-top,0px)+57px)] z-30 -mx-4 sm:-mx-6 lg:-mx-8 px-4 sm:px-6 lg:px-8 py-3 bg-zinc-50/95 dark:bg-[#09090b]/95 backdrop-blur-md border-b border-zinc-200/50 dark:border-zinc-800/50 transition-colors shadow-xs mb-8">
         <motion.div
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
@@ -607,9 +607,6 @@ const KeyGridComponent: React.FC<KeyGridProps> = ({
                   </motion.button>
                 )}
                 <motion.button
-                  onPointerDown={(e) => {
-                    if (e.pointerType === 'touch') onOpenSubmit();
-                  }}
                   onClick={onOpenSubmit}
                   whileHover={{ scale: 1.04 }}
                   whileTap={{ scale: 0.96 }}

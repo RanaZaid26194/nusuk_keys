@@ -1,4 +1,6 @@
 // theme management helper logic
+import { safeGet, safeSet } from "@/lib/safeStorage";
+
 export type ThemeMode = 'system' | 'light' | 'dark';
 export type ResolvedTheme = 'light' | 'dark';
 
@@ -15,19 +17,10 @@ export function getSystemTheme(): ResolvedTheme
 // read stored mode from localstorage
 export function getStoredThemeMode(): ThemeMode
 {
-  if (typeof window === 'undefined' || !window.localStorage)
-    return 'system';
-  try
-  {
-    const stored = window.localStorage.getItem(THEME_STORAGE_KEY) as ThemeMode | null;
-    if (stored === 'light' || stored === 'dark' || stored === 'system')
-      return stored;
-    return 'system';
-  }
-  catch
-  {
-    return 'system';
-  }
+  const stored = safeGet(THEME_STORAGE_KEY) as ThemeMode | null;
+  if (stored === 'light' || stored === 'dark' || stored === 'system')
+    return stored;
+  return 'system';
 }
 
 // resolve theme based on mode
@@ -61,17 +54,7 @@ export function applyTheme(resolved: ResolvedTheme): void
 // save user choice and update dom
 export function saveThemeMode(mode: ThemeMode): ResolvedTheme
 {
-  if (typeof window !== 'undefined' && window.localStorage)
-  {
-    try
-    {
-      window.localStorage.setItem(THEME_STORAGE_KEY, mode);
-    }
-    catch
-    {
-      // storage blocked or full
-    }
-  }
+  safeSet(THEME_STORAGE_KEY, mode);
   const resolved = resolveTheme(mode);
   applyTheme(resolved);
   return resolved;

@@ -1,5 +1,6 @@
 // daily ayah helper logic
 import rawLimits from '../data/ayahLimits.json';
+import { safeGet, safeSet } from '@/lib/safeStorage';
 
 export interface DailyAyahData
 {
@@ -121,9 +122,7 @@ export function readCachedAyah(): DailyAyahCache | null
 {
   try
   {
-    if (typeof window === 'undefined' || !window.localStorage)
-      return null;
-    const raw = window.localStorage.getItem(STORAGE_KEY);
+    const raw = safeGet(STORAGE_KEY);
     if (!raw)
       return null;
     const parsed = JSON.parse(raw) as DailyAyahCache;
@@ -140,16 +139,7 @@ export function readCachedAyah(): DailyAyahCache | null
 // safe localstorage writer
 export function writeCachedAyah(cache: DailyAyahCache): void
 {
-  try
-  {
-    if (typeof window === 'undefined' || !window.localStorage)
-      return;
-    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(cache));
-  }
-  catch
-  {
-    // localstorage full or blocked
-  }
+  safeSet(STORAGE_KEY, JSON.stringify(cache));
 }
 
 // fetch single candidate from api with strict verification

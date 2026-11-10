@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, KeyRound, CheckCircle2, AlertCircle, Send, HeartHandshake, Clipboard } from "lucide-react";
 import { Language } from "@/lib/types";
@@ -35,11 +35,11 @@ export const SubmitModal: React.FC<SubmitModalProps> = ({
     return () => window.removeEventListener("open-submit-modal", handleOpen);
   }, []);
 
-  const handleClose = () =>
+  const handleClose = useCallback(() =>
   {
     setInternalIsOpen(false);
     onClose?.();
-  };
+  }, [onClose]);
   const [code, setCode] = useState<string>(KEY_PREFIX);
   const [submitting, setSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -189,7 +189,7 @@ export const SubmitModal: React.FC<SubmitModalProps> = ({
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [isOpen, onClose]);
+  }, [isOpen, handleClose]);
 
   // sanitize user input, strip non-alphanumeric chars, preserve case, lock prefix
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) =>

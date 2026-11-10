@@ -1,4 +1,6 @@
 // local history helper for used keys
+import { safeGet, safeSet, safeRemove } from "@/lib/safeStorage";
+
 export const STORAGE_KEY_USED = "nusuk_used_keys_v1";
 export const MAX_USED_ENTRIES = 2000;
 
@@ -13,9 +15,7 @@ export function loadUsedKeys(): Record<string, number>
 {
   try
   {
-    if (typeof window === "undefined" || !window.localStorage)
-      return {};
-    const raw = window.localStorage.getItem(STORAGE_KEY_USED);
+    const raw = safeGet(STORAGE_KEY_USED);
     if (!raw)
       return {};
     const parsed = JSON.parse(raw);
@@ -34,9 +34,6 @@ export function saveUsedKeys(map: Record<string, number>): void
 {
   try
   {
-    if (typeof window === "undefined" || !window.localStorage)
-      return;
-
     const entries = Object.entries(map);
     let finalMap = map;
 
@@ -47,7 +44,7 @@ export function saveUsedKeys(map: Record<string, number>): void
       finalMap = Object.fromEntries(entries.slice(0, MAX_USED_ENTRIES));
     }
 
-    window.localStorage.setItem(STORAGE_KEY_USED, JSON.stringify(finalMap));
+    safeSet(STORAGE_KEY_USED, JSON.stringify(finalMap));
   }
   catch
   {
@@ -90,13 +87,5 @@ export function unmarkUsed(code: string): Record<string, number>
 // wipe all used history
 export function clearUsedKeys(): void
 {
-  try
-  {
-    if (typeof window !== "undefined" && window.localStorage)
-      window.localStorage.removeItem(STORAGE_KEY_USED);
-  }
-  catch
-  {
-    // storage disabled
-  }
+  safeRemove(STORAGE_KEY_USED);
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useMemo, useCallback } from "react";
+import React, { useState, useEffect, useMemo, useCallback, useRef } from "react";
 import { MotionConfig, motion } from "framer-motion";
 import { Plus } from "lucide-react";
 import { ChallengeKey, FilterTab, Language, Stats, SortOption } from "@/lib/types";
@@ -19,6 +19,7 @@ import { loadUsedKeys, markUsed, unmarkUsed, clearUsedKeys, normalizeCode, STORA
 import { isValidKey, normalizeNumerals } from "@/lib/keyFormat";
 import { translations } from "@/lib/translations";
 import { playHapticSound } from "@/lib/audio";
+import { safeGet, safeSet, safeRemove } from "@/lib/safeStorage";
 
 const LOCAL_STORAGE_KEYS = "nusuk_keys_data_v1";
 const LOCAL_STORAGE_CACHE = "nusuk_keys_cache_v2";
@@ -27,6 +28,25 @@ const LOCAL_STORAGE_LANG = "nusuk_keys_lang_v1";
 const LOCAL_STORAGE_COPY_COUNTED = "nusuk_copy_counted_v1";
 const COPY_COOLDOWN_MS = 24 * 60 * 60 * 1000; // 24h soft anti-spam cooldown
 const MAX_COPY_COUNTED_ENTRIES = 2000;
+const PENDING_ACTION_TTL_MS = 15000; // 15s safety ttl for in-flight rpc
+const HIDDEN_RELOAD_MIN_MS = 5 * 60 * 1000; // 5 mins away before re-fetching
+const LOAD_KEYS_THROTTLE_MS = 30 * 1000; // max once per 30s from visibility
+
+// keep the first occurrence of each id
+const dedupeById = <T extends { id: string }>(list: T[]): T[] =>
+{
+  const seen = new Set<string>();
+  const result: T[] = [];
+  for (let i = 0; i < list.length; i++)
+  {
+    const item = list[i];
+    if (!item?.id || seen.has(item.id))
+      continue;
+    seen.add(item.id);
+    result.push(item);
+  }
+  return result;
+};
 
 export default function Home()
 {
@@ -40,15 +60,40 @@ export default function Home()
   const [isMounted, setIsMounted] = useState(false);
   const [isLanguageFlipping, setIsLanguageFlipping] = useState(false);
 
-  const handleOpenSubmitModal = useCallback(() => {
-    if (typeof window !== "undefined") {
-      window.dispatchEvent(new CustomEvent("open-submit-modal"));
-    }
+  // in-flight action tracker and visibility reload timestamps
+  const pendingIdsRef = useRef<Set<string>>(new Set());
+  const hiddenAtRef = useRef<number | null>(null);
+  const lastLoadedAtRef = useRef<number>(0);
+  const keysRef = useRef<ChallengeKey[]>(keys);
+  const langTimer1Ref = useRef<NodeJS.Timeout | null>(null);
+  const langTimer2Ref = useRef<NodeJS.Timeout | null>(null);
+
+  useEffect(() =>
+  {
+    keysRef.current = keys;
+  }, [keys]);
+
+  useEffect(() =>
+  {
+    return () =>
+    {
+      if (langTimer1Ref.current)
+        clearTimeout(langTimer1Ref.current);
+      if (langTimer2Ref.current)
+        clearTimeout(langTimer2Ref.current);
+    };
   }, []);
-  const handleOpenInfoModal = useCallback(() => {
-    if (typeof window !== "undefined") {
+
+  const handleOpenSubmitModal = useCallback(() =>
+  {
+    if (typeof window !== "undefined")
+      window.dispatchEvent(new CustomEvent("open-submit-modal"));
+  }, []);
+
+  const handleOpenInfoModal = useCallback(() =>
+  {
+    if (typeof window !== "undefined")
       window.dispatchEvent(new CustomEvent("open-info-modal"));
-    }
   }, []);
 
   // local history for used keys
@@ -94,6 +139,221 @@ export default function Home()
     });
   }, [activeTab]);
 
+  // load user votes from localstorage
+  const getUserVotes = useCallback((): Record<string, "UP" | "DOWN"> =>
+  {
+    const saved = safeGet(LOCAL_STORAGE_VOTES);
+    if (!saved)
+      return {};
+    try
+    {
+      return JSON.parse(saved);
+    }
+    catch
+    {
+      return {};
+    }
+  }, []);
+
+  // merge incoming server keys into local state
+  const mergeIncoming = useCallback((prev: ChallengeKey[], incomingList: any[]) =>
+  {
+    const currentVotes = getUserVotes();
+    const incomingIds = new Set(incomingList.map((d: any) => d.id));
+    const localOnly = prev.filter(k => !incomingIds.has(k.id));
+    const prevMap = new Map(prev.map(p => [p.id, p]));
+
+    const merged = incomingList.map((d: any) =>
+    {
+      const existing = prevMap.get(d.id);
+      const isPending = pendingIdsRef.current.has(d.id);
+      return {
+        ...d,
+        userVoted: existing?.userVoted ?? currentVotes[d.id] ?? null,
+        copies_count: isPending && existing ? existing.copies_count : (d.copies_count ?? 0),
+        upvotes: isPending && existing ? existing.upvotes : (d.upvotes ?? 0),
+        downvotes: isPending && existing ? existing.downvotes : (d.downvotes ?? 0),
+      };
+    });
+
+    return dedupeById([...localOnly, ...merged]);
+  }, [getUserVotes]);
+
+  // Fetch initial keys with 4-stage progressive hydration
+  const loadKeys = useCallback(async () =>
+  {
+    lastLoadedAtRef.current = Date.now();
+    const userVotes = getUserVotes();
+
+    if (isSupabaseConfigured && supabase)
+    {
+      const client = supabase;
+      try
+      {
+        const STAGE_1_SIZE = 500;
+
+        // ⭐ STAGE 1: Ultra-fast initial chunk (<100ms, 0 - 499 keys)
+        const { data: stage1Data, count, error } = await client
+          .from("challenge_keys")
+          .select("*", { count: "exact" })
+          .eq("is_active", true)
+          .order("created_at", { ascending: false })
+          .order("id", { ascending: true })
+          .range(0, STAGE_1_SIZE - 1);
+
+        if (error)
+          console.error("Supabase loadKeys error:", error);
+        else if (stage1Data && stage1Data.length > 0)
+        {
+          const totalCount = count || stage1Data.length;
+
+          // Paint Stage 1 immediately in <100ms
+          setKeys((prev) =>
+          {
+            const merged = mergeIncoming(prev, stage1Data);
+            safeSet(LOCAL_STORAGE_CACHE, JSON.stringify(merged));
+            return merged;
+          });
+          setIsLoading(false);
+
+          // If database has more than 500 keys, progressively hydrate Stages 2, 3, and 4 quietly in background
+          if (totalCount > STAGE_1_SIZE)
+          {
+            const deferSync = async () =>
+            {
+              try
+              {
+                let accumulated: any[] = dedupeById([...stage1Data]);
+
+                // ⭐ STAGE 2 (Background Sync): Next 500 keys (500 - 999)
+                if (totalCount > 500)
+                {
+                  const { data: stage2Data } = await client
+                    .from("challenge_keys")
+                    .select("*")
+                    .eq("is_active", true)
+                    .order("created_at", { ascending: false })
+                    .order("id", { ascending: true })
+                    .range(500, Math.min(999, totalCount - 1));
+
+                  if (stage2Data && stage2Data.length > 0)
+                  {
+                    accumulated = dedupeById(accumulated.concat(stage2Data));
+                    setKeys((prev) => mergeIncoming(prev, accumulated));
+                  }
+                }
+
+                // Smooth delay between stages so UI remains responsive & rolling counter animates
+                await new Promise((r) => setTimeout(r, 350));
+
+                // ⭐ STAGE 3 (Background Sync): Next 500 keys (1,000 - 1,499)
+                if (totalCount > 1000)
+                {
+                  const { data: stage3Data } = await client
+                    .from("challenge_keys")
+                    .select("*")
+                    .eq("is_active", true)
+                    .order("created_at", { ascending: false })
+                    .order("id", { ascending: true })
+                    .range(1000, Math.min(1499, totalCount - 1));
+
+                  if (stage3Data && stage3Data.length > 0)
+                  {
+                    accumulated = dedupeById(accumulated.concat(stage3Data));
+                    setKeys((prev) => mergeIncoming(prev, accumulated));
+                  }
+                }
+
+                // Smooth delay between stages so UI remains responsive & rolling counter animates
+                await new Promise((r) => setTimeout(r, 450));
+
+                // ⭐ STAGE 4 (Background Sync): All remaining keys (1,500 -> totalCount) in parallel
+                if (totalCount > 1500)
+                {
+                  const remainingPromises = [];
+                  for (let from = 1500; from < totalCount; from += 1000)
+                  {
+                    const to = Math.min(from + 999, totalCount - 1);
+                    remainingPromises.push(
+                      client
+                        .from("challenge_keys")
+                        .select("*")
+                        .eq("is_active", true)
+                        .order("created_at", { ascending: false })
+                        .order("id", { ascending: true })
+                        .range(from, to)
+                    );
+                  }
+
+                  const remainingResults = await Promise.all(remainingPromises);
+                  for (const res of remainingResults)
+                  {
+                    if (res.data && res.data.length > 0)
+                      accumulated = accumulated.concat(res.data);
+                  }
+                  accumulated = dedupeById(accumulated);
+
+                  setKeys((prev) =>
+                  {
+                    const allMerged = mergeIncoming(prev, accumulated);
+                    if (!safeSet(LOCAL_STORAGE_CACHE, JSON.stringify(allMerged)))
+                      safeSet(LOCAL_STORAGE_CACHE, JSON.stringify(stage1Data));
+                    return allMerged;
+                  });
+                }
+              }
+              catch (e)
+              {
+                console.warn("Background hydration warning:", e);
+              }
+            };
+
+            // Defer background stages until initial render & critical paints complete
+            if (typeof window !== "undefined")
+            {
+              if ("requestIdleCallback" in window)
+              {
+                (window as any).requestIdleCallback(() =>
+                {
+                  setTimeout(deferSync, 600);
+                }, { timeout: 3000 });
+              }
+              else
+                setTimeout(deferSync, 1200);
+            }
+          }
+          return;
+        }
+      }
+      catch (err)
+      {
+        console.warn("Supabase fetch failed, falling back to local store:", err);
+      }
+    }
+
+    // local / offline fallback
+    const saved = safeGet(LOCAL_STORAGE_CACHE) || safeGet(LOCAL_STORAGE_KEYS);
+    if (saved)
+    {
+      try
+      {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed))
+        {
+          const mapped = parsed.map((k: any) => ({ ...k, userVoted: userVotes[k?.id] || null }));
+          setKeys(dedupeById(mapped));
+          setIsLoading(false);
+          return;
+        }
+      }
+      catch {}
+    }
+
+    // Default seed
+    setKeys(dedupeById(INITIAL_DEMO_KEYS.map(k => ({ ...k, userVoted: userVotes[k.id] || null }))));
+    setIsLoading(false);
+  }, [getUserVotes, mergeIncoming]);
+
   // load used keys after mount & attach tab sync listeners
   useEffect(() =>
   {
@@ -118,10 +378,28 @@ export default function Home()
 
     const handleVisibility = () =>
     {
+      if (document.visibilityState === "hidden")
+      {
+        hiddenAtRef.current = Date.now();
+        return;
+      }
+
       if (document.visibilityState === "visible")
       {
         refreshUsedSnapshot();
-        loadKeys();
+
+        const now = Date.now();
+        const hiddenAt = hiddenAtRef.current;
+        hiddenAtRef.current = null;
+
+        const wasHiddenLongEnough = hiddenAt !== null && now - hiddenAt >= HIDDEN_RELOAD_MIN_MS;
+        const isThrottled = now - lastLoadedAtRef.current < LOAD_KEYS_THROTTLE_MS;
+
+        if (wasHiddenLongEnough && !isThrottled)
+        {
+          lastLoadedAtRef.current = now;
+          loadKeys();
+        }
       }
     };
 
@@ -135,7 +413,7 @@ export default function Home()
       window.removeEventListener("focus", handleFocus);
       document.removeEventListener("visibilitychange", handleVisibility);
     };
-  }, [refreshUsedSnapshot]);
+  }, [refreshUsedSnapshot, loadKeys]);
 
   // handle tab change with snapshot refresh
   const handleTabChange = (tab: FilterTab) =>
@@ -153,22 +431,22 @@ export default function Home()
   {
     setIsMounted(true);
 
-    try
+    const cached = safeGet(LOCAL_STORAGE_CACHE);
+    if (cached)
     {
-      const cached = localStorage.getItem(LOCAL_STORAGE_CACHE);
-      if (cached)
+      try
       {
         const parsed = JSON.parse(cached);
         if (Array.isArray(parsed) && parsed.length > 0)
         {
-          setKeys(parsed);
+          setKeys(dedupeById(parsed));
           setIsLoading(false);
         }
       }
+      catch {}
     }
-    catch {}
 
-    const savedLang = localStorage.getItem(LOCAL_STORAGE_LANG) as Language | null;
+    const savedLang = safeGet(LOCAL_STORAGE_LANG) as Language | null;
     if (savedLang === "en" || savedLang === "ar")
     {
       setLang(savedLang);
@@ -189,241 +467,40 @@ export default function Home()
       return;
 
     setIsLanguageFlipping(true);
-    setTimeout(() =>
-    {
-      setLang(newLang);
-      localStorage.setItem(LOCAL_STORAGE_LANG, newLang);
-      document.documentElement.setAttribute("dir", newLang === "ar" ? "rtl" : "ltr");
-      document.documentElement.setAttribute("lang", newLang);
+    if (langTimer1Ref.current)
+      clearTimeout(langTimer1Ref.current);
+    if (langTimer2Ref.current)
+      clearTimeout(langTimer2Ref.current);
 
-      setTimeout(() =>
+    langTimer1Ref.current = setTimeout(() =>
+    {
+      try
       {
-        setIsLanguageFlipping(false);
-      }, 50);
+        setLang(newLang);
+        safeSet(LOCAL_STORAGE_LANG, newLang);
+        if (typeof document !== "undefined")
+        {
+          document.documentElement.setAttribute("dir", newLang === "ar" ? "rtl" : "ltr");
+          document.documentElement.setAttribute("lang", newLang);
+        }
+      }
+      finally
+      {
+        langTimer2Ref.current = setTimeout(() =>
+        {
+          setIsLanguageFlipping(false);
+        }, 50);
+      }
     }, 150);
   };
 
-  // Load user votes map from localStorage
-  const getUserVotes = useCallback((): Record<string, 'UP' | 'DOWN'> => {
-    try {
-      const saved = localStorage.getItem(LOCAL_STORAGE_VOTES);
-      return saved ? JSON.parse(saved) : {};
-    } catch {
-      return {};
-    }
-  }, []);
-
-  // Fetch initial keys with 4-stage progressive hydration
-  const loadKeys = useCallback(async () => {
-    const userVotes = getUserVotes();
-
-    if (isSupabaseConfigured && supabase) {
-      const client = supabase;
-      try {
-        const STAGE_1_SIZE = 500;
-
-        // ⭐ STAGE 1: Ultra-fast initial chunk (<100ms, 0 - 499 keys)
-        const { data: stage1Data, count, error } = await client
-          .from("challenge_keys")
-          .select("*", { count: "exact" })
-          .eq("is_active", true)
-          .order("created_at", { ascending: false })
-          .range(0, STAGE_1_SIZE - 1);
-
-        if (error) {
-          console.error("Supabase loadKeys error:", error);
-        } else if (stage1Data && stage1Data.length > 0) {
-          const totalCount = count || stage1Data.length;
-
-          // Paint Stage 1 immediately in <100ms
-          const stage1Mapped: ChallengeKey[] = stage1Data.map((d: any) => ({
-            ...d,
-            userVoted: userVotes[d.id] || null,
-          }));
-
-          setKeys((prev) => {
-            if (prev.length > stage1Mapped.length) {
-              const existingIds = new Set(stage1Mapped.map(k => k.id));
-              const remainingOld = prev.filter(k => !existingIds.has(k.id));
-              return [...stage1Mapped, ...remainingOld];
-            }
-            return stage1Mapped;
-          });
-          setIsLoading(false);
-
-          // Save Stage 1 to local cache immediately
-          try {
-            localStorage.setItem(LOCAL_STORAGE_CACHE, JSON.stringify(stage1Mapped));
-          } catch {}
-
-          // If database has more than 500 keys, progressively hydrate Stages 2, 3, and 4 quietly in background
-          if (totalCount > STAGE_1_SIZE) {
-            const deferSync = async () =>
-            {
-              try
-              {
-                let accumulated: any[] = [...stage1Data];
-
-                // safe merge helper to prevent overwriting optimistic votes or newly submitted keys
-                const mergeIncoming = (prev: ChallengeKey[], incomingList: any[]) =>
-                {
-                  const currentVotes = getUserVotes();
-                  const incomingIds = new Set(incomingList.map((d: any) => d.id));
-                  const localOnly = prev.filter(k => !incomingIds.has(k.id));
-                  const prevMap = new Map(prev.map(p => [p.id, p]));
-
-                  const merged = incomingList.map((d: any) =>
-                  {
-                    const existing = prevMap.get(d.id);
-                    return {
-                      ...d,
-                      userVoted: existing?.userVoted ?? currentVotes[d.id] ?? null,
-                      copies_count: Math.max(d.copies_count || 0, existing?.copies_count || 0),
-                      upvotes: Math.max(d.upvotes || 0, existing?.upvotes || 0),
-                      downvotes: Math.max(d.downvotes || 0, existing?.downvotes || 0),
-                    };
-                  });
-
-                  return [...localOnly, ...merged];
-                };
-
-                // ⭐ STAGE 2 (Background Sync): Next 500 keys (500 - 999)
-                if (totalCount > 500)
-                {
-                  const { data: stage2Data } = await client
-                    .from("challenge_keys")
-                    .select("*")
-                    .eq("is_active", true)
-                    .order("created_at", { ascending: false })
-                    .range(500, Math.min(999, totalCount - 1));
-
-                  if (stage2Data && stage2Data.length > 0)
-                  {
-                    accumulated = accumulated.concat(stage2Data);
-                    setKeys((prev) => mergeIncoming(prev, accumulated));
-                  }
-                }
-
-                // Smooth delay between stages so UI remains responsive & rolling counter animates
-                await new Promise((r) => setTimeout(r, 350));
-
-                // ⭐ STAGE 3 (Background Sync): Next 500 keys (1,000 - 1,499)
-                if (totalCount > 1000)
-                {
-                  const { data: stage3Data } = await client
-                    .from("challenge_keys")
-                    .select("*")
-                    .eq("is_active", true)
-                    .order("created_at", { ascending: false })
-                    .range(1000, Math.min(1499, totalCount - 1));
-
-                  if (stage3Data && stage3Data.length > 0)
-                  {
-                    accumulated = accumulated.concat(stage3Data);
-                    setKeys((prev) => mergeIncoming(prev, accumulated));
-                  }
-                }
-
-                // Smooth delay between stages so UI remains responsive & rolling counter animates
-                await new Promise((r) => setTimeout(r, 450));
-
-                // ⭐ STAGE 4 (Background Sync): All remaining keys (1,500 -> totalCount) in parallel
-                if (totalCount > 1500)
-                {
-                  const remainingPromises = [];
-                  for (let from = 1500; from < totalCount; from += 1000)
-                  {
-                    const to = Math.min(from + 999, totalCount - 1);
-                    remainingPromises.push(
-                      client
-                        .from("challenge_keys")
-                        .select("*")
-                        .eq("is_active", true)
-                        .order("created_at", { ascending: false })
-                        .range(from, to)
-                    );
-                  }
-
-                  const remainingResults = await Promise.all(remainingPromises);
-                  for (const res of remainingResults)
-                  {
-                    if (res.data && res.data.length > 0)
-                      accumulated = accumulated.concat(res.data);
-                  }
-
-                  setKeys((prev) =>
-                  {
-                    const allMerged = mergeIncoming(prev, accumulated);
-                    try
-                    {
-                      localStorage.setItem(LOCAL_STORAGE_CACHE, JSON.stringify(allMerged));
-                    }
-                    catch
-                    {
-                      try
-                      {
-                        localStorage.setItem(LOCAL_STORAGE_CACHE, JSON.stringify(stage1Data));
-                      }
-                      catch {}
-                    }
-                    return allMerged;
-                  });
-                }
-              }
-              catch (e)
-              {
-                console.warn("Background hydration warning:", e);
-              }
-            };
-
-            // Defer background stages until initial render & critical paints complete
-            if (typeof window !== "undefined") {
-              if ("requestIdleCallback" in window) {
-                (window as any).requestIdleCallback(() => {
-                  setTimeout(deferSync, 600);
-                }, { timeout: 3000 });
-              } else {
-                setTimeout(deferSync, 1200);
-              }
-            }
-          }
-          return;
-        }
-      } catch (err) {
-        console.warn("Supabase fetch failed, falling back to local store:", err);
-      }
-    }
-
-    // local / offline fallback
-    try
-    {
-      const saved = localStorage.getItem(LOCAL_STORAGE_CACHE) || localStorage.getItem(LOCAL_STORAGE_KEYS);
-      if (saved)
-      {
-        const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed))
-        {
-          setKeys(parsed.map((k: any) => ({ ...k, userVoted: userVotes[k?.id] || null })));
-          setIsLoading(false);
-          return;
-        }
-      }
-    }
-    catch
-    {
-      // ignore
-    }
-
-    // Default seed
-    setKeys(INITIAL_DEMO_KEYS.map(k => ({ ...k, userVoted: userVotes[k.id] || null })));
-    setIsLoading(false);
-  }, [getUserVotes]);
-
-  useEffect(() => {
+  useEffect(() =>
+  {
     loadKeys();
 
     // Supabase Realtime Subscription if configured
-    if (isSupabaseConfigured && supabase) {
+    if (isSupabaseConfigured && supabase)
+    {
       const client = supabase;
       let throttleTimer: NodeJS.Timeout | null = null;
 
@@ -432,13 +509,30 @@ export default function Home()
         .on(
           "postgres_changes",
           { event: "*", schema: "public", table: "challenge_keys" },
-          (payload: any) => {
+          (payload: any) =>
+          {
             // Direct in-place update for individual row edits (votes/copies)
-            if (payload?.eventType === "UPDATE" && payload?.new?.id) {
-              setKeys((prev) => {
+            if (payload?.eventType === "UPDATE" && payload?.new?.id)
+            {
+              setKeys((prev) =>
+              {
                 const currentVotes = getUserVotes();
-                return prev.map((k) => {
-                  if (k.id === payload.new.id) {
+                const isPending = pendingIdsRef.current.has(payload.new.id);
+                return prev.map((k) =>
+                {
+                  if (k.id === payload.new.id)
+                  {
+                    if (isPending)
+                    {
+                      return {
+                        ...k,
+                        ...payload.new,
+                        copies_count: k.copies_count,
+                        upvotes: k.upvotes,
+                        downvotes: k.downvotes,
+                        userVoted: k.userVoted ?? currentVotes[k.id] ?? null,
+                      };
+                    }
                     return {
                       ...k,
                       ...payload.new,
@@ -452,8 +546,10 @@ export default function Home()
             }
 
             // For INSERT/DELETE, throttle loadKeys to avoid network waterfalls
-            if (!throttleTimer) {
-              throttleTimer = setTimeout(() => {
+            if (!throttleTimer)
+            {
+              throttleTimer = setTimeout(() =>
+              {
                 throttleTimer = null;
                 loadKeys();
               }, 2500);
@@ -462,7 +558,8 @@ export default function Home()
         )
         .subscribe();
 
-      return () => {
+      return () =>
+      {
         if (throttleTimer)
           clearTimeout(throttleTimer);
         client.removeChannel(channel);
@@ -470,15 +567,11 @@ export default function Home()
     }
   }, [loadKeys, getUserVotes]);
 
-  // Save to localStorage when in offline mode
-  const persistOfflineKeys = (updated: ChallengeKey[]) => {
-    if (!isSupabaseConfigured) {
-      try {
-        localStorage.setItem(LOCAL_STORAGE_KEYS, JSON.stringify(updated));
-      } catch (e) {
-        console.error("Failed to persist keys locally", e);
-      }
-    }
+  // save to localstorage when offline
+  const persistOfflineKeys = (updated: ChallengeKey[]) =>
+  {
+    if (!isSupabaseConfigured)
+      safeSet(LOCAL_STORAGE_KEYS, JSON.stringify(updated));
   };
 
   // Upvote / Downvote Handler with optimistic update and rollback on failure
@@ -489,12 +582,12 @@ export default function Home()
       return; // Already voted
 
     userVotes[keyId] = type;
-    localStorage.setItem(LOCAL_STORAGE_VOTES, JSON.stringify(userVotes));
+    safeSet(LOCAL_STORAGE_VOTES, JSON.stringify(userVotes));
 
     let votedCode = codeParam || "";
     if (!votedCode)
     {
-      const found = keys.find(k => k.id === keyId);
+      const found = keysRef.current.find(k => k.id === keyId);
       if (found?.code)
         votedCode = found.code;
     }
@@ -504,6 +597,13 @@ export default function Home()
       const nextUsed = markUsed(votedCode);
       setUsedMap(nextUsed);
     }
+
+    // track action in flight with 15s safety ttl
+    pendingIdsRef.current.add(keyId);
+    const pendingTimer = setTimeout(() =>
+    {
+      pendingIdsRef.current.delete(keyId);
+    }, PENDING_ACTION_TTL_MS);
 
     // Optimistic UI update
     setKeys((prevKeys) =>
@@ -532,7 +632,7 @@ export default function Home()
     {
       const rollbackVotes = getUserVotes();
       delete rollbackVotes[keyId];
-      localStorage.setItem(LOCAL_STORAGE_VOTES, JSON.stringify(rollbackVotes));
+      safeSet(LOCAL_STORAGE_VOTES, JSON.stringify(rollbackVotes));
       setKeys((prevKeys) =>
       {
         const rolled = prevKeys.map((k) =>
@@ -574,8 +674,18 @@ export default function Home()
         console.error("Supabase cast_vote exception:", err);
         rollbackVote();
       }
+      finally
+      {
+        clearTimeout(pendingTimer);
+        pendingIdsRef.current.delete(keyId);
+      }
     }
-  }, [getUserVotes, keys]);
+    else
+    {
+      clearTimeout(pendingTimer);
+      pendingIdsRef.current.delete(keyId);
+    }
+  }, [getUserVotes]);
 
   // Copy Count Increment with Soft Anti-Spam
   const handleCopy = useCallback(async (keyId: string, codeParam?: string) =>
@@ -583,7 +693,7 @@ export default function Home()
     let targetCode = codeParam || "";
     if (!targetCode)
     {
-      const found = keys.find(k => k.id === keyId);
+      const found = keysRef.current.find(k => k.id === keyId);
       if (found?.code)
         targetCode = found.code;
     }
@@ -601,7 +711,7 @@ export default function Home()
     {
       try
       {
-        const raw = localStorage.getItem(LOCAL_STORAGE_COPY_COUNTED);
+        const raw = safeGet(LOCAL_STORAGE_COPY_COUNTED);
         const map: Record<string, number> = raw ? JSON.parse(raw) : {};
         const lastCounted = map[cleanCode];
         const now = Date.now();
@@ -618,7 +728,7 @@ export default function Home()
             entries.sort((a, b) => b[1] - a[1]);
             finalMap = Object.fromEntries(entries.slice(0, MAX_COPY_COUNTED_ENTRIES));
           }
-          localStorage.setItem(LOCAL_STORAGE_COPY_COUNTED, JSON.stringify(finalMap));
+          safeSet(LOCAL_STORAGE_COPY_COUNTED, JSON.stringify(finalMap));
         }
       }
       catch
@@ -629,6 +739,13 @@ export default function Home()
 
     if (!shouldCount)
       return;
+
+    // track copy in flight with 15s safety ttl
+    pendingIdsRef.current.add(keyId);
+    const copyTimer = setTimeout(() =>
+    {
+      pendingIdsRef.current.delete(keyId);
+    }, PENDING_ACTION_TTL_MS);
 
     // Optimistic UI update
     setKeys((prevKeys) =>
@@ -659,6 +776,16 @@ export default function Home()
       {
         console.error("Supabase increment_copy exception:", err);
       }
+      finally
+      {
+        clearTimeout(copyTimer);
+        pendingIdsRef.current.delete(keyId);
+      }
+    }
+    else
+    {
+      clearTimeout(copyTimer);
+      pendingIdsRef.current.delete(keyId);
     }
   }, []);
 
@@ -704,7 +831,7 @@ export default function Home()
       };
 
     // 1. Instant local duplicate rejection (case-insensitive)
-    const isLocalDuplicate = keys.some(k => Boolean(k?.code && k.code.trim().toUpperCase() === cleanCode.toUpperCase()));
+    const isLocalDuplicate = keysRef.current.some(k => Boolean(k?.code && k.code.trim().toUpperCase() === cleanCode.toUpperCase()));
     if (isLocalDuplicate)
       return {
         success: false,
@@ -785,7 +912,7 @@ export default function Home()
 
         const userVotes = getUserVotes();
         userVotes[newKey.id] = 'UP';
-        localStorage.setItem(LOCAL_STORAGE_VOTES, JSON.stringify(userVotes));
+        safeSet(LOCAL_STORAGE_VOTES, JSON.stringify(userVotes));
 
         return { success: true };
       }
@@ -821,7 +948,7 @@ export default function Home()
 
     const userVotes = getUserVotes();
     userVotes[newKey.id] = 'UP';
-    localStorage.setItem(LOCAL_STORAGE_VOTES, JSON.stringify(userVotes));
+    safeSet(LOCAL_STORAGE_VOTES, JSON.stringify(userVotes));
 
     return { success: true };
   };
@@ -981,13 +1108,8 @@ export default function Home()
         <div className="fixed bottom-5 right-4 rtl:right-auto rtl:left-4 z-40 sm:hidden pb-[env(safe-area-inset-bottom)]">
           <motion.button
             type="button"
-            onPointerDown={(e) => {
-              if (e.pointerType === 'touch') {
-                handleOpenSubmitModal();
-                playHapticSound('click');
-              }
-            }}
-            onClick={() => {
+            onClick={() =>
+            {
               handleOpenSubmitModal();
               playHapticSound('click');
             }}

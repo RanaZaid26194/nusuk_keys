@@ -64,6 +64,12 @@ const FooterComponent: React.FC<FooterProps> = ({ lang }) =>
   {
     e.preventDefault();
     playHapticSound('click');
+    if (cooldown > 0)
+    {
+      setShowWarning(true);
+      setTimeout(() => setShowWarning(false), 3000);
+      return;
+    }
     if (typeof window !== "undefined")
     {
       window.dispatchEvent(new CustomEvent("open-report-modal"));
@@ -114,11 +120,6 @@ const FooterComponent: React.FC<FooterProps> = ({ lang }) =>
               >
                 <button
                   type="button"
-                  onPointerDown={(e) => {
-                    if (e.pointerType === 'touch') {
-                      handleReportClick(e);
-                    }
-                  }}
                   onClick={handleReportClick}
                   className={`group flex items-center gap-1 text-xs transition-colors cursor-pointer ${
                     cooldown > 0
@@ -136,13 +137,13 @@ const FooterComponent: React.FC<FooterProps> = ({ lang }) =>
                 </button>
               </Tooltip>
 
-              {/* Toast warning on attempted spam/rate-limit hit - viewport safe, no screen overflow */}
+              {/* Toast warning on attempted spam/rate-limit hit - viewport safe floating toast, 100% immune to screen edge clipping */}
               {showWarning && (
                 <div
                   role="alert"
-                  className="absolute bottom-full mb-2 right-0 sm:left-1/2 sm:-translate-x-1/2 rtl:left-0 rtl:right-auto sm:rtl:left-1/2 sm:rtl:-translate-x-1/2 z-30 px-3 py-1.5 text-[11px] font-medium rounded-lg bg-zinc-900 dark:bg-zinc-800 text-amber-300 border border-amber-500/40 shadow-xl max-w-[calc(100vw-2rem)] w-max max-w-xs text-center animate-in fade-in slide-in-from-bottom-1"
+                  className="fixed bottom-24 left-1/2 -translate-x-1/2 z-50 px-4 py-2 text-xs font-medium rounded-xl bg-zinc-900/95 dark:bg-zinc-800/95 text-amber-300 border border-amber-500/40 shadow-2xl backdrop-blur-md max-w-[calc(100vw-2rem)] w-max text-center pointer-events-none animate-in fade-in slide-in-from-bottom-2"
                 >
-                  {t.footer.reportCooldown?.replace("{s}", cooldown.toString()) || `Wait ${cooldown}s (anti-spam)`}
+                  {t.footer.reportCooldown?.replace("{s}", cooldown.toString()) || `Wait ${cooldown}s before reporting another key.`}
                 </div>
               )}
             </div>

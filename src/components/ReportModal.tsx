@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Flag, Mail, Copy, Check, AlertCircle, Clock, ShieldAlert } from "lucide-react";
 import { Language } from "@/lib/types";
@@ -50,10 +50,10 @@ export const ReportModal: React.FC<ReportModalProps> = ({
     return () => window.removeEventListener("open-report-modal", handleOpen);
   }, []);
 
-  const handleClose = () => {
+  const handleClose = useCallback(() => {
     setInternalIsOpen(false);
     onClose?.();
-  };
+  }, [onClose]);
 
   // Sync rate limit cooldown
   useEffect(() => {
@@ -136,7 +136,7 @@ export const ReportModal: React.FC<ReportModalProps> = ({
       window.addEventListener("keydown", handleKeyDown);
     }
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [isOpen]);
+  }, [isOpen, handleClose]);
 
   const supportEmail = "ranazaide288@gmail.com";
 

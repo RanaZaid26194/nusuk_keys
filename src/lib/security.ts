@@ -1,4 +1,5 @@
 // Client & server-side rate limiting and input sanitization helpers
+import { safeGet, safeSet } from "@/lib/safeStorage";
 
 const RATE_LIMIT_KEY = "nusuk_submit_timestamps_v1";
 const MAX_SUBMISSIONS_PER_WINDOW = 3;
@@ -42,11 +43,9 @@ export function sanitizeAndValidateCode(rawInput: string): ValidationResult {
 
 // Check local rate limits
 export function checkSubmissionRateLimit(): { allowed: boolean; waitSeconds?: number } {
-  if (typeof window === "undefined") return { allowed: true };
-
   try {
     const now = Date.now();
-    const stored = localStorage.getItem(RATE_LIMIT_KEY);
+    const stored = safeGet(RATE_LIMIT_KEY);
     const timestamps: number[] = stored ? JSON.parse(stored) : [];
 
     // Filter out timestamps older than the window
@@ -77,14 +76,12 @@ export function checkSubmissionRateLimit(): { allowed: boolean; waitSeconds?: nu
 
 // Record a successful submission for rate limiting
 export function recordSubmissionRateLimit() {
-  if (typeof window === "undefined") return;
-
   try {
     const now = Date.now();
-    const stored = localStorage.getItem(RATE_LIMIT_KEY);
+    const stored = safeGet(RATE_LIMIT_KEY);
     const timestamps: number[] = stored ? JSON.parse(stored) : [];
     const updated = [...timestamps.filter(t => now - t < WINDOW_DURATION_MS), now];
-    localStorage.setItem(RATE_LIMIT_KEY, JSON.stringify(updated));
+    safeSet(RATE_LIMIT_KEY, JSON.stringify(updated));
   } catch {
     // Ignore storage issues
   }
@@ -97,11 +94,9 @@ const REPORT_WINDOW_DURATION_MS = 5 * 60 * 1000; // 5 minutes
 const REPORT_COOLDOWN_MS = 30 * 1000; // 30 seconds cooldown between reports
 
 export function checkReportRateLimit(): { allowed: boolean; waitSeconds?: number } {
-  if (typeof window === "undefined") return { allowed: true };
-
   try {
     const now = Date.now();
-    const stored = localStorage.getItem(REPORT_RATE_LIMIT_KEY);
+    const stored = safeGet(REPORT_RATE_LIMIT_KEY);
     const timestamps: number[] = stored ? JSON.parse(stored) : [];
 
     const activeTimestamps = timestamps.filter(t => now - t < REPORT_WINDOW_DURATION_MS);
@@ -128,14 +123,12 @@ export function checkReportRateLimit(): { allowed: boolean; waitSeconds?: number
 }
 
 export function recordReportRateLimit() {
-  if (typeof window === "undefined") return;
-
   try {
     const now = Date.now();
-    const stored = localStorage.getItem(REPORT_RATE_LIMIT_KEY);
+    const stored = safeGet(REPORT_RATE_LIMIT_KEY);
     const timestamps: number[] = stored ? JSON.parse(stored) : [];
     const updated = [...timestamps.filter(t => now - t < REPORT_WINDOW_DURATION_MS), now];
-    localStorage.setItem(REPORT_RATE_LIMIT_KEY, JSON.stringify(updated));
+    safeSet(REPORT_RATE_LIMIT_KEY, JSON.stringify(updated));
   } catch {
     // Ignore storage issues
   }

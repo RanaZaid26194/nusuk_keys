@@ -21,37 +21,45 @@ const HeaderComponent: React.FC<HeaderProps> = ({
   onLanguageChange,
   onOpenSubmit,
   onOpenInfo,
-}) => {
+}) =>
+{
   const [scrolled, setScrolled] = React.useState(false);
   const t = translations[lang];
 
-  React.useEffect(() => {
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 15);
+  // listen to page scroll for compact header on both desktop and mobile
+  React.useEffect(() =>
+  {
+    const handleScroll = () =>
+    {
+      const y = window.scrollY || document.documentElement.scrollTop || document.body.scrollTop || 0;
+      setScrolled(y > 8);
     };
     handleScroll();
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  const handleLang = (newLang: Language) => {
+  const handleLang = (newLang: Language) =>
+  {
     playHapticSound('click');
     onLanguageChange(newLang);
   };
 
-  const handleOpenSubmit = () => {
+  const handleOpenSubmit = () =>
+  {
     onOpenSubmit();
     playHapticSound('click');
   };
 
-  const handleOpenInfo = () => {
+  const handleOpenInfo = () =>
+  {
     onOpenInfo();
     playHapticSound('click');
   };
 
   return (
-    <header className={`sticky top-0 z-40 w-full transition-all duration-300 ${scrolled ? 'bg-white/95 dark:bg-zinc-950/95 backdrop-blur-xl border-b border-zinc-200/90 dark:border-zinc-800/90 shadow-sm shadow-zinc-950/5 dark:shadow-black/40' : 'bg-white/80 dark:bg-zinc-950/80 backdrop-blur-md border-b border-zinc-200/40 dark:border-zinc-800/40'}`}>
-      <div className={`max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between transition-all duration-300 ${scrolled ? 'h-14 sm:h-[56px]' : 'h-16 sm:h-[72px]'}`}>
+    <header className={`sticky top-0 z-40 w-full transition-all duration-300 pt-[env(safe-area-inset-top,0px)] ${scrolled ? 'bg-white/95 dark:bg-zinc-950/95 backdrop-blur-xl border-b border-zinc-200/90 dark:border-zinc-800/90 shadow-md shadow-zinc-950/5 dark:shadow-black/50' : 'bg-white/80 dark:bg-zinc-950/80 backdrop-blur-md border-b border-zinc-200/40 dark:border-zinc-800/40'}`}>
+      <div className={`max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between transition-all duration-300 ${scrolled ? 'h-[52px] sm:h-[56px]' : 'h-16 sm:h-[72px]'}`}>
         {/* Brand / Logo */}
         <motion.div
           initial={{ opacity: 0, x: -10 }}
@@ -133,11 +141,6 @@ const HeaderComponent: React.FC<HeaderProps> = ({
           {/* Share Your Key Button with Apple-style corner (i) button */}
           <div className="relative inline-flex items-center">
             <motion.button
-              onPointerDown={(e) => {
-                if (e.pointerType === 'touch') {
-                  handleOpenSubmit();
-                }
-              }}
               onClick={handleOpenSubmit}
               whileHover={{ scale: 1.03, y: -0.5 }}
               whileTap={{ scale: 0.96 }}
@@ -158,12 +161,6 @@ const HeaderComponent: React.FC<HeaderProps> = ({
                 dotColor="emerald"
               >
                 <motion.button
-                  onPointerDown={(e) => {
-                    if (e.pointerType === 'touch') {
-                      e.stopPropagation();
-                      handleOpenInfo();
-                    }
-                  }}
                   onClick={(e) => {
                     e.stopPropagation();
                     handleOpenInfo();

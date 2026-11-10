@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { AlertTriangle, RefreshCw, Home, ShieldAlert } from "lucide-react";
 import { playHapticSound } from "@/lib/audio";
+import { safeGet } from "@/lib/safeStorage";
 
 interface ErrorProps
 {
@@ -19,16 +20,9 @@ export default function ErrorBoundary({ error, reset }: ErrorProps)
   useEffect(() =>
   {
     // read stored language preference on mount safely
-    try
-    {
-      const savedLang = localStorage.getItem("nusuk_keys_lang_v1") || localStorage.getItem("nusuk_lang");
-      if (savedLang === "ar" || savedLang === "en")
-        setLang(savedLang);
-    }
-    catch
-    {
-      // ignore
-    }
+    const savedLang = safeGet("nusuk_keys_lang_v1") || safeGet("nusuk_lang");
+    if (savedLang === "ar" || savedLang === "en")
+      setLang(savedLang);
 
     console.error("Application error caught by boundary:", error);
   }, [error]);

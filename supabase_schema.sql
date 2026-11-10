@@ -15,9 +15,9 @@ CREATE TABLE IF NOT EXISTS challenge_keys (
     CONSTRAINT challenge_keys_code_format CHECK (code ~ '^NG-[A-Za-z0-9]{8}$')
 );
 
--- 2. Create index for fast sorting
+-- 2. Create index for fast sorting and deterministic pagination
 CREATE INDEX IF NOT EXISTS idx_challenge_keys_active 
-ON challenge_keys (is_active, created_at DESC);
+ON challenge_keys (is_active, created_at DESC, id);
 
 -- 3. Enable Row Level Security (RLS)
 ALTER TABLE challenge_keys ENABLE ROW LEVEL SECURITY;

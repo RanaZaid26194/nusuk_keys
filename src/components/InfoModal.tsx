@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, HeartHandshake, BookOpen, Quote } from "lucide-react";
 import { Language } from "@/lib/types";
@@ -32,11 +32,11 @@ export const InfoModal: React.FC<InfoModalProps> = ({
     return () => window.removeEventListener("open-info-modal", handleOpen);
   }, []);
 
-  const handleClose = () =>
+  const handleClose = useCallback(() =>
   {
     setInternalIsOpen(false);
     onClose?.();
-  };
+  }, [onClose]);
   const t = translations[lang];
   const isAr = lang === "ar";
   const previousFocusRef = useRef<HTMLElement | null>(null);
@@ -142,7 +142,7 @@ export const InfoModal: React.FC<InfoModalProps> = ({
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [isOpen, onClose]);
+  }, [isOpen, handleClose]);
 
   const handleActionSubmit = () =>
   {

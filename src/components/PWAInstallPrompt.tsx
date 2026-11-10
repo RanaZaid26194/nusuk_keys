@@ -6,6 +6,7 @@ import { Download, Share2, PlusSquare, X } from "lucide-react";
 import { Language } from "@/lib/types";
 import { translations } from "@/lib/translations";
 import { playHapticSound } from "@/lib/audio";
+import { safeGet, safeSet } from "@/lib/safeStorage";
 
 interface PWAInstallPromptProps
 {
@@ -35,13 +36,13 @@ export const PWAInstallPrompt: React.FC<PWAInstallPromptProps> = ({ lang }) =>
       return;
 
     // Check if user has permanently dismissed it
-    const dismissed = localStorage.getItem(DISMISSED_KEY);
+    const dismissed = safeGet(DISMISSED_KEY);
     if (dismissed === "true")
       return;
 
     // Increment and evaluate visit count
-    const visits = parseInt(localStorage.getItem(VISIT_COUNT_KEY) || "0", 10) + 1;
-    localStorage.setItem(VISIT_COUNT_KEY, String(visits));
+    const visits = parseInt(safeGet(VISIT_COUNT_KEY) || "0", 10) + 1;
+    safeSet(VISIT_COUNT_KEY, String(visits));
 
     // Detect iOS devices
     const userAgent = window.navigator.userAgent.toLowerCase();
@@ -76,7 +77,7 @@ export const PWAInstallPrompt: React.FC<PWAInstallPromptProps> = ({ lang }) =>
   {
     playHapticSound("click");
     setShowPrompt(false);
-    localStorage.setItem(DISMISSED_KEY, "true");
+    safeSet(DISMISSED_KEY, "true");
   };
 
   const handleInstallClick = async () =>
@@ -87,7 +88,7 @@ export const PWAInstallPrompt: React.FC<PWAInstallPromptProps> = ({ lang }) =>
       deferredPrompt.prompt();
       const choice = await deferredPrompt.userChoice;
       if (choice.outcome === "accepted")
-        localStorage.setItem(DISMISSED_KEY, "true");
+        safeSet(DISMISSED_KEY, "true");
       setDeferredPrompt(null);
     }
     setShowPrompt(false);
