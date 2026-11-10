@@ -54,6 +54,9 @@ const KeyCardComponent: React.FC<KeyCardProps> = ({
   const successRate = calculateSuccessRate(item.upvotes, item.downvotes);
   const isVerified = successRate >= 75 && item.upvotes >= 2;
   const isExpired = item.downvotes > item.upvotes + 3;
+  const hasVoted = Boolean(item.userVoted);
+  const isUpvoted = item.userVoted === 'UP';
+  const isDownvoted = item.userVoted === 'DOWN';
 
   // Live relative time updating every minute
   const [timeAgo, setTimeAgo] = useState<string>(() => formatTimeAgo(item.created_at, lang));
@@ -180,7 +183,7 @@ const KeyCardComponent: React.FC<KeyCardProps> = ({
 
   const handleVoteClick = (type: 'UP' | 'DOWN') =>
   {
-    if (item.userVoted === type)
+    if (item.userVoted)
       return;
     playHapticSound('vote');
     onVote(item.id, type, item.code);
@@ -441,27 +444,30 @@ const KeyCardComponent: React.FC<KeyCardProps> = ({
         {/* Voting Buttons with Flip Counter Roll & Personality Thumbs */}
         <div className="flex items-center gap-1.5 flex-shrink-0">
           <Tooltip
-            content={isAr ? "يعمل بنجاح" : "Works for me"}
+            content={isDownvoted ? t.keyCard.alreadyVoted : (isAr ? "يعمل بنجاح" : "Works for me")}
             position="top"
-            dotColor="emerald"
+            dotColor={isDownvoted ? "none" : "emerald"}
           >
             <motion.button
+              type="button"
               onClick={() => handleVoteClick('UP')}
-              whileHover={{ scale: 1.08 }}
-              whileTap={{ scale: 0.90 }}
-              disabled={item.userVoted === 'UP'}
-              aria-label={isAr ? `تصويت إيجابي للمفتاح ${item.code}` : `Upvote key ${item.code}`}
+              whileHover={hasVoted ? undefined : { scale: 1.08 }}
+              whileTap={hasVoted ? undefined : { scale: 0.90 }}
+              disabled={hasVoted}
+              aria-label={isDownvoted ? t.keyCard.alreadyVoted : (isAr ? `تصويت إيجابي للمفتاح ${item.code}` : `Upvote key ${item.code}`)}
               className={`flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium transition-colors ${
-                item.userVoted === 'UP'
-                  ? "bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border border-emerald-500/40 shadow-xs"
+                isUpvoted
+                  ? "bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border border-emerald-500/40 shadow-xs cursor-default"
+                  : hasVoted
+                  ? "opacity-40 cursor-not-allowed bg-zinc-100 dark:bg-zinc-800/70 text-zinc-700 dark:text-zinc-400 border border-zinc-200 dark:border-zinc-700/60"
                   : "bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800/70 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-700/60"
               }`}
             >
               <motion.div
-                animate={item.userVoted === 'UP' ? { rotate: [0, -15, 6, 0], scale: [1, 1.25, 1] } : {}}
+                animate={isUpvoted ? { rotate: [0, -15, 6, 0], scale: [1, 1.25, 1] } : {}}
                 transition={{ duration: 0.35, ease: "backOut" }}
               >
-                <ThumbsUp className={`w-3.5 h-3.5 ${item.userVoted === 'UP' ? 'fill-emerald-600 text-emerald-600 dark:fill-emerald-400 dark:text-emerald-400' : ''}`} />
+                <ThumbsUp className={`w-3.5 h-3.5 ${isUpvoted ? 'fill-emerald-600 text-emerald-600 dark:fill-emerald-400 dark:text-emerald-400' : ''}`} />
               </motion.div>
               <span className="font-mono inline-block overflow-hidden relative h-[18px] min-w-[12px] text-center leading-[18px]" dir="ltr">
                 <AnimatePresence mode="popLayout" initial={false}>
@@ -482,27 +488,30 @@ const KeyCardComponent: React.FC<KeyCardProps> = ({
           </Tooltip>
 
           <Tooltip
-            content={isAr ? "منتهي أو معطل" : "Expired or invalid"}
+            content={isUpvoted ? t.keyCard.alreadyVoted : (isAr ? "منتهي أو معطل" : "Expired or invalid")}
             position="top"
-            dotColor="rose"
+            dotColor={isUpvoted ? "none" : "rose"}
           >
             <motion.button
+              type="button"
               onClick={() => handleVoteClick('DOWN')}
-              whileHover={{ scale: 1.08 }}
-              whileTap={{ scale: 0.90 }}
-              disabled={item.userVoted === 'DOWN'}
-              aria-label={isAr ? `تصويت سلبي للمفتاح ${item.code}` : `Downvote key ${item.code}`}
+              whileHover={hasVoted ? undefined : { scale: 1.08 }}
+              whileTap={hasVoted ? undefined : { scale: 0.90 }}
+              disabled={hasVoted}
+              aria-label={isUpvoted ? t.keyCard.alreadyVoted : (isAr ? `تصويت سلبي للمفتاح ${item.code}` : `Downvote key ${item.code}`)}
               className={`flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium transition-colors ${
-                item.userVoted === 'DOWN'
-                  ? "bg-rose-500/15 text-rose-700 dark:text-rose-300 border border-rose-500/40 shadow-xs"
+                isDownvoted
+                  ? "bg-rose-500/15 text-rose-700 dark:text-rose-300 border border-rose-500/40 shadow-xs cursor-default"
+                  : hasVoted
+                  ? "opacity-40 cursor-not-allowed bg-zinc-100 dark:bg-zinc-800/70 text-zinc-700 dark:text-zinc-400 border border-zinc-200 dark:border-zinc-700/60"
                   : "bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800/70 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-400 border border-zinc-200 dark:border-zinc-700/60"
               }`}
             >
               <motion.div
-                animate={item.userVoted === 'DOWN' ? { rotate: [0, 15, -4, 0], y: [0, 3, 0], scale: [1, 1.2, 1] } : {}}
+                animate={isDownvoted ? { rotate: [0, 15, -4, 0], y: [0, 3, 0], scale: [1, 1.2, 1] } : {}}
                 transition={{ duration: 0.35, ease: "easeOut" }}
               >
-                <ThumbsDown className={`w-3.5 h-3.5 ${item.userVoted === 'DOWN' ? 'fill-rose-600 text-rose-600 dark:fill-rose-400 dark:text-rose-400' : ''}`} />
+                <ThumbsDown className={`w-3.5 h-3.5 ${isDownvoted ? 'fill-rose-600 text-rose-600 dark:fill-rose-400 dark:text-rose-400' : ''}`} />
               </motion.div>
               <span className="font-mono inline-block overflow-hidden relative h-[18px] min-w-[12px] text-center leading-[18px]" dir="ltr">
                 <AnimatePresence mode="popLayout" initial={false}>

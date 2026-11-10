@@ -31,6 +31,7 @@ const MAX_COPY_COUNTED_ENTRIES = 2000;
 const PENDING_ACTION_TTL_MS = 15000; // 15s safety ttl for in-flight rpc
 const HIDDEN_RELOAD_MIN_MS = 5 * 60 * 1000; // 5 mins away before re-fetching
 const LOAD_KEYS_THROTTLE_MS = 30 * 1000; // max once per 30s from visibility
+const LOCAL_KEEP_MS = 10 * 60 * 1000; // 10 mins keep time for local submissions
 
 // keep the first occurrence of each id
 const dedupeById = <T extends { id: string }>(list: T[]): T[] =>
@@ -62,6 +63,7 @@ export default function Home()
 
   // in-flight action tracker and visibility reload timestamps
   const pendingIdsRef = useRef<Set<string>>(new Set());
+  const locallyAddedRef = useRef<Map<string, number>>(new Map());
   const hiddenAtRef = useRef<number | null>(null);
   const lastLoadedAtRef = useRef<number>(0);
   const keysRef = useRef<ChallengeKey[]>(keys);
@@ -156,12 +158,28 @@ export default function Home()
   }, []);
 
   // merge incoming server keys into local state
-  const mergeIncoming = useCallback((prev: ChallengeKey[], incomingList: any[]) =>
+  const mergeIncoming = useCallback((prev: ChallengeKey[], incomingList: any[], complete: boolean = false) =>
   {
     const currentVotes = getUserVotes();
     const incomingIds = new Set(incomingList.map((d: any) => d.id));
-    const localOnly = prev.filter(k => !incomingIds.has(k.id));
-    const prevMap = new Map(prev.map(p => [p.id, p]));
+    const now = Date.now();
+
+    // drop ghost keys unless pending or added recently
+    const localOnly = prev.filter((k) =>
+    {
+      if (incomingIds.has(k.id))
+        return false;
+      if (!complete)
+        return true;
+      if (pendingIdsRef.current.has(k.id))
+        return true;
+      const addedAt = locallyAddedRef.current.get(k.id);
+      if (addedAt !== undefined && now - addedAt < LOCAL_KEEP_MS)
+        return true;
+      return false;
+    });
+
+    const prevMap = new Map(prev.map((p) => [p.id, p]));
 
     const merged = incomingList.map((d: any) =>
     {
@@ -206,12 +224,14 @@ export default function Home()
         else if (stage1Data && stage1Data.length > 0)
         {
           const totalCount = count || stage1Data.length;
+          const stage1Complete = stage1Data.length >= totalCount;
 
           // Paint Stage 1 immediately in <100ms
           setKeys((prev) =>
           {
-            const merged = mergeIncoming(prev, stage1Data);
-            safeSet(LOCAL_STORAGE_CACHE, JSON.stringify(merged));
+            const merged = mergeIncoming(prev, stage1Data, stage1Complete);
+            if (stage1Complete)
+              safeSet(LOCAL_STORAGE_CACHE, JSON.stringify(merged));
             return merged;
           });
           setIsLoading(false);
@@ -239,7 +259,17 @@ export default function Home()
                   if (stage2Data && stage2Data.length > 0)
                   {
                     accumulated = dedupeById(accumulated.concat(stage2Data));
-                    setKeys((prev) => mergeIncoming(prev, accumulated));
+                    const stage2Complete = accumulated.length >= totalCount;
+                    setKeys((prev) =>
+                    {
+                      const merged = mergeIncoming(prev, accumulated, stage2Complete);
+                      if (stage2Complete)
+                      {
+                        if (!safeSet(LOCAL_STORAGE_CACHE, JSON.stringify(merged)))
+                          safeSet(LOCAL_STORAGE_CACHE, JSON.stringify(stage1Data));
+                      }
+                      return merged;
+                    });
                   }
                 }
 
@@ -260,7 +290,17 @@ export default function Home()
                   if (stage3Data && stage3Data.length > 0)
                   {
                     accumulated = dedupeById(accumulated.concat(stage3Data));
-                    setKeys((prev) => mergeIncoming(prev, accumulated));
+                    const stage3Complete = accumulated.length >= totalCount;
+                    setKeys((prev) =>
+                    {
+                      const merged = mergeIncoming(prev, accumulated, stage3Complete);
+                      if (stage3Complete)
+                      {
+                        if (!safeSet(LOCAL_STORAGE_CACHE, JSON.stringify(merged)))
+                          safeSet(LOCAL_STORAGE_CACHE, JSON.stringify(stage1Data));
+                      }
+                      return merged;
+                    });
                   }
                 }
 
@@ -293,9 +333,10 @@ export default function Home()
                   }
                   accumulated = dedupeById(accumulated);
 
+                  const stage4Complete = accumulated.length >= totalCount || true;
                   setKeys((prev) =>
                   {
-                    const allMerged = mergeIncoming(prev, accumulated);
+                    const allMerged = mergeIncoming(prev, accumulated, stage4Complete);
                     if (!safeSet(LOCAL_STORAGE_CACHE, JSON.stringify(allMerged)))
                       safeSet(LOCAL_STORAGE_CACHE, JSON.stringify(stage1Data));
                     return allMerged;
@@ -908,6 +949,7 @@ export default function Home()
           userVoted: 'UP',
         };
 
+        locallyAddedRef.current.set(newKey.id, Date.now());
         setKeys((prev) => [newKey, ...prev]);
 
         const userVotes = getUserVotes();
@@ -939,6 +981,7 @@ export default function Home()
       userVoted: 'UP',
     };
 
+    locallyAddedRef.current.set(newKey.id, Date.now());
     setKeys((prev) =>
     {
       const updated = [newKey, ...prev];

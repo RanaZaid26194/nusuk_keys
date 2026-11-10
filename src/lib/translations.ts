@@ -39,6 +39,7 @@ export const translations = {
       keys: "keys",
       used: "Used",
       markUnused: "Mark as unused",
+      alreadyVoted: "You already voted",
     },
     stats: {
       totalKeys: "Active Keys",
@@ -167,6 +168,7 @@ export const translations = {
       keys: "مفتاح",
       used: "مُستخدم",
       markUnused: "إلغاء الاستخدام",
+      alreadyVoted: "لقد قمت بالتصويت مسبقاً",
     },
     stats: {
       totalKeys: "المفاتيح النشطة",
