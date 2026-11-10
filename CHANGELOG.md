@@ -32,6 +32,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - **Component Memoization**:
   - Stabilized `handleVote` and `handleCopy` handlers in `page.tsx` using `keysRef` to prevent unnecessary `KeyCard` re-renders.
 
+### Fixed
+- **Verified Tab Visibility (`page.tsx`)**:
+  - Kept verified keys visible in the **Verified Working** tab even after being marked as used by the user (instead of hiding them via `usedSnapshot`), while keeping browse tabs (`All Keys`, `Most Used`, `Recently Added`) filtered cleanly.
+- **Duplicate Search Clear Icon (`globals.css`)**:
+  - Suppressed native browser `::-webkit-search-cancel-button` / `::-ms-clear` controls on `input[type="search"]` so only the themed custom clear button renders.
+
 ---
 
 ## [2.6.0] - 2026-11-10

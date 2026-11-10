@@ -114,7 +114,7 @@ export default function Home()
     setUsedSnapshot((prevSnapshot) =>
     {
       let hasLeavingKey = false;
-      if (currentTab !== "used")
+      if (currentTab !== "used" && currentTab !== "verified")
       {
         const currentCodes = Object.keys(currentMap);
         for (let i = 0; i < currentCodes.length; i++)
@@ -1036,12 +1036,11 @@ export default function Home()
       return list;
     }
 
-    // In the 4 main tabs:
-    // If NO search query, filter out keys present in usedSnapshot
-    if (!hasSearch)
-      list = list.filter(k => Boolean(k?.code && !usedSnapshot.has(normalizeCode(k.code))));
-    else
+    // keep verified tab showing all verified keys even after use; hide used keys in other main tabs unless searching
+    if (hasSearch)
       list = list.filter(k => Boolean(k?.code && k.code.toLowerCase().includes(q)));
+    else if (activeTab !== "verified")
+      list = list.filter(k => Boolean(k?.code && !usedSnapshot.has(normalizeCode(k.code))));
 
     // Tabs
     if (activeTab === "verified")
