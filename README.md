@@ -28,8 +28,9 @@ A high-performance, modern progressive web application designed to help pilgrims
   - **Stage 1 (<100ms)**: Renders the first 500 challenge keys instantly upon load.
   - **Stage 2 (Background Sync)**: Fetches up to 1,000 keys silently.
   - **Stage 3 (Background Sync)**: Expands the list to 1,500 keys.
-  - **Stage 4 (Parallel Streaming)**: Hydrates the full catalog of **7,000+ keys** without ever locking the UI thread.
-- **💾 Zero-Latency Local Caching (SWR)**: Utilizes `localStorage` with versioned cache busting (`nusuk_keys_cache_v2`). Return visits render in **0ms** from local storage while syncing fresh changes in the background.
+  - **Stage 4 (Parallel Streaming)**: Hydrates the full catalog of **7,000+ keys** without locking the UI thread.
+  - **Automatic Ghost Key Pruning**: Automatically prunes deleted/expired keys on complete catalog load while preserving recently submitted local keys and in-flight votes.
+- **💾 Zero-Latency Local Caching (SWR)**: Utilizes `localStorage` with versioned cache busting (`nusuk_keys_cache_v2`) and SSR-safe error handling (`safeStorage.ts`). Return visits render in **0ms** from local storage while syncing fresh changes in the background.
 - **🎨 Modern Minimalist Glassmorphic Design**:
   - Dark zinc glassmorphic surfaces (`bg-zinc-900/60`, `backdrop-blur-xl`).
   - Smooth rounded squircles and micro-badges.
@@ -42,6 +43,8 @@ A high-performance, modern progressive web application designed to help pilgrims
   - Handcrafted **Nasta'liq** calligraphy style typography for Quranic Ayahs (*Surah Al-Ma'idah 5:2*) and Hadith (*Sahih Muslim 2699*), rendered with vertical breathing room.
 - **🛡️ Multi-Tier Security, Anti-Abuse & Moderation**:
   - Client & database level Regex sanitization: `^NG-[A-Za-z0-9_-]+$`.
+  - Atomic RPC-Only Mutations: Direct `UPDATE` revoked from `anon`/`authenticated`; counters modify exclusively through hardened `SECURITY DEFINER` stored procedures (`cast_vote`, `increment_copy`).
+  - Post-Vote Locking: Vote buttons lock immediately post-vote with bilingual feedback (`"You already voted"` / `"لقد قمت بالتصويت مسبقاً"`).
   - Dedicated pilgrim **Report Modal** with native mailto routing and instant clipboard copy for rapid invalid key removal.
   - Token-bucket client-side rate limiting (prevents rapid submission spam).
   - Real-time duplicate key detection against Supabase Postgres with animated shake alerts.
@@ -212,6 +215,7 @@ nusuk_keys/
 │   └── lib/
 │       ├── audio.ts              # Web Audio API procedural sound synthesizer
 │       ├── dailyAyah.ts          # Deterministic daily ayah resolver & cache
+│       ├── safeStorage.ts        # Throw-resilient SSR-safe localStorage wrapper
 │       ├── security.ts           # Code sanitization, validation & rate limiting
 │       ├── supabase.ts           # Supabase client instantiation
 │       ├── translations.ts       # Bilingual English & Arabic dictionaries

@@ -55,7 +55,9 @@ sequenceDiagram
 ### Key Performance Benefits:
 1. **First Contentful Paint (FCP)**: Delivered in **<100ms** because Stage 1 requests only 500 rows.
 2. **Zero Layout Shift (CLS = 0)**: The container layout and skeleton dimensions precisely match loaded cards.
-3. **Optimistic Updates**: The animated rolling counter (`NumberCounter.tsx`) handles increments smoothly without freezing frame rates.
+3. **Deterministic Pagination**: Compound ordering by `created_at DESC, id ASC` prevents row duplication or skipping during progressive queries.
+4. **Adaptive Ghost Key Pruning**: When hydration reaches completion (`deduped incoming >= server count`), deleted/deactivated keys are purged from state and cache. Locally added keys (`locallyAddedRef`, 10-minute TTL) and in-flight actions (`pendingIdsRef`, 15s TTL) are strictly protected.
+5. **Optimistic Updates**: The animated rolling counter (`NumberCounter.tsx`) handles increments smoothly without freezing frame rates.
 
 ---
 
@@ -124,6 +126,14 @@ Arabic is a first-class citizen in Nusuk Keys:
         │
         ▼
 [6. Database Commit] ───> Code stored, broadcasted via Supabase Realtime
+
+[Counter Mutations: Votes & Copies]
+        │
+        ▼
+[Direct UPDATE Revoked] ─> anon & authenticated cannot directly UPDATE table
+        │
+        ▼
+[SECURITY DEFINER RPC] ─> Atomic mutation via cast_vote(p_key_id, p_type) & increment_copy(p_key_id)
 ```
 
 ---

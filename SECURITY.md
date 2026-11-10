@@ -17,6 +17,7 @@ In Supabase's architectural model:
 2. **Postgres Row Level Security (RLS) is the Hard Boundary**: The client never executes arbitrary database operations. Every query passes through Postgres RLS policies:
    - **SELECT**: Restricted to `is_active = true`.
    - **INSERT**: Strictly gated with `WITH CHECK (code ~ '^NG-[A-Za-z0-9_-]+$')`. Any attempt to insert malicious payloads, extra columns, or invalid codes is rejected at the database engine level.
+   - **UPDATE**: Direct `UPDATE` is completely revoked from `anon` and `authenticated` roles. Counter increments (`upvotes`, `downvotes`, `copies_count`) can only occur via explicit, rate-gated `SECURITY DEFINER` stored procedures (`cast_vote`, `increment_copy`).
    - **DELETE**: Completely disabled for the `anon` role (no policy exists, defaulting to `DENY ALL`).
 3. **The Service Role Key is Never Exposed**: The high-privilege `service_role` key (which bypasses RLS) is **never** included in client code, environment files, or repository commits.
 

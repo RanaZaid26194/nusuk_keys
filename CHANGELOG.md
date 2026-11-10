@@ -6,6 +6,34 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ---
 
+## [2.7.0] - 2026-11-10
+
+### Added
+- **Ghost Key Pruning on Complete Hydration (`page.tsx`)**:
+  - Adaptive merge engine `mergeIncoming(prev, incomingList, complete)` detecting full catalog loads (`deduped incoming >= totalCount`).
+  - Automatically purges deleted or deactivated keys from browser state and `localStorage` cache upon load completion.
+  - **Local Keep Rule**: Preserves local-only keys if they have an active RPC in flight (`pendingIdsRef`) or were submitted by this browser within `LOCAL_KEEP_MS` (10 minutes via `locallyAddedRef`).
+  - Cache writes are deferred until pruning is complete, preventing ghost keys from being re-persisted.
+- **Post-Vote Button Locking & Feedback (`KeyCard.tsx`)**:
+  - Disables both vote buttons immediately upon casting a vote (`item.userVoted`).
+  - Preserves selected vote highlight while dimming the other button (`opacity-40 cursor-not-allowed`, hover/tap animations disabled).
+  - Displays bilingual feedback tooltip: `"You already voted"` (EN) / `"لقد قمت بالتصويت مسبقاً"` (AR).
+  - Silently blocks vote triggers and audio synthesis when clicking disabled buttons.
+- **Safe Storage Helper (`safeStorage.ts`)**:
+  - SSR-safe, throw-resilient wrappers (`safeGet`, `safeSet`, `safeRemove`) protecting against quota limits and private browsing blocks.
+- **Strict RPC Security Lockdown (`supabase_lockdown.sql`, `supabase_schema.sql`)**:
+  - Revoked direct `UPDATE` privileges on `challenge_keys` from `anon` and `authenticated` roles.
+  - Counter mutations (`upvotes`, `downvotes`, `copies_count`) run exclusively via atomic `SECURITY DEFINER` RPCs (`cast_vote`, `increment_copy`).
+
+### Changed
+- **Deterministic Multi-Stage Pagination**:
+  - Added secondary `id ASC` order across all query stages (`.order("created_at", { ascending: false }).order("id", { ascending: true })`).
+  - Added `dedupeById` across stage assembly, realtime updates, and cache hydration.
+- **Component Memoization**:
+  - Stabilized `handleVote` and `handleCopy` handlers in `page.tsx` using `keysRef` to prevent unnecessary `KeyCard` re-renders.
+
+---
+
 ## [2.6.0] - 2026-11-10
 
 ### Added
