@@ -18,6 +18,9 @@ begin
   end loop;
 end $$;
 
+-- direct table update revoked, counters only change through rpc
+revoke update on public.challenge_keys from anon, authenticated;
+
 -- show remaining policies (should only be select and insert)
 select policyname, cmd
 from pg_policies

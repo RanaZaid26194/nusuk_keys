@@ -24,3 +24,8 @@ where n.nspname = 'public'
 select conname, convalidated, pg_get_constraintdef(oid) as definition
 from pg_constraint
 where conname = 'challenge_keys_code_format';
+
+-- 5. check that direct table UPDATE is revoked from anon and authenticated (expected: both return false)
+select 
+  has_table_privilege('anon', 'public.challenge_keys', 'UPDATE') as anon_can_update,
+  has_table_privilege('authenticated', 'public.challenge_keys', 'UPDATE') as authenticated_can_update;

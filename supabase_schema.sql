@@ -37,6 +37,9 @@ ON challenge_keys FOR INSERT WITH CHECK (
   AND is_active = true
 );
 
+-- the two rpcs are the only way counters change and they run as security definer
+REVOKE UPDATE ON public.challenge_keys FROM anon, authenticated;
+
 -- 5. Atomic RPC Server-Side Functions (SECURITY DEFINER)
 CREATE OR REPLACE FUNCTION increment_copy(p_key_id UUID)
 RETURNS INT
