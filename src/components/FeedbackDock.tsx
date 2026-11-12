@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, PanInfo } from "framer-motion";
 import { Key, ThumbsUp, ThumbsDown, RotateCcw, Check, X } from "lucide-react";
 import { Language } from "@/lib/types";
 import { translations } from "@/lib/translations";
@@ -23,6 +23,7 @@ export const FeedbackDock: React.FC<FeedbackDockProps> = ({
   onDismiss,
 }) => {
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
+  const [swipeDismiss, setSwipeDismiss] = useState<"left" | "right" | null>(null);
   const autoDismissTimerRef = useRef<NodeJS.Timeout | null>(null);
   const isAr = lang === "ar";
   const t = translations[lang].feedbackDock;
@@ -30,6 +31,7 @@ export const FeedbackDock: React.FC<FeedbackDockProps> = ({
   // Reset state when keyItem changes
   useEffect(() => {
     setStatusMessage(null);
+    setSwipeDismiss(null);
 
     if (autoDismissTimerRef.current) {
       clearTimeout(autoDismissTimerRef.current);
@@ -50,10 +52,10 @@ export const FeedbackDock: React.FC<FeedbackDockProps> = ({
     };
   }, [keyItem, onDismiss]);
 
-  // Handle escape key
+  // Handle escape key on desktop only (avoid Android Back button dispatching Escape)
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape" && keyItem) {
+      if (e.key === "Escape" && keyItem && typeof window !== "undefined" && window.innerWidth >= 640) {
         onDismiss();
       }
     };
@@ -62,7 +64,7 @@ export const FeedbackDock: React.FC<FeedbackDockProps> = ({
   }, [keyItem, onDismiss]);
 
   const handleAction = (type: "UP" | "DOWN") => {
-    if (!keyItem || statusMessage) return;
+    if (!keyItem || statusMessage || swipeDismiss) return;
 
     if (autoDismissTimerRef.current) {
       clearTimeout(autoDismissTimerRef.current);
@@ -78,14 +80,13 @@ export const FeedbackDock: React.FC<FeedbackDockProps> = ({
 
     onVote(keyItem.id, type, keyItem.code);
 
-    // Give visual confirmation for 1s before sliding away
     setTimeout(() => {
       onDismiss();
-    }, 1000);
+    }, 950);
   };
 
   const handleMarkUnused = () => {
-    if (!keyItem || statusMessage) return;
+    if (!keyItem || statusMessage || swipeDismiss) return;
 
     if (autoDismissTimerRef.current) {
       clearTimeout(autoDismissTimerRef.current);
@@ -101,32 +102,70 @@ export const FeedbackDock: React.FC<FeedbackDockProps> = ({
 
     onMarkUnused(keyItem.code);
 
-    // Give visual confirmation for 1s before sliding away
     setTimeout(() => {
       onDismiss();
-    }, 1000);
+    }, 950);
+  };
+
+  // Swipe to dismiss left or right with spring physics
+  const handleDragEnd = (
+    _: MouseEvent | TouchEvent | PointerEvent,
+    info: PanInfo
+  ) => {
+    const swipeDistance = info.offset.x;
+    const swipeVelocity = info.velocity.x;
+    const distanceThreshold = 65; // 65px swipe
+    const velocityThreshold = 280; // or fast flick
+
+    if (swipeDistance > distanceThreshold || swipeVelocity > velocityThreshold) {
+      setSwipeDismiss("right");
+      try {
+        playHapticSound("click");
+      } catch {}
+      setTimeout(() => {
+        onDismiss();
+      }, 190);
+    } else if (swipeDistance < -distanceThreshold || swipeVelocity < -velocityThreshold) {
+      setSwipeDismiss("left");
+      try {
+        playHapticSound("click");
+      } catch {}
+      setTimeout(() => {
+        onDismiss();
+      }, 190);
+    }
   };
 
   return (
     <AnimatePresence>
       {keyItem && (
-        <motion.div
-          key={`dock-wrapper-${keyItem.id}`}
-          initial={{ opacity: 0, y: 35, scale: 0.95 }}
-          animate={{ opacity: 1, y: 0, scale: 1 }}
-          exit={{ opacity: 0, y: 25, scale: 0.95 }}
-          transition={{ duration: 0.26, ease: [0.16, 1, 0.3, 1] }}
-          className="fixed inset-x-0 bottom-6 sm:bottom-8 z-[9999] flex justify-center pointer-events-none px-3"
+        <div
+          className="fixed inset-x-0 bottom-20 sm:bottom-8 z-[9999] flex justify-center pointer-events-none px-2 sm:px-4"
           style={{
-            paddingBottom: "max(12px, env(safe-area-inset-bottom, 12px))",
+            paddingBottom: "max(8px, env(safe-area-inset-bottom))",
           }}
         >
-          <aside
+          <motion.aside
+            key={`dock-${keyItem.id}`}
             role="region"
             aria-label={t.didItWork}
-            className="pointer-events-auto max-w-[calc(100vw-1rem)] sm:max-w-2xl w-auto shadow-[0_16px_40px_rgba(0,0,0,0.55)]"
+            drag="x"
+            dragConstraints={{ left: 0, right: 0 }}
+            dragElastic={0.65}
+            onDragEnd={handleDragEnd}
+            whileDrag={{ scale: 0.98 }}
+            initial={{ opacity: 0, y: 30, scale: 0.94 }}
+            animate={
+              swipeDismiss === "right"
+                ? { x: 320, opacity: 0, scale: 0.88, transition: { duration: 0.22, ease: "easeOut" } }
+                : swipeDismiss === "left"
+                ? { x: -320, opacity: 0, scale: 0.88, transition: { duration: 0.22, ease: "easeOut" } }
+                : { x: 0, y: 0, opacity: 1, scale: 1, transition: { duration: 0.26, ease: [0.16, 1, 0.3, 1] } }
+            }
+            exit={{ opacity: 0, y: 20, scale: 0.94, transition: { duration: 0.2 } }}
+            className="pointer-events-auto select-none touch-pan-y max-w-[calc(100vw-0.75rem)] sm:max-w-2xl w-auto rounded-full backdrop-blur-xl bg-slate-900/95 dark:bg-slate-900/95 text-slate-100 border border-emerald-500/35 ring-1 ring-white/10 shadow-[0_12px_36px_rgba(0,0,0,0.55)] cursor-grab active:cursor-grabbing"
           >
-            <div className="relative flex items-center gap-1.5 sm:gap-2.5 px-2.5 sm:px-4 py-2 sm:py-2.5 rounded-full backdrop-blur-xl bg-slate-900/95 dark:bg-slate-900/95 text-slate-100 border border-emerald-500/35 ring-1 ring-white/10">
+            <div className="relative flex items-center gap-1 sm:gap-2 px-2 sm:px-3.5 py-1.5 sm:py-2 rounded-full">
               {statusMessage ? (
                 <div className="flex items-center gap-2 text-xs font-semibold text-emerald-400 px-2 py-0.5">
                   <div className="w-5 h-5 rounded-full bg-emerald-500/20 flex items-center justify-center shrink-0">
@@ -137,14 +176,14 @@ export const FeedbackDock: React.FC<FeedbackDockProps> = ({
               ) : (
                 <>
                   {/* Code Pill */}
-                  <div className="flex items-center gap-1 sm:gap-1.5 px-2 sm:px-2.5 py-1 rounded-full bg-emerald-500/15 border border-emerald-500/25 text-emerald-300 font-mono text-[11px] sm:text-xs font-bold tracking-wide shrink-0">
+                  <div className="flex items-center gap-1 sm:gap-1.5 px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-full bg-emerald-500/15 border border-emerald-500/25 text-emerald-300 font-mono text-[10.5px] sm:text-xs font-bold tracking-wide shrink-0">
                     <Key className="w-3 h-3 text-emerald-400 shrink-0" />
-                    <span className="truncate max-w-[85px] sm:max-w-[140px]">
+                    <span className="truncate max-w-[70px] sm:max-w-[130px]">
                       {keyItem.code}
                     </span>
                   </div>
 
-                  {/* Prompt Label (Visible on md+ screens, kept compact on narrow mobile) */}
+                  {/* Prompt Label (Visible on md+ screens, hidden on mobile to conserve space) */}
                   <span className="text-xs font-medium text-slate-200 hidden md:inline shrink-0">
                     {t.didItWork}
                   </span>
@@ -156,9 +195,9 @@ export const FeedbackDock: React.FC<FeedbackDockProps> = ({
                       type="button"
                       onClick={() => handleAction("UP")}
                       aria-label={`${t.worked} (${keyItem.code})`}
-                      className="inline-flex items-center gap-1 px-2 sm:px-2.5 py-1 rounded-full text-[11px] sm:text-xs font-semibold bg-emerald-500/20 hover:bg-emerald-500/30 active:scale-95 text-emerald-300 border border-emerald-500/40 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 cursor-pointer"
+                      className="inline-flex items-center gap-1 px-2 sm:px-2.5 py-1 rounded-full text-[10.5px] sm:text-xs font-semibold bg-emerald-500/20 hover:bg-emerald-500/30 active:scale-95 text-emerald-300 border border-emerald-500/40 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 cursor-pointer"
                     >
-                      <ThumbsUp className="w-3.5 h-3.5 fill-emerald-400/20 shrink-0" />
+                      <ThumbsUp className="w-3 h-3 fill-emerald-400/20 shrink-0" />
                       <span>{t.worked}</span>
                     </button>
 
@@ -167,10 +206,11 @@ export const FeedbackDock: React.FC<FeedbackDockProps> = ({
                       type="button"
                       onClick={() => handleAction("DOWN")}
                       aria-label={`${t.failed} (${keyItem.code})`}
-                      className="inline-flex items-center gap-1 px-2 sm:px-2.5 py-1 rounded-full text-[11px] sm:text-xs font-semibold bg-rose-500/15 hover:bg-rose-500/25 active:scale-95 text-rose-300 border border-rose-500/30 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-400 cursor-pointer"
+                      className="inline-flex items-center gap-1 px-2 sm:px-2.5 py-1 rounded-full text-[10.5px] sm:text-xs font-semibold bg-rose-500/15 hover:bg-rose-500/25 active:scale-95 text-rose-300 border border-rose-500/30 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-400 cursor-pointer"
                     >
-                      <ThumbsDown className="w-3.5 h-3.5 fill-rose-400/20 shrink-0" />
-                      <span>{t.failed}</span>
+                      <ThumbsDown className="w-3 h-3 fill-rose-400/20 shrink-0" />
+                      <span className="sm:hidden">{t.failedShort}</span>
+                      <span className="hidden sm:inline">{t.failed}</span>
                     </button>
 
                     {/* Mark As Unused Button */}
@@ -179,10 +219,11 @@ export const FeedbackDock: React.FC<FeedbackDockProps> = ({
                       onClick={handleMarkUnused}
                       aria-label={`${t.didntUse} (${keyItem.code})`}
                       title={t.didntUse}
-                      className="inline-flex items-center gap-1 px-2 sm:px-2.5 py-1 rounded-full text-[11px] sm:text-xs font-medium bg-zinc-800/80 hover:bg-zinc-700/80 active:scale-95 text-zinc-300 border border-zinc-700/60 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-400 cursor-pointer"
+                      className="inline-flex items-center gap-1 px-1.5 sm:px-2.5 py-1 rounded-full text-[10.5px] sm:text-xs font-medium bg-zinc-800/80 hover:bg-zinc-700/80 active:scale-95 text-zinc-300 border border-zinc-700/60 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-400 cursor-pointer"
                     >
                       <RotateCcw className="w-3 h-3 text-zinc-400 shrink-0" />
-                      <span>{t.didntUse}</span>
+                      <span className="sm:hidden">{t.unusedShort}</span>
+                      <span className="hidden sm:inline">{t.didntUse}</span>
                     </button>
                   </div>
 
@@ -191,6 +232,7 @@ export const FeedbackDock: React.FC<FeedbackDockProps> = ({
                     type="button"
                     onClick={onDismiss}
                     aria-label={t.dismiss}
+                    title={t.swipeHint}
                     className="p-1 rounded-full text-slate-400 hover:text-white hover:bg-white/10 active:scale-90 transition-colors shrink-0 cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white/30"
                   >
                     <X className="w-3.5 h-3.5" />
@@ -198,8 +240,8 @@ export const FeedbackDock: React.FC<FeedbackDockProps> = ({
                 </>
               )}
             </div>
-          </aside>
-        </motion.div>
+          </motion.aside>
+        </div>
       )}
     </AnimatePresence>
   );

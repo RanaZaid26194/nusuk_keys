@@ -10,9 +10,10 @@ import { Tooltip } from "./Tooltip";
 interface BackToTopProps
 {
   lang?: Language;
+  hide?: boolean;
 }
 
-export const BackToTop: React.FC<BackToTopProps> = ({ lang = "en" }) =>
+export const BackToTop: React.FC<BackToTopProps> = ({ lang = "en", hide = false }) =>
 {
   const [visible, setVisible] = useState(false);
 
@@ -41,7 +42,7 @@ export const BackToTop: React.FC<BackToTopProps> = ({ lang = "en" }) =>
 
   return (
     <AnimatePresence>
-      {visible && (
+      {visible && !hide && (
         <motion.div
           initial={{ opacity: 0, y: 16, scale: 0.85 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}

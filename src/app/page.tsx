@@ -450,7 +450,6 @@ export default function Home()
       refreshUsedSnapshot();
 
       let staged = stagedKeyRef.current;
-      let hasLeft = hasLeftSinceStagedRef.current;
 
       if (!staged)
       {
@@ -463,12 +462,7 @@ export default function Home()
         catch {}
       }
 
-      if (!hasLeft)
-      {
-        hasLeft = safeGet(LOCAL_STORAGE_STAGED_LEFT) === "true";
-      }
-
-      if (staged && hasLeft)
+      if (staged)
       {
         const now = Date.now();
         if (now - (staged.stagedAt || 0) < 30 * 60 * 1000)
@@ -567,8 +561,7 @@ export default function Home()
     try
     {
       const rawStaged = safeGet(LOCAL_STORAGE_STAGED_FEEDBACK);
-      const hasLeft = safeGet(LOCAL_STORAGE_STAGED_LEFT) === "true";
-      if (rawStaged && hasLeft)
+      if (rawStaged)
       {
         const staged = JSON.parse(rawStaged);
         const now = Date.now();
@@ -1291,7 +1284,7 @@ export default function Home()
         </div>
 
         {/* Floating Back to Top Button */}
-        <BackToTop lang={lang} />
+        <BackToTop lang={lang} hide={Boolean(activeFeedbackKey)} />
 
         {/* Gentle PWA Install Prompt */}
         <PWAInstallPrompt lang={lang} />
