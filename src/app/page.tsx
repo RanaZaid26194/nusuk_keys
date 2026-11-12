@@ -28,6 +28,8 @@ const LOCAL_STORAGE_CACHE = "nusuk_keys_cache_v2";
 const LOCAL_STORAGE_VOTES = "nusuk_user_votes_v1";
 const LOCAL_STORAGE_LANG = "nusuk_keys_lang_v1";
 const LOCAL_STORAGE_COPY_COUNTED = "nusuk_copy_counted_v1";
+const LOCAL_STORAGE_STAGED_FEEDBACK = "nusuk_staged_feedback_v1";
+const LOCAL_STORAGE_STAGED_LEFT = "nusuk_staged_left_v1";
 const COPY_COOLDOWN_MS = 24 * 60 * 60 * 1000; // 24h soft anti-spam cooldown
 const MAX_COPY_COUNTED_ENTRIES = 2000;
 const PENDING_ACTION_TTL_MS = 15000; // 15s safety ttl for in-flight rpc
@@ -419,67 +421,107 @@ export default function Home()
       }
     };
 
-    const handleFocus = () =>
+    const handleAppLeave = () =>
     {
-      refreshUsedSnapshot();
-    };
-
-    const handleVisibility = () =>
-    {
-      if (document.visibilityState === "hidden")
+      hiddenAtRef.current = Date.now();
+      let staged = stagedKeyRef.current;
+      if (!staged)
       {
-        hiddenAtRef.current = Date.now();
-        // If a key was staged (copied or opened in Nusuk) and user actually left the site/app:
-        if (stagedKeyRef.current)
+        try
         {
-          hasLeftSinceStagedRef.current = true;
-          const nextUsed = markUsed(stagedKeyRef.current.code);
-          setUsedMap(nextUsed);
+          const raw = safeGet(LOCAL_STORAGE_STAGED_FEEDBACK);
+          if (raw)
+            staged = JSON.parse(raw);
         }
-        return;
+        catch {}
       }
 
-      if (document.visibilityState === "visible")
+      if (staged)
       {
-        refreshUsedSnapshot();
+        hasLeftSinceStagedRef.current = true;
+        safeSet(LOCAL_STORAGE_STAGED_LEFT, "true");
+        const nextUsed = markUsed(staged.code);
+        setUsedMap(nextUsed);
+      }
+    };
 
-        // Prompt user with feedback dock only if they returned after leaving with a staged key
-        if (stagedKeyRef.current && hasLeftSinceStagedRef.current)
+    const handleAppReturn = () =>
+    {
+      refreshUsedSnapshot();
+
+      let staged = stagedKeyRef.current;
+      let hasLeft = hasLeftSinceStagedRef.current;
+
+      if (!staged)
+      {
+        try
         {
-          const staged = stagedKeyRef.current;
+          const raw = safeGet(LOCAL_STORAGE_STAGED_FEEDBACK);
+          if (raw)
+            staged = JSON.parse(raw);
+        }
+        catch {}
+      }
+
+      if (!hasLeft)
+      {
+        hasLeft = safeGet(LOCAL_STORAGE_STAGED_LEFT) === "true";
+      }
+
+      if (staged && hasLeft)
+      {
+        const now = Date.now();
+        if (now - (staged.stagedAt || 0) < 30 * 60 * 1000)
+        {
           const currentVotes = getUserVotes();
           if (!currentVotes[staged.id])
           {
             setActiveFeedbackKey({ id: staged.id, code: staged.code });
           }
-          stagedKeyRef.current = null;
-          hasLeftSinceStagedRef.current = false;
         }
+        stagedKeyRef.current = null;
+        hasLeftSinceStagedRef.current = false;
+        safeRemove(LOCAL_STORAGE_STAGED_FEEDBACK);
+        safeRemove(LOCAL_STORAGE_STAGED_LEFT);
+      }
 
-        const now = Date.now();
-        const hiddenAt = hiddenAtRef.current;
-        hiddenAtRef.current = null;
+      const now = Date.now();
+      const hiddenAt = hiddenAtRef.current;
+      hiddenAtRef.current = null;
 
-        const wasHiddenLongEnough = hiddenAt !== null && now - hiddenAt >= HIDDEN_RELOAD_MIN_MS;
-        const isThrottled = now - lastLoadedAtRef.current < LOAD_KEYS_THROTTLE_MS;
+      const wasHiddenLongEnough = hiddenAt !== null && now - hiddenAt >= HIDDEN_RELOAD_MIN_MS;
+      const isThrottled = now - lastLoadedAtRef.current < LOAD_KEYS_THROTTLE_MS;
 
-        if (wasHiddenLongEnough && !isThrottled)
-        {
-          lastLoadedAtRef.current = now;
-          loadKeys();
-        }
+      if (wasHiddenLongEnough && !isThrottled)
+      {
+        lastLoadedAtRef.current = now;
+        loadKeys();
       }
     };
 
+    const onVisibilityChange = () =>
+    {
+      if (document.visibilityState === "hidden")
+        handleAppLeave();
+      else if (document.visibilityState === "visible")
+        handleAppReturn();
+    };
+
     window.addEventListener("storage", handleStorage);
-    window.addEventListener("focus", handleFocus);
-    document.addEventListener("visibilitychange", handleVisibility);
+    window.addEventListener("focus", handleAppReturn);
+    window.addEventListener("pageshow", handleAppReturn);
+    window.addEventListener("blur", handleAppLeave);
+    window.addEventListener("pagehide", handleAppLeave);
+    document.addEventListener("visibilitychange", onVisibilityChange);
 
     return () =>
     {
       window.removeEventListener("storage", handleStorage);
-      window.removeEventListener("focus", handleFocus);
-      document.removeEventListener("visibilitychange", handleVisibility);
+      window.removeEventListener("focus", handleAppReturn);
+      window.removeEventListener("pageshow", handleAppReturn);
+      window.removeEventListener("blur", handleAppLeave);
+      window.removeEventListener("pagehide", handleAppLeave);
+      document.removeEventListener("visibilitychange", onVisibilityChange);
     };
   }, [refreshUsedSnapshot, loadKeys, getUserVotes]);
 
@@ -526,7 +568,30 @@ export default function Home()
       document.documentElement.setAttribute("dir", "ltr");
       document.documentElement.setAttribute("lang", "en");
     }
-  }, []);
+
+    // Restore feedback dock if user returned from Nusuk after mobile browser page reload
+    try
+    {
+      const rawStaged = safeGet(LOCAL_STORAGE_STAGED_FEEDBACK);
+      const hasLeft = safeGet(LOCAL_STORAGE_STAGED_LEFT) === "true";
+      if (rawStaged && hasLeft)
+      {
+        const staged = JSON.parse(rawStaged);
+        const now = Date.now();
+        if (staged?.id && staged?.code && now - (staged.stagedAt || 0) < 30 * 60 * 1000)
+        {
+          const currentVotes = getUserVotes();
+          if (!currentVotes[staged.id])
+          {
+            setActiveFeedbackKey({ id: staged.id, code: staged.code });
+          }
+        }
+        safeRemove(LOCAL_STORAGE_STAGED_FEEDBACK);
+        safeRemove(LOCAL_STORAGE_STAGED_LEFT);
+      }
+    }
+    catch {}
+  }, [getUserVotes]);
 
   // 150ms content fade before applying direction to prevent layout mirroring flash
   const handleLanguageChange = (newLang: Language) =>
@@ -652,6 +717,8 @@ export default function Home()
       stagedKeyRef.current = null;
       hasLeftSinceStagedRef.current = false;
     }
+    safeRemove(LOCAL_STORAGE_STAGED_FEEDBACK);
+    safeRemove(LOCAL_STORAGE_STAGED_LEFT);
 
     const userVotes = getUserVotes();
     if (userVotes[keyId])
@@ -780,12 +847,15 @@ export default function Home()
     // Stage this key: confirmed used and prompted for feedback only when user leaves app
     if (targetCode)
     {
-      stagedKeyRef.current = {
+      const staged = {
         id: keyId,
         code: targetCode,
         stagedAt: Date.now(),
       };
+      stagedKeyRef.current = staged;
       hasLeftSinceStagedRef.current = false;
+      safeSet(LOCAL_STORAGE_STAGED_FEEDBACK, JSON.stringify(staged));
+      safeRemove(LOCAL_STORAGE_STAGED_LEFT);
     }
 
     // Soft anti-spam: count only once per key per 24 hours per browser
@@ -881,12 +951,17 @@ export default function Home()
     const found = keysRef.current.find(k => k.code && k.code.trim().toUpperCase() === code.trim().toUpperCase());
     const keyId = found?.id || code;
 
-    stagedKeyRef.current = {
+    const staged = {
       id: keyId,
       code: code,
       stagedAt: Date.now(),
     };
-    hasLeftSinceStagedRef.current = false;
+    stagedKeyRef.current = staged;
+    hasLeftSinceStagedRef.current = true;
+    safeSet(LOCAL_STORAGE_STAGED_FEEDBACK, JSON.stringify(staged));
+    safeSet(LOCAL_STORAGE_STAGED_LEFT, "true");
+    const nextUsed = markUsed(code);
+    setUsedMap(nextUsed);
   }, []);
 
   // Mark as unused sends key back to main tabs immediately
@@ -898,6 +973,8 @@ export default function Home()
       stagedKeyRef.current = null;
       hasLeftSinceStagedRef.current = false;
     }
+    safeRemove(LOCAL_STORAGE_STAGED_FEEDBACK);
+    safeRemove(LOCAL_STORAGE_STAGED_LEFT);
     const nextUsed = unmarkUsed(code);
     setUsedMap(nextUsed);
     const norm = normalizeCode(code);
@@ -1205,7 +1282,7 @@ export default function Home()
         </main>
 
         {/* Mobile Floating Action Button (Bottom right / RTL bottom left, safe area aware) */}
-        <div className="fixed bottom-5 right-4 rtl:right-auto rtl:left-4 z-40 sm:hidden pb-[env(safe-area-inset-bottom)]">
+        <div className={`fixed bottom-5 right-4 rtl:right-auto rtl:left-4 z-40 sm:hidden pb-[env(safe-area-inset-bottom)] transition-all duration-200 ${activeFeedbackKey ? "pointer-events-none opacity-0 scale-90" : "opacity-100 scale-100"}`}>
           <motion.button
             type="button"
             onClick={() =>
@@ -1249,7 +1326,11 @@ export default function Home()
           keyItem={activeFeedbackKey}
           lang={lang}
           onVote={handleVote}
-          onDismiss={() => setActiveFeedbackKey(null)}
+          onDismiss={() => {
+            setActiveFeedbackKey(null);
+            safeRemove(LOCAL_STORAGE_STAGED_FEEDBACK);
+            safeRemove(LOCAL_STORAGE_STAGED_LEFT);
+          }}
         />
 
         {/* Footer */}
