@@ -55,7 +55,9 @@ export const translations = {
       didItWork: "Did it work?",
       worked: "Worked",
       failed: "Didn't work",
+      didntUse: "Didn't use",
       recorded: "Recorded!",
+      unmarkedUnused: "Marked as unused",
       dismiss: "Dismiss",
     },
     stats: {
@@ -201,7 +203,9 @@ export const translations = {
       didItWork: "هل اشتغل الرمز؟",
       worked: "اشتغل",
       failed: "لم يعمل",
+      didntUse: "لم أستخدمه",
       recorded: "تم التسجيل!",
+      unmarkedUnused: "أعيد كغير مستخدم",
       dismiss: "إغلاق",
     },
     stats: {

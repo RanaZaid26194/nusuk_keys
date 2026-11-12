@@ -473,11 +473,7 @@ export default function Home()
         const now = Date.now();
         if (now - (staged.stagedAt || 0) < 30 * 60 * 1000)
         {
-          const currentVotes = getUserVotes();
-          if (!currentVotes[staged.id])
-          {
-            setActiveFeedbackKey({ id: staged.id, code: staged.code });
-          }
+          setActiveFeedbackKey({ id: staged.id, code: staged.code });
         }
         stagedKeyRef.current = null;
         hasLeftSinceStagedRef.current = false;
@@ -510,7 +506,6 @@ export default function Home()
     window.addEventListener("storage", handleStorage);
     window.addEventListener("focus", handleAppReturn);
     window.addEventListener("pageshow", handleAppReturn);
-    window.addEventListener("blur", handleAppLeave);
     window.addEventListener("pagehide", handleAppLeave);
     document.addEventListener("visibilitychange", onVisibilityChange);
 
@@ -519,7 +514,6 @@ export default function Home()
       window.removeEventListener("storage", handleStorage);
       window.removeEventListener("focus", handleAppReturn);
       window.removeEventListener("pageshow", handleAppReturn);
-      window.removeEventListener("blur", handleAppLeave);
       window.removeEventListener("pagehide", handleAppLeave);
       document.removeEventListener("visibilitychange", onVisibilityChange);
     };
@@ -580,11 +574,7 @@ export default function Home()
         const now = Date.now();
         if (staged?.id && staged?.code && now - (staged.stagedAt || 0) < 30 * 60 * 1000)
         {
-          const currentVotes = getUserVotes();
-          if (!currentVotes[staged.id])
-          {
-            setActiveFeedbackKey({ id: staged.id, code: staged.code });
-          }
+          setActiveFeedbackKey({ id: staged.id, code: staged.code });
         }
         safeRemove(LOCAL_STORAGE_STAGED_FEEDBACK);
         safeRemove(LOCAL_STORAGE_STAGED_LEFT);
@@ -1326,6 +1316,7 @@ export default function Home()
           keyItem={activeFeedbackKey}
           lang={lang}
           onVote={handleVote}
+          onMarkUnused={handleToggleUsed}
           onDismiss={() => {
             setActiveFeedbackKey(null);
             safeRemove(LOCAL_STORAGE_STAGED_FEEDBACK);
