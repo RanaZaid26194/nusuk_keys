@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
-import { motion, AnimatePresence, PanInfo } from "framer-motion";
+import { motion, AnimatePresence, useMotionValue, useTransform, PanInfo } from "framer-motion";
 import { Key, ThumbsUp, ThumbsDown, RotateCcw, Check, X } from "lucide-react";
 import { Language } from "@/lib/types";
 import { translations } from "@/lib/translations";
@@ -28,10 +28,16 @@ export const FeedbackDock: React.FC<FeedbackDockProps> = ({
   const isAr = lang === "ar";
   const t = translations[lang].feedbackDock;
 
+  // Motion values for smooth interactive drag tilting & opacity
+  const x = useMotionValue(0);
+  const dynamicRotate = useTransform(x, [-180, 0, 180], [-7, 0, 7]);
+  const dynamicOpacity = useTransform(x, [-160, 0, 160], [0.35, 1, 0.35]);
+
   // Reset state when keyItem changes
   useEffect(() => {
     setStatusMessage(null);
     setSwipeDismiss(null);
+    x.set(0);
 
     if (autoDismissTimerRef.current) {
       clearTimeout(autoDismissTimerRef.current);
@@ -50,7 +56,7 @@ export const FeedbackDock: React.FC<FeedbackDockProps> = ({
         clearTimeout(autoDismissTimerRef.current);
       }
     };
-  }, [keyItem, onDismiss]);
+  }, [keyItem, onDismiss, x]);
 
   // Handle escape key on desktop only (avoid Android Back button dispatching Escape)
   useEffect(() => {
@@ -82,7 +88,7 @@ export const FeedbackDock: React.FC<FeedbackDockProps> = ({
 
     setTimeout(() => {
       onDismiss();
-    }, 950);
+    }, 900);
   };
 
   const handleMarkUnused = () => {
@@ -104,7 +110,7 @@ export const FeedbackDock: React.FC<FeedbackDockProps> = ({
 
     setTimeout(() => {
       onDismiss();
-    }, 950);
+    }, 900);
   };
 
   // Swipe to dismiss left or right with spring physics
@@ -114,8 +120,8 @@ export const FeedbackDock: React.FC<FeedbackDockProps> = ({
   ) => {
     const swipeDistance = info.offset.x;
     const swipeVelocity = info.velocity.x;
-    const distanceThreshold = 65; // 65px swipe
-    const velocityThreshold = 280; // or fast flick
+    const distanceThreshold = 55; // 55px swipe
+    const velocityThreshold = 260; // or fast flick
 
     if (swipeDistance > distanceThreshold || swipeVelocity > velocityThreshold) {
       setSwipeDismiss("right");
@@ -124,7 +130,7 @@ export const FeedbackDock: React.FC<FeedbackDockProps> = ({
       } catch {}
       setTimeout(() => {
         onDismiss();
-      }, 190);
+      }, 180);
     } else if (swipeDistance < -distanceThreshold || swipeVelocity < -velocityThreshold) {
       setSwipeDismiss("left");
       try {
@@ -132,7 +138,7 @@ export const FeedbackDock: React.FC<FeedbackDockProps> = ({
       } catch {}
       setTimeout(() => {
         onDismiss();
-      }, 190);
+      }, 180);
     }
   };
 
@@ -140,32 +146,37 @@ export const FeedbackDock: React.FC<FeedbackDockProps> = ({
     <AnimatePresence>
       {keyItem && (
         <div
-          className="fixed inset-x-0 bottom-20 sm:bottom-8 z-[9999] flex justify-center pointer-events-none px-2 sm:px-4"
+          className="fixed inset-x-0 bottom-5 sm:bottom-6 z-[9999] flex justify-center pointer-events-none px-2.5 sm:px-4"
           style={{
-            paddingBottom: "max(8px, env(safe-area-inset-bottom))",
+            paddingBottom: "env(safe-area-inset-bottom, 0px)",
           }}
         >
           <motion.aside
             key={`dock-${keyItem.id}`}
             role="region"
             aria-label={t.didItWork}
+            style={{
+              x,
+              rotate: swipeDismiss ? undefined : dynamicRotate,
+              opacity: swipeDismiss ? undefined : dynamicOpacity,
+            }}
             drag="x"
             dragConstraints={{ left: 0, right: 0 }}
             dragElastic={0.65}
             onDragEnd={handleDragEnd}
             whileDrag={{ scale: 0.98 }}
-            initial={{ opacity: 0, y: 30, scale: 0.94 }}
+            initial={{ opacity: 0, y: 45, scale: 0.92 }}
             animate={
               swipeDismiss === "right"
-                ? { x: 320, opacity: 0, scale: 0.88, transition: { duration: 0.22, ease: "easeOut" } }
+                ? { x: 360, opacity: 0, scale: 0.86, rotate: 9, transition: { duration: 0.2, ease: [0.32, 0.72, 0, 1] } }
                 : swipeDismiss === "left"
-                ? { x: -320, opacity: 0, scale: 0.88, transition: { duration: 0.22, ease: "easeOut" } }
-                : { x: 0, y: 0, opacity: 1, scale: 1, transition: { duration: 0.26, ease: [0.16, 1, 0.3, 1] } }
+                ? { x: -360, opacity: 0, scale: 0.86, rotate: -9, transition: { duration: 0.2, ease: [0.32, 0.72, 0, 1] } }
+                : { x: 0, y: 0, opacity: 1, scale: 1, transition: { type: "spring", stiffness: 420, damping: 28, mass: 0.8 } }
             }
-            exit={{ opacity: 0, y: 20, scale: 0.94, transition: { duration: 0.2 } }}
+            exit={{ opacity: 0, y: 35, scale: 0.92, transition: { duration: 0.18, ease: "easeOut" } }}
             className="pointer-events-auto select-none touch-pan-y max-w-[calc(100vw-0.75rem)] sm:max-w-2xl w-auto rounded-full backdrop-blur-xl bg-slate-900/95 dark:bg-slate-900/95 text-slate-100 border border-emerald-500/35 ring-1 ring-white/10 shadow-[0_12px_36px_rgba(0,0,0,0.55)] cursor-grab active:cursor-grabbing"
           >
-            <div className="relative flex items-center gap-1 sm:gap-2 px-2 sm:px-3.5 py-1.5 sm:py-2 rounded-full">
+            <div className="relative flex items-center gap-1 sm:gap-2 px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded-full">
               {statusMessage ? (
                 <div className="flex items-center gap-2 text-xs font-semibold text-emerald-400 px-2 py-0.5">
                   <div className="w-5 h-5 rounded-full bg-emerald-500/20 flex items-center justify-center shrink-0">
@@ -176,9 +187,9 @@ export const FeedbackDock: React.FC<FeedbackDockProps> = ({
               ) : (
                 <>
                   {/* Code Pill */}
-                  <div className="flex items-center gap-1 sm:gap-1.5 px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-full bg-emerald-500/15 border border-emerald-500/25 text-emerald-300 font-mono text-[10.5px] sm:text-xs font-bold tracking-wide shrink-0">
+                  <div className="flex items-center gap-1 sm:gap-1.5 px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-full bg-emerald-500/15 border border-emerald-500/25 text-emerald-300 font-mono text-[10.5px] sm:text-xs font-bold tracking-wide shrink-0">
                     <Key className="w-3 h-3 text-emerald-400 shrink-0" />
-                    <span className="truncate max-w-[70px] sm:max-w-[130px]">
+                    <span className="truncate max-w-[84px] sm:max-w-[140px]">
                       {keyItem.code}
                     </span>
                   </div>
@@ -191,19 +202,23 @@ export const FeedbackDock: React.FC<FeedbackDockProps> = ({
                   {/* Action Buttons */}
                   <div className="flex items-center gap-1 sm:gap-1.5 shrink-0">
                     {/* Worked Button */}
-                    <button
+                    <motion.button
                       type="button"
+                      whileHover={{ scale: 1.04 }}
+                      whileTap={{ scale: 0.94 }}
                       onClick={() => handleAction("UP")}
                       aria-label={`${t.worked} (${keyItem.code})`}
                       className="inline-flex items-center gap-1 px-2 sm:px-2.5 py-1 rounded-full text-[10.5px] sm:text-xs font-semibold bg-emerald-500/20 hover:bg-emerald-500/30 active:scale-95 text-emerald-300 border border-emerald-500/40 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 cursor-pointer"
                     >
                       <ThumbsUp className="w-3 h-3 fill-emerald-400/20 shrink-0" />
                       <span>{t.worked}</span>
-                    </button>
+                    </motion.button>
 
                     {/* Didn't Work Button */}
-                    <button
+                    <motion.button
                       type="button"
+                      whileHover={{ scale: 1.04 }}
+                      whileTap={{ scale: 0.94 }}
                       onClick={() => handleAction("DOWN")}
                       aria-label={`${t.failed} (${keyItem.code})`}
                       className="inline-flex items-center gap-1 px-2 sm:px-2.5 py-1 rounded-full text-[10.5px] sm:text-xs font-semibold bg-rose-500/15 hover:bg-rose-500/25 active:scale-95 text-rose-300 border border-rose-500/30 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-400 cursor-pointer"
@@ -211,11 +226,13 @@ export const FeedbackDock: React.FC<FeedbackDockProps> = ({
                       <ThumbsDown className="w-3 h-3 fill-rose-400/20 shrink-0" />
                       <span className="sm:hidden">{t.failedShort}</span>
                       <span className="hidden sm:inline">{t.failed}</span>
-                    </button>
+                    </motion.button>
 
                     {/* Mark As Unused Button */}
-                    <button
+                    <motion.button
                       type="button"
+                      whileHover={{ scale: 1.04 }}
+                      whileTap={{ scale: 0.94 }}
                       onClick={handleMarkUnused}
                       aria-label={`${t.didntUse} (${keyItem.code})`}
                       title={t.didntUse}
@@ -224,19 +241,21 @@ export const FeedbackDock: React.FC<FeedbackDockProps> = ({
                       <RotateCcw className="w-3 h-3 text-zinc-400 shrink-0" />
                       <span className="sm:hidden">{t.unusedShort}</span>
                       <span className="hidden sm:inline">{t.didntUse}</span>
-                    </button>
+                    </motion.button>
                   </div>
 
                   {/* Dismiss X */}
-                  <button
+                  <motion.button
                     type="button"
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.9 }}
                     onClick={onDismiss}
                     aria-label={t.dismiss}
                     title={t.swipeHint}
                     className="p-1 rounded-full text-slate-400 hover:text-white hover:bg-white/10 active:scale-90 transition-colors shrink-0 cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white/30"
                   >
                     <X className="w-3.5 h-3.5" />
-                  </button>
+                  </motion.button>
                 </>
               )}
             </div>
