@@ -28,9 +28,8 @@ export const FeedbackDock: React.FC<FeedbackDockProps> = ({
   const isAr = lang === "ar";
   const t = translations[lang].feedbackDock;
 
-  // Motion values for smooth interactive drag tilting & opacity
+  // Motion values for smooth interactive horizontal drag & fade
   const x = useMotionValue(0);
-  const dynamicRotate = useTransform(x, [-180, 0, 180], [-7, 0, 7]);
   const dynamicOpacity = useTransform(x, [-160, 0, 160], [0.35, 1, 0.35]);
 
   // Reset state when keyItem changes
@@ -157,7 +156,6 @@ export const FeedbackDock: React.FC<FeedbackDockProps> = ({
             aria-label={t.didItWork}
             style={{
               x,
-              rotate: swipeDismiss ? undefined : dynamicRotate,
               opacity: swipeDismiss ? undefined : dynamicOpacity,
             }}
             drag="x"
@@ -165,15 +163,15 @@ export const FeedbackDock: React.FC<FeedbackDockProps> = ({
             dragElastic={0.65}
             onDragEnd={handleDragEnd}
             whileDrag={{ scale: 0.98 }}
-            initial={{ opacity: 0, y: 45, scale: 0.92 }}
+            initial={{ opacity: 0, y: 40, scale: 0.94 }}
             animate={
               swipeDismiss === "right"
-                ? { x: 360, opacity: 0, scale: 0.86, rotate: 9, transition: { duration: 0.2, ease: [0.32, 0.72, 0, 1] } }
+                ? { x: 360, opacity: 0, scale: 0.92, transition: { duration: 0.2, ease: [0.16, 1, 0.3, 1] } }
                 : swipeDismiss === "left"
-                ? { x: -360, opacity: 0, scale: 0.86, rotate: -9, transition: { duration: 0.2, ease: [0.32, 0.72, 0, 1] } }
-                : { x: 0, y: 0, opacity: 1, scale: 1, transition: { type: "spring", stiffness: 420, damping: 28, mass: 0.8 } }
+                ? { x: -360, opacity: 0, scale: 0.92, transition: { duration: 0.2, ease: [0.16, 1, 0.3, 1] } }
+                : { x: 0, y: 0, opacity: 1, scale: 1, transition: { type: "spring", stiffness: 380, damping: 28, mass: 0.8 } }
             }
-            exit={{ opacity: 0, y: 35, scale: 0.92, transition: { duration: 0.18, ease: "easeOut" } }}
+            exit={{ opacity: 0, y: 30, scale: 0.94, transition: { duration: 0.18, ease: "easeOut" } }}
             className="pointer-events-auto select-none touch-pan-y max-w-[calc(100vw-0.75rem)] sm:max-w-2xl w-auto rounded-full backdrop-blur-xl bg-slate-900/95 dark:bg-slate-900/95 text-slate-100 border border-emerald-500/35 ring-1 ring-white/10 shadow-[0_12px_36px_rgba(0,0,0,0.55)] cursor-grab active:cursor-grabbing"
           >
             <div className="relative flex items-center gap-1 sm:gap-2 px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded-full">
