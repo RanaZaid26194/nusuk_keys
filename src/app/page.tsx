@@ -13,6 +13,7 @@ import { ReportModal } from "@/components/ReportModal";
 import { Footer } from "@/components/Footer";
 import { BackToTop } from "@/components/BackToTop";
 import { PWAInstallPrompt } from "@/components/PWAInstallPrompt";
+import { FeedbackDock } from "@/components/FeedbackDock";
 import { supabase, isSupabaseConfigured, INITIAL_DEMO_KEYS } from "@/lib/supabase";
 import { calculateSuccessRate } from "@/lib/utils";
 import { getKeyStatus } from "@/lib/keyStatus";
@@ -61,6 +62,11 @@ export default function Home()
   const [sortBy, setSortBy] = useState<SortOption>("newest");
   const [isMounted, setIsMounted] = useState(false);
   const [isLanguageFlipping, setIsLanguageFlipping] = useState(false);
+
+  // Floating feedback dock state & confirmed-use tracking
+  const [activeFeedbackKey, setActiveFeedbackKey] = useState<{ id: string; code: string } | null>(null);
+  const stagedKeyRef = useRef<{ id: string; code: string; stagedAt: number } | null>(null);
+  const hasLeftSinceStagedRef = useRef(false);
 
   // in-flight action tracker and visibility reload timestamps
   const pendingIdsRef = useRef<Set<string>>(new Set());
@@ -423,12 +429,32 @@ export default function Home()
       if (document.visibilityState === "hidden")
       {
         hiddenAtRef.current = Date.now();
+        // If a key was staged (copied or opened in Nusuk) and user actually left the site/app:
+        if (stagedKeyRef.current)
+        {
+          hasLeftSinceStagedRef.current = true;
+          const nextUsed = markUsed(stagedKeyRef.current.code);
+          setUsedMap(nextUsed);
+        }
         return;
       }
 
       if (document.visibilityState === "visible")
       {
         refreshUsedSnapshot();
+
+        // Prompt user with feedback dock only if they returned after leaving with a staged key
+        if (stagedKeyRef.current && hasLeftSinceStagedRef.current)
+        {
+          const staged = stagedKeyRef.current;
+          const currentVotes = getUserVotes();
+          if (!currentVotes[staged.id])
+          {
+            setActiveFeedbackKey({ id: staged.id, code: staged.code });
+          }
+          stagedKeyRef.current = null;
+          hasLeftSinceStagedRef.current = false;
+        }
 
         const now = Date.now();
         const hiddenAt = hiddenAtRef.current;
@@ -455,7 +481,7 @@ export default function Home()
       window.removeEventListener("focus", handleFocus);
       document.removeEventListener("visibilitychange", handleVisibility);
     };
-  }, [refreshUsedSnapshot, loadKeys]);
+  }, [refreshUsedSnapshot, loadKeys, getUserVotes]);
 
   // handle tab change with snapshot refresh
   const handleTabChange = (tab: FilterTab) =>
@@ -619,6 +645,14 @@ export default function Home()
   // Upvote / Downvote Handler with optimistic update and rollback on failure
   const handleVote = useCallback(async (keyId: string, type: 'UP' | 'DOWN', codeParam?: string) =>
   {
+    // Dismiss feedback dock if voting directly on a card or via the dock
+    setActiveFeedbackKey((prev) => (prev?.id === keyId ? null : prev));
+    if (stagedKeyRef.current?.id === keyId)
+    {
+      stagedKeyRef.current = null;
+      hasLeftSinceStagedRef.current = false;
+    }
+
     const userVotes = getUserVotes();
     if (userVotes[keyId])
       return; // Already voted
@@ -740,10 +774,18 @@ export default function Home()
         targetCode = found.code;
     }
 
+    // Dismiss old dock immediately if user copies another key
+    setActiveFeedbackKey(null);
+
+    // Stage this key: confirmed used and prompted for feedback only when user leaves app
     if (targetCode)
     {
-      const nextUsed = markUsed(targetCode);
-      setUsedMap(nextUsed);
+      stagedKeyRef.current = {
+        id: keyId,
+        code: targetCode,
+        stagedAt: Date.now(),
+      };
+      hasLeftSinceStagedRef.current = false;
     }
 
     // Soft anti-spam: count only once per key per 24 hours per browser
@@ -831,16 +873,31 @@ export default function Home()
     }
   }, []);
 
-  // Open in Nusuk counts as used
+  // Open in Nusuk stages key for confirmed use and feedback upon return
   const handleOpenNusuk = useCallback((code: string) =>
   {
-    const nextUsed = markUsed(code);
-    setUsedMap(nextUsed);
+    setActiveFeedbackKey(null);
+
+    const found = keysRef.current.find(k => k.code && k.code.trim().toUpperCase() === code.trim().toUpperCase());
+    const keyId = found?.id || code;
+
+    stagedKeyRef.current = {
+      id: keyId,
+      code: code,
+      stagedAt: Date.now(),
+    };
+    hasLeftSinceStagedRef.current = false;
   }, []);
 
   // Mark as unused sends key back to main tabs immediately
   const handleToggleUsed = useCallback((code: string) =>
   {
+    setActiveFeedbackKey((prev) => (prev && normalizeCode(prev.code) === normalizeCode(code) ? null : prev));
+    if (stagedKeyRef.current && normalizeCode(stagedKeyRef.current.code) === normalizeCode(code))
+    {
+      stagedKeyRef.current = null;
+      hasLeftSinceStagedRef.current = false;
+    }
     const nextUsed = unmarkUsed(code);
     setUsedMap(nextUsed);
     const norm = normalizeCode(code);
@@ -1186,6 +1243,14 @@ export default function Home()
 
         {/* Report Broken Key Modal (100% reliable on iOS & mobile) */}
         <ReportModal lang={lang} />
+
+        {/* Floating Feedback Dock (Did the last key work?) */}
+        <FeedbackDock
+          keyItem={activeFeedbackKey}
+          lang={lang}
+          onVote={handleVote}
+          onDismiss={() => setActiveFeedbackKey(null)}
+        />
 
         {/* Footer */}
         <Footer lang={lang} />

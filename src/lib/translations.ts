@@ -51,6 +51,13 @@ export const translations = {
       needsTooltip: "Needs {upvotes}+ upvotes ({rate}%+) or {copies}+ copies.",
       expiredTooltip: "Dislikes exceed upvotes by more than {margin}.",
     },
+    feedbackDock: {
+      didItWork: "Did it work?",
+      worked: "Worked",
+      failed: "Didn't work",
+      recorded: "Recorded!",
+      dismiss: "Dismiss",
+    },
     stats: {
       totalKeys: "Active Keys",
       activeRate: "Verification Rate",
@@ -189,6 +196,13 @@ export const translations = {
       likelyTooltipRatio: "{n}+ نسخ مع تقييمات سلبية ≤{pct}%. صوّت لتأكيد عمله.",
       needsTooltip: "يحتاج {upvotes}+ تأكيدات ({rate}%+) أو {copies}+ نسخ.",
       expiredTooltip: "التقييمات السلبية تفوق الإيجابية بأكثر من {margin}.",
+    },
+    feedbackDock: {
+      didItWork: "هل اشتغل الرمز؟",
+      worked: "اشتغل",
+      failed: "لم يعمل",
+      recorded: "تم التسجيل!",
+      dismiss: "إغلاق",
     },
     stats: {
       totalKeys: "المفاتيح النشطة",
