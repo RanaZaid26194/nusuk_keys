@@ -14,6 +14,7 @@ import { Footer } from "@/components/Footer";
 import { BackToTop } from "@/components/BackToTop";
 import { PWAInstallPrompt } from "@/components/PWAInstallPrompt";
 import { FeedbackDock } from "@/components/FeedbackDock";
+import { SeoGuide } from "@/components/SeoGuide";
 import { supabase, isSupabaseConfigured, INITIAL_DEMO_KEYS } from "@/lib/supabase";
 import { calculateSuccessRate } from "@/lib/utils";
 import { getKeyStatus } from "@/lib/keyStatus";
@@ -1262,6 +1263,9 @@ export default function Home()
             onToggleUsed={handleToggleUsed}
             onClearUsed={handleClearUsed}
           />
+
+          {/* Semantic SEO & Umrah Challenge Guide Section */}
+          <SeoGuide lang={lang} onOpenSubmit={handleOpenSubmitModal} />
         </main>
 
         {/* Mobile Floating Action Button (Bottom right / RTL bottom left, safe area aware) */}

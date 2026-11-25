@@ -34,15 +34,21 @@ export const viewport: Viewport = {
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
-    default: "Nusuk Keys | Challenge Keys Directory (مفاتيح نسك)",
+    default: "Nusuk Keys — Umrah Challenge Referral Keys Directory (مفاتيح نسك)",
     template: "%s | Nusuk Keys",
   },
-  description: "Discover and share active Nusuk Challenge keys (NG-...). Community-verified directory for Umrah pilgrims with one-tap copy and instant deep-linking into the official Nusuk App.",
+  description: "Discover & share 15,000+ active Nusuk Umrah Challenge referral keys (NG-...). Community-verified directory with 1-tap copy & instant Nusuk app launch.",
   keywords: [
     "Nusuk",
     "Nusuk App",
-    "Nusuk Challenge Keys",
     "Nusuk Keys",
+    "keys nusuk",
+    "keys nusuk vercel",
+    "nusuk keys vercel",
+    "Nusuk Challenge Keys",
+    "Nusuk Referral Keys",
+    "Umrah Challenge Referral Keys",
+    "Nusuk Key Hub",
     "Umrah Challenge",
     "Saudi Arabia",
     "Hajj",
@@ -51,6 +57,8 @@ export const metadata: Metadata = {
     "مفاتيح نسك",
     "تحدي نسك",
     "رموز نسك",
+    "رموز احالة نسك",
+    "اكواد نسك",
   ],
   authors: [{ name: "Nusuk Keys", url: siteUrl }],
   creator: "Nusuk Keys",
@@ -68,8 +76,8 @@ export const metadata: Metadata = {
     },
   },
   openGraph: {
-    title: "Nusuk Keys | Challenge Keys Directory (مفاتيح نسك)",
-    description: "Discover and share live verified Nusuk referral keys to complete Umrah challenges and unlock rewards in the official Nusuk app.",
+    title: "Nusuk Keys — Umrah Challenge Referral Keys Directory (مفاتيح نسك)",
+    description: "Discover & share 15,000+ active Nusuk Umrah Challenge referral keys (NG-...). Community-verified directory with 1-tap copy & instant Nusuk app launch.",
     url: siteUrl,
     siteName: "Nusuk Keys",
     locale: "en_US",
@@ -87,8 +95,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Nusuk Keys | Challenge Keys Directory (مفاتيح نسك)",
-    description: "Live verified referral keys to unlock rewards and complete challenges in the official Nusuk Umrah App.",
+    title: "Nusuk Keys — Umrah Challenge Referral Keys Directory (مفاتيح نسك)",
+    description: "Discover & share 15,000+ active Nusuk Umrah Challenge referral keys (NG-...). Community-verified directory with 1-tap copy & instant Nusuk app launch.",
     images: [`${siteUrl}/og-image.png`],
     creator: "@nusuk_keys",
   },
@@ -166,10 +174,26 @@ const jsonLd = {
         },
         {
           "@type": "Question",
+          "name": "How do I redeem a challenge key in the Nusuk App?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Copy any verified key (starting with NG-) from keys-nusuk.vercel.app, tap 'Open in Nusuk', navigate to the Umrah Challenge / Competitions tab in the official Nusuk app, and paste the code to unlock your bonus keys.",
+          },
+        },
+        {
+          "@type": "Question",
           "name": "How does sharing a challenge key act as Sadaqah Jariyah?",
           "acceptedAnswer": {
             "@type": "Answer",
             "text": "By sharing a valid challenge key, pilgrims help others complete religious milestones and challenges in the holy lands, embodying the Hadith: 'Allah helps His servant as long as the servant is helping his brother' (Sahih Muslim 2699).",
+          },
+        },
+        {
+          "@type": "Question",
+          "name": "Is keys-nusuk.vercel.app free to use?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes, Nusuk Keys is a 100% free, non-profit community project built for Umrah pilgrims worldwide. It requires no login, contains no ads, and provides instant one-tap copy access to over 15,000 verified keys.",
           },
         },
       ],

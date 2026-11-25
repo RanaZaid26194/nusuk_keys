@@ -66,6 +66,15 @@ const nextConfig = {
           },
         ],
       },
+      {
+        source: '/(robots.txt|sitemap.xml|llms.txt|llms-full.txt)',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=3600, s-maxage=86400, stale-while-revalidate=86400',
+          },
+        ],
+      },
     ];
   },
 };
