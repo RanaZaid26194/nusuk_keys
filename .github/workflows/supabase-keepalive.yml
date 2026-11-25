@@ -1,0 +1,32 @@
+name: Supabase Keep-Alive
+
+on:
+  schedule:
+    # Runs every 3 days at 00:00 UTC to prevent Supabase from pausing
+    - cron: "0 0 */3 * *" 
+  workflow_dispatch: # Allows manual trigger from the GitHub Actions UI
+
+jobs:
+  ping:
+    name: Ping Supabase REST API
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send PING to Supabase
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+        run: |
+          if [ -z "$SUPABASE_URL" ] || [ -z "$SUPABASE_ANON_KEY" ]; then
+            echo "::error::SUPABASE_URL or SUPABASE_ANON_KEY secret is not set!"
+            exit 1
+          fi
+          BASE_URL="${SUPABASE_URL%/}"
+          echo "Pinging Supabase at $BASE_URL/rest/v1/ ..."
+          HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" -H "apikey: $SUPABASE_ANON_KEY" -H "Authorization: Bearer $SUPABASE_ANON_KEY" "$BASE_URL/rest/v1/")
+          echo "HTTP Status: $HTTP_STATUS"
+          if [ "$HTTP_STATUS" -ge 200 ] && [ "$HTTP_STATUS" -lt 500 ]; then
+            echo "Success: Supabase keep-alive ping successful."
+          else
+            echo "::error::Failed to ping Supabase. HTTP $HTTP_STATUS"
+            exit 1
+          fi
